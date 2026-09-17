@@ -19,9 +19,9 @@ public class SideNav {
 
 
     /**
-     * Creates the navigation menu, containing several buttons calling ViewManager to change view
+     * Creates the navigation menu, containing several buttons calling ViewManager to change view.
      *
-     * @return a Parent object representing the main nav layout.
+     * @return a Parent object representing the navigation menu layout.
      */
     public Parent show(){
         //Create navPane
@@ -48,6 +48,17 @@ public class SideNav {
         invoiceBtn.getStyleClass().addAll("nav-btn", "invoice");
         paymentBtn.getStyleClass().addAll("nav-btn", "payment");
         exitBtn.getStyleClass().addAll("nav-btn", "destructive");
+
+        //Calls on ViewManager
+        /*customerBtn.setOnAction(e -> ViewManager.showCustomers());
+        vehicleBtn.setOnAction(e -> ViewManager.showVehicles());
+        bookingBtn.setOnAction(e -> ViewManager.showBookings());
+        mechanicsBtn.setOnAction(e -> ViewManager.showMechanics());
+        serviceBtn.setOnAction(e -> ViewManager.showServices());
+        workOrderBtn.setOnAction(e -> ViewManager.showWorkOrders());
+        invoiceBtn.setOnAction(e -> ViewManager.showinvoices());
+        paymentBtn.setOnAction(e -> ViewManager.showPayments());
+        exitBtn.setOnAction(e -> ViewManager.exit());*/
 
         //Place all buttons in navPane
         VBox navBox = new VBox(
