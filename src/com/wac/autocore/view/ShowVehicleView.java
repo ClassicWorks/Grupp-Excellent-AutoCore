@@ -9,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
 public class ShowVehicleView {
 
     public Parent show(){
-        VBox vBox = new VBox();
+        VBox layout = new VBox();
 
         //Skapa filtrerings nodes
         ObservableList<String> sortings = FXCollections.observableArrayList(
@@ -27,20 +28,28 @@ public class ShowVehicleView {
         TextField searchBar = new TextField();
         searchBar.setPromptText("Sökord");
         HBox filterBox = new HBox(sortingComboBox, searchBar);
-        vBox.getChildren().add(filterBox);
+        layout.getChildren().add(filterBox);
 
         //Skapa alla cards för vehicles
         VBox vehiclesBox = new VBox();
-        //TODO listan ska kunna uppdateras baserat på filtering
+        ScrollPane vehiclesBoxScroll = new ScrollPane(vehiclesBox);
+        vehiclesBoxScroll.setPrefViewportHeight(200);
+
+        //TODO listan ska kunna uppdateras baserat på filtering?
         List<Vehicle> vehicles = Database.getVehicles();
         for (Vehicle vehicle : vehicles){
             Node vehicleCard = VehicleCard.getCard(vehicle);
             vehiclesBox.getChildren().add(vehicleCard);
         }
+        layout.getChildren().add(vehiclesBoxScroll);
 
         //TODO lägg till knappar för att lägga till bil
+        Button createVehicleBtn = new Button("Skapa ny bil");
+        createVehicleBtn.setOnAction(e -> System.out.println("Calling on ViewManager.createVehicle()"));
+        TilePane actionBox = new TilePane(40,40,createVehicleBtn);
 
-        vBox.getChildren().add(vehiclesBox);
-        return vBox;
+        layout.getChildren().add(actionBox);
+
+        return layout;
     }
 }
