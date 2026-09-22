@@ -37,14 +37,19 @@ public class VehicleCard {
         ImageView customerIcon = new ImageView("resources/imgs/user-solid.png");
         customerIcon.setFitWidth(20);
         customerIcon.setFitHeight(20);
-        //TODO if no customer connected what should happen? Is Customer always needed? Remove is no customer
-        Hyperlink customerLink = new Hyperlink(
-                Database.getCustomers().stream()
-                        .filter(c -> c.getId() == vehicle.getCustomerId())
-                        .findFirst()
-                        .map(Customer::getName)
-                        .orElse("No customer connected"));
-        customerLink.setOnAction(e -> System.out.printf("Calling ViewManager.showCustomer(%d)\n",vehicle.getCustomerId()));
+        Hyperlink customerLink;
+        //TODO If customer does not exist (Skriv om för databas)
+        if(vehicle.getCustomerId() <= 0)
+            customerLink = new Hyperlink("No customer connected");
+        else {
+            customerLink = new Hyperlink(
+                    Database.getCustomers().stream()
+                            .filter(c -> c.getId() == vehicle.getCustomerId())
+                            .findFirst()
+                            .map(Customer::getName)
+                            .orElse("No customer connected"));
+            customerLink.setOnAction(e -> System.out.printf("Calling ViewManager.showCustomer(%d)\n", vehicle.getCustomerId()));
+        }
         HBox customerInfoBox = new HBox(customerIcon, customerLink);
 
         //Actionable buttons
