@@ -3,6 +3,7 @@ package com.wac.autocore.view.components;
 import com.wac.autocore.data.Database;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -11,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 
 public class VehicleCard {
@@ -23,10 +25,13 @@ public class VehicleCard {
         ImageView vehicleIcon = new ImageView(new Image("resources/imgs/car-solid.png"));
         vehicleIcon.setFitHeight(40);
         vehicleIcon.setFitWidth(40);
+
         Label regNumberLabel = new Label(vehicle.getRegistrationNumber());
         Label brandModelYearLabel = new Label(String.format("%s - %2s, %d",
                 vehicle.getBrand(), vehicle.getModel(), vehicle.getYear()));
         VBox vehicleInfoBox = new VBox(regNumberLabel, brandModelYearLabel);
+
+        HBox vehicleBox = new HBox(vehicleIcon, vehicleInfoBox);
 
         //Info om kund
         ImageView customerIcon = new ImageView("resources/imgs/user-solid.png");
@@ -44,16 +49,28 @@ public class VehicleCard {
 
         //Actionable buttons
         Button bookingBtn = new Button("Boka");
+        bookingBtn.getStyleClass().add("create-btn");
+
         bookingBtn.setOnAction(e -> System.out.printf("Calling ViewManager.createBooking(%d)\n",vehicle.getId()));
         HBox buttonBox = new HBox(bookingBtn);
         buttonBox.setAlignment(Pos.BASELINE_RIGHT);
 
-        //TODO knappar för att ta bort eller redigera fordon
+        ImageView editIcon = new ImageView("resources/imgs/pen-to-square-solid.png");
+        editIcon.setFitHeight(30);
+        editIcon.setFitWidth(30);
+        ImageView deleteIcon = new ImageView("resources/imgs/trash-solid.png");
+        deleteIcon.setFitHeight(30);
+        deleteIcon.setFitWidth(30);
+        Button editVehicleBtn = new Button("redigera", editIcon);
+        Button deleteVehicleBtn = new Button("Radera", deleteIcon);
+        VBox actionableBox = new VBox(editVehicleBtn, deleteVehicleBtn);
 
-        HBox vehicleBox = new HBox(vehicleIcon, vehicleInfoBox);
+
+
         vehicleCard.getChildren().add(vehicleBox);
         vehicleCard.getChildren().add(customerInfoBox);
         vehicleCard.getChildren().add(buttonBox);
-        return vehicleCard;
+        HBox cardWBtns = new HBox(vehicleCard, actionableBox);
+        return cardWBtns;
     }
 }

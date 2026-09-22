@@ -19,7 +19,8 @@ public class ShowVehicleView {
     public Parent show(){
         VBox layout = new VBox();
 
-        //Skapa filtrerings nodes
+        //Filtrerings nodes
+        //TODO Just nu finns ingen logik för filtrering, är det något som ska implementeras? Vilka typer?
         ObservableList<String> sortings = FXCollections.observableArrayList(
                 "A-Ö", "Ö-A", "Bokade", "Ej Bokade"
         );
@@ -30,12 +31,15 @@ public class ShowVehicleView {
         HBox filterBox = new HBox(sortingComboBox, searchBar);
         layout.getChildren().add(filterBox);
 
-        //Skapa alla cards för vehicles
+        //Visa alla cards för vehicles
         VBox vehiclesBox = new VBox();
-        ScrollPane vehiclesBoxScroll = new ScrollPane(vehiclesBox);
-        vehiclesBoxScroll.setPrefViewportHeight(200);
 
-        //TODO listan ska kunna uppdateras baserat på filtering?
+        ScrollPane vehiclesBoxScroll = new ScrollPane(vehiclesBox);
+
+        vehiclesBoxScroll.setPrefHeight(200);
+        vehiclesBoxScroll.setPrefViewportWidth(400);
+
+        //TODO listan ska kunna uppdateras baserat på filtering
         List<Vehicle> vehicles = Database.getVehicles();
         for (Vehicle vehicle : vehicles){
             Node vehicleCard = VehicleCard.getCard(vehicle);
@@ -43,11 +47,12 @@ public class ShowVehicleView {
         }
         layout.getChildren().add(vehiclesBoxScroll);
 
-        //TODO lägg till knappar för att lägga till bil
+        //Knapp för att skapa bil
         Button createVehicleBtn = new Button("Skapa ny bil");
-        createVehicleBtn.setOnAction(e -> System.out.println("Calling on ViewManager.createVehicle()"));
-        TilePane actionBox = new TilePane(40,40,createVehicleBtn);
+        createVehicleBtn.getStyleClass().add("create-btn");
 
+        createVehicleBtn.setOnAction(e -> System.out.println("Calling on ViewManager.createVehicle()"));
+        VBox actionBox = new VBox(createVehicleBtn);
         layout.getChildren().add(actionBox);
 
         return layout;

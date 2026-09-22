@@ -1,16 +1,37 @@
 
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.view.ShowVehicleView;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
-public class Main {
+public class Main extends Application {
 
     private static final Scanner scanner = new Scanner(System.in);
     private static final GarageSystem garageSystem = new GarageSystem();
 
+    @Override
+    public void start(Stage stage) throws Exception {
+        //SideNav sideNav = new SideNav();
+        ShowVehicleView showVehicleView = new ShowVehicleView();
+        BorderPane borderPane = new BorderPane();
+        ScrollPane scrollpane = new ScrollPane(showVehicleView.show());
+        scrollpane.setFitToWidth(true);
+        borderPane.setCenter(scrollpane);
+        //borderPane.setLeft(sideNav.show());
+        Scene scene = new Scene(borderPane);
+        stage.setScene(scene);
+        stage.show();
+    }
+
     public static void main(String[] args) {
+        launch();
 
         boolean running = true;
 
@@ -342,4 +363,6 @@ public class Main {
             }
         }
     }
+
+
 }
