@@ -1,5 +1,6 @@
 package com.wac.autocore.view;
 
+import com.wac.autocore.manager.ViewManager;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
@@ -49,16 +50,16 @@ public class SideNav {
         paymentBtn.getStyleClass().addAll("nav-btn", "payment");
         exitBtn.getStyleClass().addAll("nav-btn", "destructive");
 
-        //Calls on ViewManager
-        /*customerBtn.setOnAction(e -> ViewManager.showCustomers());
-        vehicleBtn.setOnAction(e -> ViewManager.showVehicles());
-        bookingBtn.setOnAction(e -> ViewManager.showBookings());
-        mechanicsBtn.setOnAction(e -> ViewManager.showMechanics());
-        serviceBtn.setOnAction(e -> ViewManager.showServices());
-        workOrderBtn.setOnAction(e -> ViewManager.showWorkOrders());
-        invoiceBtn.setOnAction(e -> ViewManager.showinvoices());
-        paymentBtn.setOnAction(e -> ViewManager.showPayments());
-        exitBtn.setOnAction(e -> ViewManager.exit());*/
+
+        customerBtn.setOnAction(e -> ViewManager.getInstance().showCustomers());
+        vehicleBtn.setOnAction(e -> ViewManager.getInstance().showVehicles());
+        bookingBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
+        mechanicsBtn.setOnAction(e -> ViewManager.getInstance().showMechanics());
+        serviceBtn.setOnAction(e -> ViewManager.getInstance().showServices());
+        workOrderBtn.setOnAction(e -> ViewManager.getInstance().showWorkOrders());
+        invoiceBtn.setOnAction(e -> ViewManager.getInstance().showInvoices());
+        paymentBtn.setOnAction(e -> ViewManager.getInstance().showPayments());
+        exitBtn.setOnAction(e -> ViewManager.getInstance().exit());
 
         //Place all buttons in navPane
         VBox navBox = new VBox(
