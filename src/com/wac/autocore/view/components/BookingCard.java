@@ -46,7 +46,7 @@ public class BookingCard extends HBox {
             mechanicLink.setOnAction(e -> System.out.printf("Calling ViewManager.getInstance().showMechanicsView(%d)\n", mechanic.getId()));
             customerInfoBox.getChildren().add(mechanicLink);
         } else {
-            Label mechanicLabel = new Label("No mechanic added");
+            Label mechanicLabel = new Label("No mechanic assigned");
             customerInfoBox.getChildren().add(mechanicLabel);
         }
 

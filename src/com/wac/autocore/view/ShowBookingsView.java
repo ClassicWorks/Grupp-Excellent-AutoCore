@@ -2,6 +2,7 @@ package com.wac.autocore.view;
 
 import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Customer;
+import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.view.components.BookingCard;
@@ -64,16 +65,18 @@ public class ShowBookingsView {
                         .orElseThrow(() -> new NullPointerException(String.format("No vehicle with id %d found.", booking.getVehicleId())));
                 Customer customer = garageSystem.getCustomer(vehicle.getId())
                         .orElseThrow(() -> new NullPointerException(String.format("No customer with id %d found.", vehicle.getCustomerId())));
+                Mechanic mechanic = garageSystem.getMechanic(booking.getMechanicId()).orElse(null);
 
                 BookingCard bookingCard = new BookingCard(
                         booking,
                         vehicle,
-                        null);
+                        mechanic);
                 bookingCard.setOnMouseClicked(e -> bookingDetails.populate(
                         booking,
                         customer,
                         vehicle,
-                        null));
+                        mechanic
+                        ));
                 bookingsBox.getChildren().add(bookingCard);
             } catch (Exception e){
                 Label errorMessage = new Label(String.format("Booking faulty. booking ID: %d, error: %s",

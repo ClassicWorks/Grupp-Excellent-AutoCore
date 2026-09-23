@@ -146,6 +146,7 @@ public class Database {
                 LocalDate.now().plusDays(4),
                 "Noise from front brakes"
         ));
+        bookings.get(1).setMechanicId(1);
     }
 
     public static List<Customer> getCustomers() {
