@@ -1,13 +1,16 @@
 package com.wac.autocore.manager;
 
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.view.CreateBookingView;
 import com.wac.autocore.view.ShowBookingsView;
 import com.wac.autocore.view.ShowVehicleView;
 import com.wac.autocore.view.SideNav;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class ViewManager {
@@ -44,6 +47,17 @@ public class ViewManager {
 
     public void showView(Node view) {
         rootLayout.setCenter(view);
+    }
+
+    public void showNewWindow(Parent view){
+        Stage stage = new Stage();
+
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        Scene scene = new Scene(view);
+
+        stage.setScene(scene);
+        stage.showAndWait();
     }
 
 
@@ -85,6 +99,10 @@ public class ViewManager {
 
     public void showPayments() {
         showView(new Label("Payments - placeholder"));
+    }
+
+    public void showCreateBooking(){showNewWindow(
+            new CreateBookingView(garageSystem).show());
     }
 
     public void exit() {

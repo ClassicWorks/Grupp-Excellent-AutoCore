@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class GarageSystem {
 
@@ -73,6 +74,12 @@ public class GarageSystem {
         return Database.getVehicles().stream()
                 .filter(v -> id == v.getId() )
                 .findFirst();
+    }
+
+    public List<Vehicle> getCustomersVehicle(int customerId){
+        return getVehicles().stream()
+                .filter(v -> customerId == v.getCustomerId())
+                .collect(Collectors.toList());
     }
 
     public void showBookings() {
@@ -253,6 +260,17 @@ public class GarageSystem {
         System.out.println("Booking created successfully.");
         System.out.println(booking);
 
+        return booking;
+    }
+
+    public Booking createBooking(int vehicleId,
+                                 LocalDate date,
+                                 String description,
+                                 int mechanicId) {
+        Booking booking = createBooking(vehicleId, date, description);
+        if (booking != null) {
+            booking.setMechanicId(mechanicId);
+        }
         return booking;
     }
 

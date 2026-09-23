@@ -1,5 +1,6 @@
 package com.wac.autocore.view;
 
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Mechanic;
@@ -107,7 +108,7 @@ public class ShowBookingsView {
         title.getStyleClass().setAll("page-title");
         Button createBookingBtn = new Button("Create new booking");
         createBookingBtn.getStyleClass().addAll("create-btn");
-        createBookingBtn.setOnAction(e -> System.out.println("Should call on ViewManager.getInstance().showCreateBooking()"));
+        createBookingBtn.setOnAction(e -> ViewManager.getInstance().showCreateBooking());
         headerPane.setCenter(title);
         headerPane.setRight(createBookingBtn);
         return headerPane;
