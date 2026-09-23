@@ -1,5 +1,6 @@
 package com.wac.autocore.manager;
 
+import com.wac.autocore.view.ShowVehicleView;
 import com.wac.autocore.view.SideNav;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -55,7 +56,7 @@ public class ViewManager {
     }
 
     public void showVehicles() {
-        showView(new Label("Vehicles - placeholder"));
+        showView(new ShowVehicleView().show());
     }
 
     public void showBookings() {
