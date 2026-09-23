@@ -1,5 +1,7 @@
 package com.wac.autocore.manager;
 
+import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.view.ShowBookingsView;
 import com.wac.autocore.view.ShowVehicleView;
 import com.wac.autocore.view.SideNav;
 import javafx.scene.Node;
@@ -11,11 +13,13 @@ import javafx.stage.Stage;
 public class ViewManager {
 
     private static ViewManager instance;
+    private GarageSystem garageSystem;
 
     private Stage primaryStage;
     private BorderPane rootLayout;
 
     private ViewManager() {
+        garageSystem = new GarageSystem();
     }
 
     public static synchronized ViewManager getInstance() {
@@ -60,7 +64,7 @@ public class ViewManager {
     }
 
     public void showBookings() {
-        showView(new Label("Bookings - placeholder"));
+        showView(new ShowBookingsView(garageSystem).show());
     }
 
     public void showMechanics() {

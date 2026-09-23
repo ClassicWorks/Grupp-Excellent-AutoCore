@@ -11,6 +11,9 @@ import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.model.WorkOrder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class GarageSystem {
 
@@ -42,6 +45,24 @@ public class GarageSystem {
         }
     }
 
+    public List<Vehicle> getVehicles() {
+        System.out.println();
+        System.out.println("=== VEHICLES ===");
+
+        if (Database.getVehicles().isEmpty()) {
+            System.out.println("No vehicles found.");
+            return new ArrayList<>();
+        }
+
+        return Database.getVehicles();
+    }
+
+    public Optional<Vehicle> getVehicle(int id){
+        return Database.getVehicles().stream()
+                .filter(v -> id == v.getId() )
+                .findFirst();
+    }
+
     public void showBookings() {
         System.out.println();
         System.out.println("=== BOOKINGS ===");
@@ -54,6 +75,16 @@ public class GarageSystem {
         for (Booking booking : Database.getBookings()) {
             System.out.println(booking);
         }
+    }
+
+    public List<Booking> getBookings() {
+
+        if (Database.getBookings().isEmpty()) {
+            System.out.println("No bookings found.");
+            return new ArrayList<>();
+        }
+
+        return Database.getBookings();
     }
 
     public void showServiceItems() {
