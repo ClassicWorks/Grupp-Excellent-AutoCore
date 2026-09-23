@@ -1,13 +1,9 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.data.Database;
 import com.wac.autocore.model.Booking;
-import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
-import com.wac.autocore.service.GarageSystem;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -16,17 +12,16 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.util.Optional;
 
-public class BookingCard {
-    public static Node getCard(Booking booking, Vehicle vehicle, Mechanic mechanic){
+public class BookingCard extends HBox {
+    public BookingCard(Booking booking, Vehicle vehicle, Mechanic mechanic){
         VBox vehicleCard = new VBox();
         vehicleCard.setStyle("-fx-border-color: blue");
         vehicleCard.getStyleClass().add("vehicle-card");
 
         //date
         Label date = new Label(booking.getDate().toString());
-        VBox dateBox = new VBox();
+        VBox dateBox = new VBox(date);
 
         //Info about booked vehicle
         ImageView vehicleIcon = new ImageView(new Image("resources/imgs/car-solid.png"));
@@ -79,7 +74,6 @@ public class BookingCard {
         vehicleCard.getChildren().add(vehicleBox);
         vehicleCard.getChildren().add(customerInfoBox);
         vehicleCard.getChildren().add(buttonBox);
-        HBox cardWBtns = new HBox(vehicleCard, actionableBox);
-        return cardWBtns;
+        this.getChildren().addAll(vehicleCard, actionableBox);
     }
 }

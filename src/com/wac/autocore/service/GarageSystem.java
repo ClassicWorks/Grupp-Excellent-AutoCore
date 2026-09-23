@@ -31,6 +31,21 @@ public class GarageSystem {
         }
     }
 
+    public List<Customer> getCustomers() {
+        if (Database.getCustomers().isEmpty()) {
+            System.out.println("No customers found.");
+            return new ArrayList<>();
+        }
+
+        return Database.getCustomers();
+    }
+
+    public Optional<Customer> getCustomer(int id){
+        return Database.getCustomers().stream()
+                .filter(c -> id == c.getId() )
+                .findFirst();
+    }
+
     public void showVehicles() {
         System.out.println();
         System.out.println("=== VEHICLES ===");
@@ -46,9 +61,6 @@ public class GarageSystem {
     }
 
     public List<Vehicle> getVehicles() {
-        System.out.println();
-        System.out.println("=== VEHICLES ===");
-
         if (Database.getVehicles().isEmpty()) {
             System.out.println("No vehicles found.");
             return new ArrayList<>();

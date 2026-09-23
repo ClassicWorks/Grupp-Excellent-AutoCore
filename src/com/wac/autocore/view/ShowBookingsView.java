@@ -1,9 +1,11 @@
 package com.wac.autocore.view;
 
 import com.wac.autocore.model.Booking;
+import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.view.components.BookingCard;
+import com.wac.autocore.view.components.BookingDetails;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -11,7 +13,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-import java.awt.print.Book;
 
 
 public class ShowBookingsView {
@@ -32,6 +33,9 @@ public class ShowBookingsView {
         right.setPercentWidth(50);
         mainContent.getColumnConstraints().addAll(left, right);
 
+        //more information block
+        BookingDetails bookingDetails = new BookingDetails();
+
         //Filtrerings nodes
         //TODO Just nu finns ingen logik för filtrering, är det något som ska implementeras? Vilka typer?
         ObservableList<String> sortOrderList = FXCollections.observableArrayList(
@@ -46,33 +50,51 @@ public class ShowBookingsView {
         //Show alla cards of bookings
         VBox bookingsBox = new VBox();
 
-        ScrollPane bookingsBoxScroll = new ScrollPane(bookingsBox);
+        ScrollPane bookingsScroll = new ScrollPane(bookingsBox);
+        bookingsScroll.setFitToWidth(true);
 
-        bookingsBoxScroll.setPrefHeight(200);
-        bookingsBoxScroll.setPrefViewportWidth(400);
+        //Take as much space as possible
+        bookingsScroll.setMaxHeight(Double.MAX_VALUE);
+        bookingDetails.setMaxHeight(Double.MAX_VALUE);
 
+        //Populate list
         for(Booking booking : garageSystem.getBookings()){
-            if(garageSystem.getVehicle(booking.getVehicleId()).isPresent()) {
-                bookingsBox.getChildren().add(BookingCard.getCard(
+            try{
+                Vehicle vehicle = garageSystem.getVehicle(booking.getVehicleId())
+                        .orElseThrow(() -> new NullPointerException(String.format("No vehicle with id %d found.", booking.getVehicleId())));
+                Customer customer = garageSystem.getCustomer(vehicle.getId())
+                        .orElseThrow(() -> new NullPointerException(String.format("No customer with id %d found.", vehicle.getCustomerId())));
+
+                BookingCard bookingCard = new BookingCard(
                         booking,
-                        garageSystem.getVehicle(booking.getVehicleId()).get(),
+                        vehicle,
+                        null);
+                bookingCard.setOnMouseClicked(e -> bookingDetails.populate(
+                        booking,
+                        customer,
+                        vehicle,
                         null));
-            }
-            else {
-               bookingsBox.getChildren().add(new Label(String.format("Booking faulty: %d", booking.getId())));
+                bookingsBox.getChildren().add(bookingCard);
+            } catch (Exception e){
+                Label errorMessage = new Label(String.format("Booking faulty. booking ID: %d, error: %s",
+                    booking.getId(), e.getMessage()));
+                bookingsBox.getChildren().add(errorMessage);
+
             }
         }
 
+        VBox listBookingsBox = new VBox(filterBox, bookingsScroll);
 
-        VBox listBookingsBox = new VBox(filterBox, bookingsBoxScroll);
-        listBookingsBox.setStyle("-fx-background-color: #a33c3c;");
-        VBox bookingInfoBox = new VBox();
-        bookingInfoBox.setStyle("-fx-background-color: #000000;");
+        //Make nodes possible to fill entire view
+        GridPane.setVgrow(listBookingsBox, Priority.ALWAYS);
+        GridPane.setVgrow(bookingDetails, Priority.ALWAYS);
+        VBox.setVgrow(mainContent, Priority.ALWAYS);
+        VBox.setVgrow(bookingsScroll, Priority.ALWAYS);
+
         mainContent.add(listBookingsBox, 0, 0);
-        mainContent.add(bookingInfoBox, 1, 0);
+        mainContent.add(bookingDetails, 1, 0);
 
         layout.getChildren().add(mainContent);
-
         return layout;
     }
 
