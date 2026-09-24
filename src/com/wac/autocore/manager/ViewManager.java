@@ -4,6 +4,7 @@ import com.wac.autocore.view.components.CreateBookingForm;
 import com.wac.autocore.view.ShowBookingsView;
 import com.wac.autocore.view.ShowVehicleView;
 import com.wac.autocore.view.SideNav;
+import com.wac.autocore.view.components.CreateVehicleForm;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -46,16 +47,21 @@ public class ViewManager {
         rootLayout.setCenter(view);
     }
 
-    public void showNewWindow(Parent view){
-        Stage stage = new Stage();
+    public void showPopup(Stage popup, String title, Parent content, Runnable onClose) {
 
-        stage.initModality(Modality.APPLICATION_MODAL);
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initOwner(primaryStage);
+        popup.setTitle(title);
 
-        Scene scene = new Scene(view);
+        Scene scene = new Scene(content, 400, 400);
+        popup.setScene(scene);
 
-        stage.setScene(scene);
-        stage.showAndWait();
+        popup.showAndWait();
+        if (onClose != null) {
+            onClose.run();
+        }
     }
+
 
     /*
      * Byt ut placeholder-metoder (Labels) mot riktig view allt eftersom de byggs.
@@ -65,9 +71,7 @@ public class ViewManager {
      * oavsett om det är en Label eller en färdig view.
      */
 
-    public void showCustomers() {
-        showView(new Label("Customers - placeholder"));
-    }
+    public void showCustomers() {showView(com.wac.autocore.view.components.CustomerForm.getForm(null));}
 
     public void showVehicles() {
         showView(new ShowVehicleView().show());
@@ -97,8 +101,15 @@ public class ViewManager {
         showView(new Label("Payments - placeholder"));
     }
 
-    public void showCreateBooking(){showNewWindow(
-            new CreateBookingForm().show());
+    public void showCreateBooking(){
+  //TODO change to new method
+  /*showNewWindow(
+            new CreateBookingForm().show());*/
+    public void showCreateVehiclePopup() {
+        Stage popup = new Stage();
+        Parent content = new CreateVehicleForm(popup).show();
+
+        showPopup(popup, "Create new vehicle", content, this::showVehicles);
     }
 
     public void exit() {

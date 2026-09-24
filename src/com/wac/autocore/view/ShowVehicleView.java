@@ -1,6 +1,7 @@
 package com.wac.autocore.view;
 
 import com.wac.autocore.data.Database;
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.view.components.VehicleCard;
 import javafx.collections.FXCollections;
@@ -51,7 +52,7 @@ public class ShowVehicleView {
         Button createVehicleBtn = new Button("Skapa ny bil");
         createVehicleBtn.getStyleClass().add("create-btn");
 
-        createVehicleBtn.setOnAction(e -> System.out.println("Calling on ViewManager.createVehicle()"));
+        createVehicleBtn.setOnAction(e -> ViewManager.getInstance().showCreateVehiclePopup());
         VBox actionBox = new VBox(createVehicleBtn);
         layout.getChildren().add(actionBox);
 
