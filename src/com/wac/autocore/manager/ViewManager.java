@@ -110,7 +110,7 @@ public class ViewManager {
     public void showCreateBooking(int vehicleId){
         Stage popup = new Stage();
         Parent content = new CreateBookingForm(popup).show(vehicleId);
-        showPopup(popup, "Create new Booking", content, this::showBookings);
+        showPopup(popup, "Create new Booking", content, null);
     }
     public void showCreateVehiclePopup() {
         Stage popup = new Stage();

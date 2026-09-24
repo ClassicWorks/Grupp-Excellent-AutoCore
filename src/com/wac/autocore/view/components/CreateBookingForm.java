@@ -295,10 +295,7 @@ public class CreateBookingForm {
     // =========================================================
     private Node createCustomerInfo(Customer customer) {
         ImageView customerIcon =
-                new ImageView("resources/imgs/user-solid.png");
-
-        customerIcon.setFitWidth(20);
-        customerIcon.setFitHeight(20);
+                new IconImageView("resources/imgs/user-solid.png", 20, 20);
 
         Label customerName =
                 new Label(customer.getName());
