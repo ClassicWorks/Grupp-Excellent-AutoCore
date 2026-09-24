@@ -6,6 +6,8 @@ public class Booking {
 
     private int id;
     private int vehicleId;
+    // Optional; 0 means no mechanic has been assigned.
+    private int mechanicId;
     private LocalDate date;
     private String description;
     private String status;
@@ -32,6 +34,14 @@ public class Booking {
 
     public void setVehicleId(int vehicleId) {
         this.vehicleId = vehicleId;
+    }
+
+    public int getMechanicId() {
+        return mechanicId;
+    }
+
+    public void setMechanicId(int mechanicId) {
+        this.mechanicId = mechanicId;
     }
 
     public LocalDate getDate() {

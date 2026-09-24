@@ -11,6 +11,10 @@ import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.model.WorkOrder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class GarageSystem {
 
@@ -28,6 +32,21 @@ public class GarageSystem {
         }
     }
 
+    public List<Customer> getCustomers() {
+        if (Database.getCustomers().isEmpty()) {
+            System.out.println("No customers found.");
+            return new ArrayList<>();
+        }
+
+        return Database.getCustomers();
+    }
+
+    public Optional<Customer> getCustomer(int id){
+        return Database.getCustomers().stream()
+                .filter(c -> id == c.getId() )
+                .findFirst();
+    }
+
     public void showVehicles() {
         System.out.println();
         System.out.println("=== VEHICLES ===");
@@ -42,6 +61,27 @@ public class GarageSystem {
         }
     }
 
+    public List<Vehicle> getVehicles() {
+        if (Database.getVehicles().isEmpty()) {
+            System.out.println("No vehicles found.");
+            return new ArrayList<>();
+        }
+
+        return Database.getVehicles();
+    }
+
+    public Optional<Vehicle> getVehicle(int id){
+        return Database.getVehicles().stream()
+                .filter(v -> id == v.getId() )
+                .findFirst();
+    }
+
+    public List<Vehicle> getCustomersVehicle(int customerId){
+        return getVehicles().stream()
+                .filter(v -> customerId == v.getCustomerId())
+                .collect(Collectors.toList());
+    }
+
     public void showBookings() {
         System.out.println();
         System.out.println("=== BOOKINGS ===");
@@ -54,6 +94,16 @@ public class GarageSystem {
         for (Booking booking : Database.getBookings()) {
             System.out.println(booking);
         }
+    }
+
+    public List<Booking> getBookings() {
+
+        if (Database.getBookings().isEmpty()) {
+            System.out.println("No bookings found.");
+            return new ArrayList<>();
+        }
+
+        return Database.getBookings();
     }
 
     public void showServiceItems() {
@@ -82,6 +132,21 @@ public class GarageSystem {
         for (Mechanic mechanic : Database.getMechanics()) {
             System.out.println(mechanic);
         }
+    }
+
+    public List<Mechanic> getMechanics() {
+        if (Database.getMechanics().isEmpty()) {
+            System.out.println("No mechanics found.");
+            return new ArrayList<>();
+        }
+
+        return Database.getMechanics();
+    }
+
+    public Optional<Mechanic> getMechanic(int id){
+        return Database.getMechanics().stream()
+                .filter(m -> m.getId() == id)
+                .findFirst();
     }
 
     public void showWorkOrders() {
@@ -195,6 +260,17 @@ public class GarageSystem {
         System.out.println("Booking created successfully.");
         System.out.println(booking);
 
+        return booking;
+    }
+
+    public Booking createBooking(int vehicleId,
+                                 LocalDate date,
+                                 String description,
+                                 int mechanicId) {
+        Booking booking = createBooking(vehicleId, date, description);
+        if (booking != null) {
+            booking.setMechanicId(mechanicId);
+        }
         return booking;
     }
 

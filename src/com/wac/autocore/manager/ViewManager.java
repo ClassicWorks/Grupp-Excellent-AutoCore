@@ -1,5 +1,7 @@
 package com.wac.autocore.manager;
 
+import com.wac.autocore.view.components.CreateBookingForm;
+import com.wac.autocore.view.ShowBookingsView;
 import com.wac.autocore.view.ShowVehicleView;
 import com.wac.autocore.view.SideNav;
 import com.wac.autocore.view.components.CreateVehicleForm;
@@ -76,7 +78,7 @@ public class ViewManager {
     }
 
     public void showBookings() {
-        showView(new Label("Bookings - placeholder"));
+        showView(new ShowBookingsView().show());
     }
 
     public void showMechanics() {
@@ -99,6 +101,10 @@ public class ViewManager {
         showView(new Label("Payments - placeholder"));
     }
 
+    public void showCreateBooking(){
+  //TODO change to new method
+  /*showNewWindow(
+            new CreateBookingForm().show());*/
     public void showCreateVehiclePopup() {
         Stage popup = new Stage();
         Parent content = new CreateVehicleForm(popup).show();

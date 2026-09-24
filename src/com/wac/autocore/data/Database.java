@@ -80,6 +80,15 @@ public class Database {
                 3
         ));
 
+        vehicles.add(new Vehicle(
+                4,
+                "FFR654",
+                "BMV",
+                "X4",
+                2014,
+                3
+        ));
+
         serviceItems.add(new ServiceItem(
                 1,
                 "Oil change",
@@ -139,6 +148,7 @@ public class Database {
                 LocalDate.now().plusDays(2),
                 "Annual service and general inspection"
         ));
+        bookings.get(0).setMechanicId(0);
 
         bookings.add(new Booking(
                 2,
@@ -146,6 +156,14 @@ public class Database {
                 LocalDate.now().plusDays(4),
                 "Noise from front brakes"
         ));
+
+        workOrders.add(new WorkOrder(
+                1,
+                1,
+                1
+        ));
+        bookings.get(0).setStatus("WORK_ORDER_CREATED");
+        workOrders.get(0).addServiceItem(1);
     }
 
     public static List<Customer> getCustomers() {
