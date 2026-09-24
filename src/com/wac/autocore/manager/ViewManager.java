@@ -2,10 +2,13 @@ package com.wac.autocore.manager;
 
 import com.wac.autocore.view.ShowVehicleView;
 import com.wac.autocore.view.SideNav;
+import com.wac.autocore.view.components.CreateVehicleForm;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class ViewManager {
@@ -40,6 +43,21 @@ public class ViewManager {
 
     public void showView(Node view) {
         rootLayout.setCenter(view);
+    }
+
+    public void showPopup(Stage popup, String title, Parent content, Runnable onClose) {
+
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initOwner(primaryStage);
+        popup.setTitle(title);
+
+        Scene scene = new Scene(content, 400, 400);
+        popup.setScene(scene);
+
+        popup.showAndWait();
+        if (onClose != null) {
+            onClose.run();
+        }
     }
 
 
@@ -79,6 +97,13 @@ public class ViewManager {
 
     public void showPayments() {
         showView(new Label("Payments - placeholder"));
+    }
+
+    public void showCreateVehiclePopup() {
+        Stage popup = new Stage();
+        Parent content = new CreateVehicleForm(popup).show();
+
+        showPopup(popup, "Create new vehicle", content, this::showVehicles);
     }
 
     public void exit() {
