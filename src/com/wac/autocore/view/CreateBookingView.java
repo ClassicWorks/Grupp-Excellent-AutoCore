@@ -1,10 +1,12 @@
 package com.wac.autocore.view;
 
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
-import com.wac.autocore.view.components.VehicleCard;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -20,18 +22,19 @@ import java.time.LocalDate;
 
 public class CreateBookingView {
     private GarageSystem garageSystem;
-    private Vehicle selectedVehicle;
+    private ObjectProperty<Vehicle> selectedVehicle;
 
-    VBox vehicleResult = new VBox();
-    VBox bookingInformation = new VBox();
+    private VBox vehicleResult = new VBox();
+    private VBox bookingInformation = new VBox();
 
     public CreateBookingView(GarageSystem garageSystem) {
         this.garageSystem = garageSystem;
+        selectedVehicle = new SimpleObjectProperty<>();
     }
 
     public Parent show(){
         Label title = new Label("Create booking");
-        VBox results = new VBox();
+        VBox customerResults = new VBox();
         Label searchFieldLabel = new Label("Choose customer");
         TextField searchField = new TextField();
 
@@ -39,36 +42,49 @@ public class CreateBookingView {
         TextArea descriptionField = new TextArea();
 
         Label mechanicLabel = new Label("Choose mechanic (optionally)");
-        ObservableList<String> availableMechanics = FXCollections.observableArrayList();
         //TODO change to only show unbooked mechanics
-        garageSystem.getMechanics().forEach(m ->
-                availableMechanics.add(String.format("ID: %d - %s",
-                        m.getId(), m.getName())));
-
-        ComboBox<String> mechanicComboBox = new ComboBox<>(availableMechanics);
+        ObservableList<Mechanic> availableMechanics = FXCollections.observableArrayList();
+        availableMechanics.add(null);
+        availableMechanics.addAll(garageSystem.getMechanics());
+        ComboBox<Mechanic> mechanicComboBox = new ComboBox<>(availableMechanics);
         mechanicComboBox.setPromptText("Choose mechanic");
 
         Button createBtn = new Button("Create booking");
+        Button cancelBtn = new Button("Cancel booking");
+        HBox actionBtns = new HBox(cancelBtn, createBtn);
 
         bookingInformation.setVisible(false);
         bookingInformation.getChildren().addAll(descriptionLabel, descriptionField, mechanicLabel, mechanicComboBox);
 
+        VBox layout = new VBox(title, searchFieldLabel, searchField, customerResults, vehicleResult, bookingInformation, actionBtns);
+
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            customerResults.getChildren().clear();
+
+            garageSystem.getCustomers().stream()
+                    .filter(c ->
+                            c.getName().toLowerCase()
+                                    .contains(newValue.toLowerCase())
+                    ).forEach(c ->
+                            customerResults.getChildren().add(getResult(c))
+                    );
+        });
+
+        createBtn.disableProperty().bind(
+                selectedVehicle.isNull()
+                        .or(descriptionField.textProperty().isEmpty())
+        );
+
         createBtn.setOnAction(e -> {
-            if (selectedVehicle != null) {
+            if (selectedVehicle.get() != null) {
                 int mechanicId = 0;
-                String selectedMechanic = mechanicComboBox.getValue();
-                if (selectedMechanic != null) {
-                    for (Mechanic m : garageSystem.getMechanics()) {
-                        //TODO very ugly code, need to fix
-                        if (String.format("ID: %d - %s", m.getId(), m.getName()).equals(selectedMechanic)) {
-                            mechanicId = m.getId();
-                            break;
-                        }
-                    }
+                Mechanic mechanic = mechanicComboBox.getValue();
+                if (mechanic != null) {
+                    mechanicId = mechanic.getId();
                 }
 
                 garageSystem.createBooking(
-                        selectedVehicle.getId(),
+                        selectedVehicle.get().getId(),
                         LocalDate.now(),
                         descriptionField.getText(),
                         mechanicId
@@ -76,23 +92,18 @@ public class CreateBookingView {
 
                 if (createBtn.getScene() != null && createBtn.getScene().getWindow() instanceof Stage) {
                     ((Stage) createBtn.getScene().getWindow()).close();
+                    //TODO call ViewManager.getInstance().showDialogBox() or something to confirm that booking has been created
+                    ViewManager.getInstance().showBookings();
                 }
             }
         });
 
-        VBox layout = new VBox(title, searchFieldLabel, searchField, results, vehicleResult, bookingInformation, createBtn);
-
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            results.getChildren().clear();
-
-            garageSystem.getCustomers().stream()
-                    .filter(c ->
-                            c.getName().toLowerCase()
-                                    .contains(newValue.toLowerCase())
-                    ).forEach(c ->
-                            results.getChildren().add(getResult(c))
-                    );
-        });
+        cancelBtn.setOnAction( e -> {
+                    if (cancelBtn.getScene() != null && cancelBtn.getScene().getWindow() instanceof Stage) {
+                        ((Stage) cancelBtn.getScene().getWindow()).close();
+                    }
+                }
+        );
 
         return layout;
     }
@@ -102,6 +113,7 @@ public class CreateBookingView {
 
         resultBtn.setOnAction(e -> {
             vehicleResult.getChildren().clear();
+            selectedVehicle.set(null);
             garageSystem.getCustomersVehicle(customer.getId())
                     .forEach(v -> vehicleResult.getChildren().add(getResult(v)));
         });
@@ -124,7 +136,8 @@ public class CreateBookingView {
         vehicleCard.getStyleClass().add("vehicle-card");
 
         vehicleCard.setOnMouseClicked(e -> {
-            selectedVehicle = vehicle;
+            selectedVehicle.set(vehicle);
+            vehicleCard.setStyle("-fx-background-color: lightblue");
             bookingInformation.setVisible(true);
         });
         return vehicleCard;

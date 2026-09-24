@@ -80,6 +80,15 @@ public class Database {
                 3
         ));
 
+        vehicles.add(new Vehicle(
+                3,
+                "FFR",
+                "BMV",
+                "X4",
+                2014,
+                3
+        ));
+
         serviceItems.add(new ServiceItem(
                 1,
                 "Oil change",
