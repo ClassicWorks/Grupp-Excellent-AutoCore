@@ -101,10 +101,14 @@ public class ViewManager {
         showView(new Label("Payments - placeholder"));
     }
 
-    public void showCreateBooking(){
-  //TODO change to new method
+    public void showCreateBooking() {
+        //TODO change to new method
+        Stage popup = new Stage();
+        Parent content = new CreateBookingForm(popup).show();
+        showPopup(popup, "Create new Booking", content, this::showBookings);
   /*showNewWindow(
             new CreateBookingForm().show());*/
+    }
     public void showCreateVehiclePopup() {
         Stage popup = new Stage();
         Parent content = new CreateVehicleForm(popup).show();

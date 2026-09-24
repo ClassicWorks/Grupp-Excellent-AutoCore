@@ -1,6 +1,5 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
@@ -24,11 +23,13 @@ public class CreateBookingForm {
     private final GarageSystem garageSystem;
     private ObjectProperty<Vehicle> selectedVehicle;
 
+    private final Stage popupStage;
     private VBox vehicleResult = new VBox();
     private VBox bookingInformation = new VBox();
 
-    public CreateBookingForm() {
-        this.garageSystem = new GarageSystem();
+    public CreateBookingForm(Stage popupStage) {
+        this.popupStage = popupStage;
+        garageSystem = new GarageSystem();
         selectedVehicle = new SimpleObjectProperty<>();
     }
 
@@ -91,20 +92,12 @@ public class CreateBookingForm {
                         mechanicId
                 );
 
-                if (createBtn.getScene() != null && createBtn.getScene().getWindow() instanceof Stage) {
-                    ((Stage) createBtn.getScene().getWindow()).close();
-                    //TODO call ViewManager.getInstance().showDialogBox() or something to confirm that booking has been created
-                    ViewManager.getInstance().showBookings();
-                }
+                popupStage.close();
+                //TODO call ViewManager.getInstance().showDialogBox() or something to confirm that booking has been created
             }
         });
 
-        cancelBtn.setOnAction( e -> {
-                    if (cancelBtn.getScene() != null && cancelBtn.getScene().getWindow() instanceof Stage) {
-                        ((Stage) cancelBtn.getScene().getWindow()).close();
-                    }
-                }
-        );
+        cancelBtn.setOnAction( e -> popupStage.close());
 
         return new ScrollPane(layout);
     }
