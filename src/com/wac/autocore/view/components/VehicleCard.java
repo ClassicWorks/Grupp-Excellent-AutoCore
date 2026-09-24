@@ -1,22 +1,18 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.data.Database;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 
-public class VehicleCard {
-    public static Node getCard(Vehicle vehicle){
+public class VehicleCard extends HBox{
+    public VehicleCard(Vehicle vehicle, Customer customer){
         VBox vehicleCard = new VBox();
         vehicleCard.setStyle("-fx-border-color: blue");
         vehicleCard.getStyleClass().add("vehicle-card");
@@ -37,24 +33,21 @@ public class VehicleCard {
         ImageView customerIcon = new ImageView("resources/imgs/user-solid.png");
         customerIcon.setFitWidth(20);
         customerIcon.setFitHeight(20);
-        Hyperlink customerLink;
-        //TODO If customer does not exist (Skriv om för databas)
-        if(vehicle.getCustomerId() <= 0)
-            customerLink = new Hyperlink("No customer connected");
-        else {
-            customerLink = new Hyperlink(
-                    Database.getCustomers().stream()
-                            .filter(c -> c.getId() == vehicle.getCustomerId())
-                            .findFirst()
-                            .map(Customer::getName)
-                            .orElse("No customer connected"));
-            customerLink.setOnAction(e -> System.out.printf("Calling ViewManager.showCustomer(%d)\n", vehicle.getCustomerId()));
+        HBox customerInfoBox = new HBox(customerIcon);
+        //TODO If customer does not exist
+        if(vehicle.getCustomerId() <= 0 || customer == null) {
+            Label noCustomer = new Label("No customer connected");
+            customerInfoBox.getChildren().add(noCustomer);
         }
-        HBox customerInfoBox = new HBox(customerIcon, customerLink);
+        else {
+            Hyperlink customerLink = new Hyperlink(customer.getName());
+            customerLink.setOnAction(e -> System.out.printf("Calling ViewManager.showCustomer(%d)\n", vehicle.getCustomerId()));
+            customerInfoBox.getChildren().add(customerLink);
+        }
 
         //Actionable buttons
         Button bookingBtn = new Button("Boka");
-        bookingBtn.getStyleClass().add("create-btn");
+        bookingBtn.getStyleClass().addAll("create-btn");
 
         bookingBtn.setOnAction(e -> System.out.printf("Calling ViewManager.createBooking(%d)\n",vehicle.getId()));
         HBox buttonBox = new HBox(bookingBtn);
@@ -68,6 +61,9 @@ public class VehicleCard {
         deleteIcon.setFitWidth(30);
         Button editVehicleBtn = new Button("redigera", editIcon);
         Button deleteVehicleBtn = new Button("Radera", deleteIcon);
+        deleteVehicleBtn.getStyleClass().addAll("delete-card-btn");
+        editVehicleBtn.getStyleClass().addAll("edit-card-btn");
+
         VBox actionableBox = new VBox(editVehicleBtn, deleteVehicleBtn);
 
 
@@ -75,7 +71,6 @@ public class VehicleCard {
         vehicleCard.getChildren().add(vehicleBox);
         vehicleCard.getChildren().add(customerInfoBox);
         vehicleCard.getChildren().add(buttonBox);
-        HBox cardWBtns = new HBox(vehicleCard, actionableBox);
-        return cardWBtns;
+        this.getChildren().addAll(vehicleCard, actionableBox);
     }
 }
