@@ -7,7 +7,6 @@ import com.wac.autocore.model.Vehicle;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -29,21 +28,15 @@ public class BookingDetails extends BorderPane {
     public BookingDetails() {
         HBox topBox = new HBox(10, date, bookingId);
 
-        ImageView vehicleIcon = new ImageView(new Image("resources/imgs/car-solid.png"));
-        vehicleIcon.setFitHeight(40);
-        vehicleIcon.setFitWidth(40);
+        ImageView vehicleIcon = new IconImageView("resources/imgs/car-solid.png", 40, 40);
         VBox vehicleText = new VBox(registrationNumber, brandModelYear);
         HBox vehicleBox = new HBox(vehicleIcon, vehicleText);
 
-        ImageView customerIcon = new ImageView("resources/imgs/user-solid.png");
-        customerIcon.setFitWidth(20);
-        customerIcon.setFitHeight(20);
+        ImageView customerIcon = new IconImageView("resources/imgs/user-solid.png", 20, 20);
         VBox customerText = new VBox(customerName, customerInfo);
         HBox customerBox = new HBox(customerIcon, customerText);
 
-        ImageView mechanicIcon = new ImageView("resources/imgs/wrench-solid.png");
-        mechanicIcon.setFitWidth(20);
-        mechanicIcon.setFitHeight(20);
+        ImageView mechanicIcon = new IconImageView("resources/imgs/wrench-solid.png", 20, 20);
         HBox mechanicBox = new HBox(mechanicIcon, mechanicName);
 
         HBox descriptionBox = new HBox(description);

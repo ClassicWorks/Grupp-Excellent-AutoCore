@@ -11,7 +11,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -20,130 +19,294 @@ import javafx.stage.Stage;
 import java.time.LocalDate;
 
 public class CreateBookingForm {
-    private final GarageSystem garageSystem;
-    private ObjectProperty<Vehicle> selectedVehicle;
+    private static final String SELECTED_STYLE =
+            "-fx-background-color: lightblue; -fx-border-color: blue;";
 
+    private static final String UNSELECTED_STYLE =
+            "-fx-border-color: blue;";
+
+    private final GarageSystem garageSystem;
     private final Stage popupStage;
-    private VBox vehicleResult = new VBox();
-    private VBox bookingInformation = new VBox();
+
+    private final ObjectProperty<Vehicle> selectedVehicle =
+            new SimpleObjectProperty<>();
+
+    private final VBox customerResults = new VBox();
+    private final VBox vehicleResults = new VBox();
+    private final VBox bookingInformation = new VBox();
+
+    private final TextArea descriptionField = new TextArea();
+    private ComboBox<Mechanic> mechanicComboBox;
+
 
     public CreateBookingForm(Stage popupStage) {
         this.popupStage = popupStage;
-        garageSystem = new GarageSystem();
-        selectedVehicle = new SimpleObjectProperty<>();
+        this.garageSystem = new GarageSystem();
     }
 
-    public Parent show(){
-        Label title = new Label("Create booking");
-        VBox customerResults = new VBox();
-        Label searchFieldLabel = new Label("Choose customer");
+    /**
+     * User chooses customer and vehicle
+     */
+    public Parent show() {
+        VBox layout = new VBox();
+
+        layout.getChildren().add(createTitle());
+        layout.getChildren().add(createCustomerSelection());
+        layout.getChildren().add(vehicleResults);
+        layout.getChildren().add(createBookingInformation());
+        layout.getChildren().add(createActionButtons());
+
+        ScrollPane scrollPane = new ScrollPane(layout);
+        scrollPane.setFitToWidth(true);
+        return scrollPane;
+    }
+
+
+    /**
+     * Vehicle is already chosen
+     */
+    public Parent show(int vehicleId) {
+        Vehicle vehicle = garageSystem.getVehicle(vehicleId).orElse(null);
+
+        if (vehicle == null) {
+            //TODO dialog window with error message
+            return new ScrollPane(new Label("No vehicle found."));
+        }
+
+        Customer customer = garageSystem
+                .getCustomer(vehicle.getCustomerId())
+                .orElse(null);
+
+        if (customer == null) {
+            //TODO dialog window with error message
+            return new ScrollPane(new Label("No connected customer found."));
+        }
+
+        VBox layout = new VBox();
+
+        layout.getChildren().add(createTitle());
+        layout.getChildren().add(createCustomerInfo(customer));
+        layout.getChildren().add(new VehicleCard(vehicle));
+        layout.getChildren().add(createBookingInformation());
+        layout.getChildren().add(createActionButtons());
+
+        selectedVehicle.set(vehicle);
+
+        ScrollPane scrollPane = new ScrollPane(layout);
+        scrollPane.setFitToWidth(true);
+        return scrollPane;
+    }
+
+    private Label createTitle() {
+        return new Label("Create booking");
+    }
+
+    // =========================================================
+    // CUSTOMER SELECTION
+    // =========================================================
+
+    private Node createCustomerSelection() {
+        Label label = new Label("Choose customer");
         TextField searchField = new TextField();
 
-        Label descriptionLabel = new Label("Describe the problem");
-        TextArea descriptionField = new TextArea();
+        searchField.textProperty().addListener(
+                (observable, oldValue, newValue) ->
+                        updateCustomerResults(newValue)
+        );
+
+        return new VBox(label, searchField, customerResults);
+    }
+
+
+    private void updateCustomerResults(String query) {
+        customerResults.getChildren().clear();
+
+        garageSystem.getCustomers().stream()
+                .filter(customer ->
+                        customer.getName()
+                                .toLowerCase()
+                                .contains(query.toLowerCase())
+                )
+                .forEach(customer ->
+                        customerResults.getChildren()
+                                .add(createCustomerResult(customer))
+                );
+    }
+
+
+    private Node createCustomerResult(Customer customer) {
+        Button button = new Button(
+                String.format(
+                        "ID: %d - %s",
+                        customer.getId(),
+                        customer.getName()
+                )
+        );
+
+        button.setOnAction(e -> showVehiclesOfCustomer(customer));
+
+        return button;
+    }
+
+
+    private void showVehiclesOfCustomer(Customer customer) {
+        vehicleResults.getChildren().clear();
+        selectedVehicle.set(null);
+
+        garageSystem.getCustomersVehicle(customer.getId())
+                .forEach(vehicle ->
+                        vehicleResults
+                                .getChildren()
+                                .add(createSelectableVehicleCard(vehicle))
+                );
+    }
+
+    // =========================================================
+    // VEHICLE SELECTION
+    // =========================================================
+    private Node createSelectableVehicleCard(Vehicle vehicle) {
+        Node vehicleCard = new VehicleCard(vehicle);
+
+        vehicleCard.setOnMouseClicked(
+                e -> selectVehicle(vehicleCard, vehicle)
+        );
+
+        return vehicleCard;
+    }
+
+
+    private void selectVehicle(Node selectedCard, Vehicle vehicle) {
+        selectedVehicle.set(vehicle);
+
+        Parent parent = selectedCard.getParent();
+
+        if (parent != null) {
+            parent.getChildrenUnmodifiable().forEach(node -> {
+                if (node.getStyleClass().contains("vehicle-card")) {
+                    node.setStyle(UNSELECTED_STYLE);
+                    node.getStyleClass().remove("selected");
+                }
+            });
+        }
+
+        selectedCard.setStyle(SELECTED_STYLE);
+        selectedCard.getStyleClass().add("selected");
+    }
+
+    // =========================================================
+    // BOOKING INFORMATION
+    // =========================================================
+    private Node createBookingInformation() {
+        Label descriptionLabel =
+                new Label("Describe the problem");
+
+        Label mechanicLabel =
+                new Label("Choose mechanic (optionally)");
+
         descriptionField.setPrefRowCount(3);
 
-        Label mechanicLabel = new Label("Choose mechanic (optionally)");
-        //TODO change to only show unbooked mechanics
-        ObservableList<Mechanic> availableMechanics = FXCollections.observableArrayList();
-        availableMechanics.add(null);
-        availableMechanics.addAll(garageSystem.getMechanics());
-        ComboBox<Mechanic> mechanicComboBox = new ComboBox<>(availableMechanics);
-        mechanicComboBox.setPromptText("Choose mechanic");
+        mechanicComboBox = createMechanicComboBox();
 
-        Button createBtn = new Button("Create booking");
-        Button cancelBtn = new Button("Cancel booking");
-        HBox actionBtns = new HBox(cancelBtn, createBtn);
+        bookingInformation.getChildren().clear();
+        bookingInformation.getChildren().addAll(
+                descriptionLabel,
+                descriptionField,
+                mechanicLabel,
+                mechanicComboBox
+        );
 
-        bookingInformation.setVisible(false);
-        bookingInformation.getChildren().addAll(descriptionLabel, descriptionField, mechanicLabel, mechanicComboBox);
+        bookingInformation.setVisible(true);
 
-        VBox layout = new VBox(title, searchFieldLabel, searchField, customerResults, vehicleResult, bookingInformation, actionBtns);
+        return bookingInformation;
+    }
 
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            customerResults.getChildren().clear();
+    //TODO only get available mechanics
 
-            garageSystem.getCustomers().stream()
-                    .filter(c ->
-                            c.getName().toLowerCase()
-                                    .contains(newValue.toLowerCase())
-                    ).forEach(c ->
-                            customerResults.getChildren().add(getResult(c))
-                    );
-        });
+    private ComboBox<Mechanic> createMechanicComboBox() {
+        ObservableList<Mechanic> mechanics =
+                FXCollections.observableArrayList();
 
-        createBtn.disableProperty().bind(
+        mechanics.add(null);
+        mechanics.addAll(garageSystem.getMechanics());
+
+        ComboBox<Mechanic> comboBox =
+                new ComboBox<>(mechanics);
+
+        comboBox.setPromptText("Choose mechanic");
+
+        return comboBox;
+    }
+
+    // =========================================================
+    // ACTIONS
+    // =========================================================
+    private HBox createActionButtons() {
+        Button cancelButton =
+                new Button("Cancel booking");
+
+        Button createButton =
+                new Button("Create booking");
+
+        createButton.disableProperty().bind(
                 selectedVehicle.isNull()
                         .or(descriptionField.textProperty().isEmpty())
         );
 
-        createBtn.setOnAction(e -> {
-            if (selectedVehicle.get() != null) {
-                int mechanicId = 0;
-                Mechanic mechanic = mechanicComboBox.getValue();
-                if (mechanic != null) {
-                    mechanicId = mechanic.getId();
-                }
+        createButton.setOnAction(
+                e -> createBooking()
+        );
 
-                garageSystem.createBooking(
-                        selectedVehicle.get().getId(),
-                        LocalDate.now(),
-                        descriptionField.getText(),
-                        mechanicId
-                );
+        cancelButton.setOnAction(
+                e -> popupStage.close()
+        );
 
-                popupStage.close();
-                //TODO call ViewManager.getInstance().showDialogBox() or something to confirm that booking has been created
-            }
-        });
-
-        cancelBtn.setOnAction( e -> popupStage.close());
-
-        return new ScrollPane(layout);
+        return new HBox(
+                cancelButton,
+                createButton
+        );
     }
 
-    private Node getResult(Customer customer){
-        Button resultBtn = new Button(String.format("ID: %d - %s", customer.getId(), customer.getName()));
 
-        resultBtn.setOnAction(e -> {
-            vehicleResult.getChildren().clear();
-            selectedVehicle.set(null);
-            garageSystem.getCustomersVehicle(customer.getId())
-                    .forEach(v -> vehicleResult.getChildren().add(getResult(v)));
-        });
-        return resultBtn;
+    private void createBooking() {
+        Vehicle vehicle = selectedVehicle.get();
+
+        if (vehicle == null) {
+            return;
+        }
+
+        Mechanic mechanic = mechanicComboBox.getValue();
+
+        int mechanicId = mechanic != null
+                ? mechanic.getId()
+                : 0;
+
+        garageSystem.createBooking(
+                vehicle.getId(),
+                LocalDate.now(),
+                descriptionField.getText(),
+                mechanicId
+        );
+
+        popupStage.close();
     }
 
-    private Node getResult(Vehicle vehicle){
-        //TODO once CSS is implemented change from Style to StyleClass
-        String selectedStyle = "-fx-background-color:lightblue; -fx-border-color: blue";
-        String unselectedStyle = "-fx-border-color: blue";
-        //Info om bilen
-        ImageView vehicleIcon = new ImageView(new Image("resources/imgs/car-solid.png"));
-        vehicleIcon.setFitHeight(40);
-        vehicleIcon.setFitWidth(40);
+    // =========================================================
+    // ALREADY SELECTED VEHICLE
+    // =========================================================
+    private Node createCustomerInfo(Customer customer) {
+        ImageView customerIcon =
+                new ImageView("resources/imgs/user-solid.png");
 
-        Label regNumberLabel = new Label(vehicle.getRegistrationNumber());
-        Label brandModelYearLabel = new Label(String.format("%s - %2s, %d",
-                vehicle.getBrand(), vehicle.getModel(), vehicle.getYear()));
-        VBox vehicleInfoBox = new VBox(regNumberLabel, brandModelYearLabel);
+        customerIcon.setFitWidth(20);
+        customerIcon.setFitHeight(20);
 
-        HBox vehicleCard = new HBox(vehicleIcon, vehicleInfoBox);
-        vehicleCard.setStyle(unselectedStyle);
-        vehicleCard.getStyleClass().add("vehicle-card");
+        Label customerName =
+                new Label(customer.getName());
 
-        vehicleCard.setOnMouseClicked(e -> {
-            selectedVehicle.set(vehicle);
-            vehicleCard.getParent().getChildrenUnmodifiable().forEach(node -> {
-                if(node.getStyleClass().contains("vehicle-card")){
-                    node.getStyleClass().removeAll("selected");
-                    node.setStyle(unselectedStyle);
-                }
-            });
-            vehicleCard.setStyle(selectedStyle);
-            vehicleCard.getStyleClass().add("selected");
-            bookingInformation.setVisible(true);
-        });
-        return vehicleCard;
+        return new HBox(
+                customerIcon,
+                customerName
+        );
     }
+
 }
