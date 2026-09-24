@@ -1,4 +1,4 @@
-package com.wac.autocore.view;
+package com.wac.autocore.view.components;
 
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
@@ -20,15 +20,15 @@ import javafx.stage.Stage;
 
 import java.time.LocalDate;
 
-public class CreateBookingView {
-    private GarageSystem garageSystem;
+public class CreateBookingForm {
+    private final GarageSystem garageSystem;
     private ObjectProperty<Vehicle> selectedVehicle;
 
     private VBox vehicleResult = new VBox();
     private VBox bookingInformation = new VBox();
 
-    public CreateBookingView(GarageSystem garageSystem) {
-        this.garageSystem = garageSystem;
+    public CreateBookingForm() {
+        this.garageSystem = new GarageSystem();
         selectedVehicle = new SimpleObjectProperty<>();
     }
 
@@ -40,6 +40,7 @@ public class CreateBookingView {
 
         Label descriptionLabel = new Label("Describe the problem");
         TextArea descriptionField = new TextArea();
+        descriptionField.setPrefRowCount(3);
 
         Label mechanicLabel = new Label("Choose mechanic (optionally)");
         //TODO change to only show unbooked mechanics
@@ -105,7 +106,7 @@ public class CreateBookingView {
                 }
         );
 
-        return layout;
+        return new ScrollPane(layout);
     }
 
     private Node getResult(Customer customer){
@@ -121,6 +122,9 @@ public class CreateBookingView {
     }
 
     private Node getResult(Vehicle vehicle){
+        //TODO once CSS is implemented change from Style to StyleClass
+        String selectedStyle = "-fx-background-color:lightblue; -fx-border-color: blue";
+        String unselectedStyle = "-fx-border-color: blue";
         //Info om bilen
         ImageView vehicleIcon = new ImageView(new Image("resources/imgs/car-solid.png"));
         vehicleIcon.setFitHeight(40);
@@ -132,12 +136,19 @@ public class CreateBookingView {
         VBox vehicleInfoBox = new VBox(regNumberLabel, brandModelYearLabel);
 
         HBox vehicleCard = new HBox(vehicleIcon, vehicleInfoBox);
-        vehicleCard.setStyle("-fx-border-color: blue");
+        vehicleCard.setStyle(unselectedStyle);
         vehicleCard.getStyleClass().add("vehicle-card");
 
         vehicleCard.setOnMouseClicked(e -> {
             selectedVehicle.set(vehicle);
-            vehicleCard.setStyle("-fx-background-color: lightblue");
+            vehicleCard.getParent().getChildrenUnmodifiable().forEach(node -> {
+                if(node.getStyleClass().contains("vehicle-card")){
+                    node.getStyleClass().removeAll("selected");
+                    node.setStyle(unselectedStyle);
+                }
+            });
+            vehicleCard.setStyle(selectedStyle);
+            vehicleCard.getStyleClass().add("selected");
             bookingInformation.setVisible(true);
         });
         return vehicleCard;

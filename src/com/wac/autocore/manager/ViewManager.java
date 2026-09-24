@@ -1,7 +1,6 @@
 package com.wac.autocore.manager;
 
-import com.wac.autocore.service.GarageSystem;
-import com.wac.autocore.view.CreateBookingView;
+import com.wac.autocore.view.components.CreateBookingForm;
 import com.wac.autocore.view.ShowBookingsView;
 import com.wac.autocore.view.ShowVehicleView;
 import com.wac.autocore.view.SideNav;
@@ -16,13 +15,11 @@ import javafx.stage.Stage;
 public class ViewManager {
 
     private static ViewManager instance;
-    private GarageSystem garageSystem;
 
     private Stage primaryStage;
     private BorderPane rootLayout;
 
     private ViewManager() {
-        garageSystem = new GarageSystem();
     }
 
     public static synchronized ViewManager getInstance() {
@@ -60,7 +57,6 @@ public class ViewManager {
         stage.showAndWait();
     }
 
-
     /*
      * Byt ut placeholder-metoder (Labels) mot riktig view allt eftersom de byggs.
      * Exempel: showView(new CustomerView().show());
@@ -78,7 +74,7 @@ public class ViewManager {
     }
 
     public void showBookings() {
-        showView(new ShowBookingsView(garageSystem).show());
+        showView(new ShowBookingsView().show());
     }
 
     public void showMechanics() {
@@ -102,7 +98,7 @@ public class ViewManager {
     }
 
     public void showCreateBooking(){showNewWindow(
-            new CreateBookingView(garageSystem).show());
+            new CreateBookingForm().show());
     }
 
     public void exit() {

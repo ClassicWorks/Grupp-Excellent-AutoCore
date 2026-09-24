@@ -20,8 +20,8 @@ import javafx.scene.layout.*;
 public class ShowBookingsView {
     private final GarageSystem garageSystem;
 
-    public ShowBookingsView(GarageSystem garageSystem) {
-        this.garageSystem = garageSystem;
+    public ShowBookingsView() {
+        this.garageSystem = new GarageSystem();
     }
 
     public Parent show(){
@@ -45,9 +45,13 @@ public class ShowBookingsView {
         );
         ComboBox<String> sortingComboBox = new ComboBox<>(sortOrderList);
         sortingComboBox.setPromptText("Sortera");
-        TextField searchBar = new TextField();
-        searchBar.setPromptText("Sökord");
-        HBox filterBox = new HBox(sortingComboBox, searchBar);
+        //TODO If you want to see all types of bookings. Should then not be Combobox, maybe checkboxes?
+        /*ObservableList<String> filterList = FXCollections.observableArrayList(
+                "Booked", "In progress","Awaiting invoice", "Awaiting payment", "Payed"
+        );
+        ComboBox<String> filterComboBox = new ComboBox<>(filterList);
+        filterComboBox.setPromptText("Sortera");*/
+        HBox filterBox = new HBox(sortingComboBox);
 
         //Show alla cards of bookings
         VBox bookingsBox = new VBox();
@@ -62,9 +66,13 @@ public class ShowBookingsView {
         //Populate list
         for(Booking booking : garageSystem.getBookings()){
             try{
+                //Only show bookings waiting on work order
+                if(!booking.getStatus().equalsIgnoreCase("BOOKED")) {
+                    continue;
+                }
                 Vehicle vehicle = garageSystem.getVehicle(booking.getVehicleId())
                         .orElseThrow(() -> new NullPointerException(String.format("No vehicle with id %d found.", booking.getVehicleId())));
-                Customer customer = garageSystem.getCustomer(vehicle.getId())
+                Customer customer = garageSystem.getCustomer(vehicle.getCustomerId())
                         .orElseThrow(() -> new NullPointerException(String.format("No customer with id %d found.", vehicle.getCustomerId())));
                 Mechanic mechanic = garageSystem.getMechanic(booking.getMechanicId()).orElse(null);
 
@@ -83,7 +91,6 @@ public class ShowBookingsView {
                 Label errorMessage = new Label(String.format("Booking faulty. booking ID: %d, error: %s",
                     booking.getId(), e.getMessage()));
                 bookingsBox.getChildren().add(errorMessage);
-
             }
         }
 

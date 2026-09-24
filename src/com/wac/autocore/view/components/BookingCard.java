@@ -7,7 +7,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -24,7 +23,7 @@ public class BookingCard extends HBox {
         VBox dateBox = new VBox(date);
 
         //Info about booked vehicle
-        ImageView vehicleIcon = new ImageView(new Image("resources/imgs/car-solid.png"));
+        ImageView vehicleIcon = new ImageView("resources/imgs/car-solid.png");
         vehicleIcon.setFitHeight(40);
         vehicleIcon.setFitWidth(40);
 
@@ -51,11 +50,13 @@ public class BookingCard extends HBox {
         }
 
         //Actionable buttons
-        Button bookingBtn = new Button("Create work order");
-        bookingBtn.getStyleClass().add("create-btn");
+        Button createWorkOrderBtn = new Button("Create work order");
+        createWorkOrderBtn.getStyleClass().add("create-btn");
 
-        bookingBtn.setOnAction(e -> System.out.printf("Calling ViewManager.createBooking(%d)\n",booking.getId()));
-        HBox buttonBox = new HBox(bookingBtn);
+        createWorkOrderBtn.setOnAction(e ->
+                System.out.printf("Calling ViewManager.createWorkOrder(%d)\n",booking.getId())
+        );
+        HBox buttonBox = new HBox(createWorkOrderBtn);
         buttonBox.setAlignment(Pos.BASELINE_RIGHT);
 
         ImageView editIcon = new ImageView("resources/imgs/pen-to-square-solid.png");
@@ -64,11 +65,19 @@ public class BookingCard extends HBox {
         ImageView deleteIcon = new ImageView("resources/imgs/trash-solid.png");
         deleteIcon.setFitHeight(30);
         deleteIcon.setFitWidth(30);
-        Button editVehicleBtn = new Button("redigera", editIcon);
-        editVehicleBtn.getStyleClass().addAll("edit-card-btn");
-        Button deleteVehicleBtn = new Button("Radera", deleteIcon);
-        deleteVehicleBtn.getStyleClass().addAll("delete-card-btn");
-        VBox actionableBox = new VBox(editVehicleBtn, deleteVehicleBtn);
+
+        Button editBookingBtn = new Button("redigera", editIcon);
+        editBookingBtn.getStyleClass().addAll("edit-card-btn");
+        editBookingBtn.setOnAction(e ->
+                System.out.printf("Calling ViewManager.editBooking(%d)\n",booking.getId())
+        );
+
+        Button deleteBookingBtn = new Button("Radera", deleteIcon);
+        deleteBookingBtn.getStyleClass().addAll("delete-card-btn");
+        deleteBookingBtn.setOnAction(e ->
+                System.out.printf("Calling ViewManager.deleteBooking(%d)\n",booking.getId())
+        );
+        VBox actionableBox = new VBox(editBookingBtn, deleteBookingBtn);
 
         vehicleCard.getChildren().add(dateBox);
         vehicleCard.getChildren().add(vehicleBox);
