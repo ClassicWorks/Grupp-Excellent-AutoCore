@@ -51,9 +51,7 @@ public class ViewManager {
      * oavsett om det är en Label eller en färdig view.
      */
 
-    public void showCustomers() {
-        showView(new Label("Customers - placeholder"));
-    }
+    public void showCustomers() {showView(com.wac.autocore.view.components.CustomerForm.getForm(null));}
 
     public void showVehicles() {
         showView(new ShowVehicleView().show());
