@@ -111,11 +111,15 @@ public class ViewManager {
     }
 
     public void showCreateBooking() {
-        //TODO change to new method
-  /*showNewWindow(
-            new CreateBookingForm().show());*/
-    } // la till detta
-  
+        Stage popup = new Stage();
+        Parent content = new CreateBookingForm(popup).show();
+        showPopup(popup, "Create new Booking", content, this::showBookings);
+    }
+
+    public void showCreateBooking(int vehicleId){
+        Stage popup = new Stage();
+        Parent content = new CreateBookingForm(popup).show(vehicleId);
+        showPopup(popup, "Create new Booking", content, null);
     public void showCreateWorkOrderPopup(int bookingId) {
         Stage popup = new Stage();
         Parent content = new CreateWorkOrderForm(popup).show(bookingId);

@@ -1,24 +1,36 @@
 package com.wac.autocore.view;
 
-import com.wac.autocore.data.Database;
 import com.wac.autocore.manager.ViewManager;
+import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
+import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.view.components.VehicleCard;
+import com.wac.autocore.view.components.VehicleDetails;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
-
-import java.util.List;
+import javafx.scene.layout.*;
 
 public class ShowVehicleView {
+    private GarageSystem garageSystem;
+
+    public ShowVehicleView() {
+        garageSystem = new GarageSystem();
+    }
 
     public Parent show(){
         VBox layout = new VBox();
+        layout.getChildren().add(getHeader());
+
+        //Split Stage 50/50
+        GridPane mainContent = new GridPane();
+        ColumnConstraints left = new ColumnConstraints();
+        left.setPercentWidth(50);
+        ColumnConstraints right = new ColumnConstraints();
+        right.setPercentWidth(50);
+        mainContent.getColumnConstraints().addAll(left, right);
 
         //Filtrerings nodes
         //TODO Just nu finns ingen logik för filtrering, är det något som ska implementeras? Vilka typer?
@@ -30,32 +42,46 @@ public class ShowVehicleView {
         TextField searchBar = new TextField();
         searchBar.setPromptText("Sökord");
         HBox filterBox = new HBox(sortingComboBox, searchBar);
-        layout.getChildren().add(filterBox);
+        mainContent.getChildren().add(filterBox);
 
-        //Visa alla cards för vehicles
+        //List all cards for vehicles
         VBox vehiclesBox = new VBox();
-
         ScrollPane vehiclesBoxScroll = new ScrollPane(vehiclesBox);
+        vehiclesBoxScroll.setMaxHeight(Double.MAX_VALUE);
 
-        vehiclesBoxScroll.setPrefHeight(200);
-        vehiclesBoxScroll.setPrefViewportWidth(400);
+        //Show details of car
+        VehicleDetails vehicleDetails = new VehicleDetails();
+        vehicleDetails.setMaxHeight(Double.MAX_VALUE);
 
         //TODO listan ska kunna uppdateras baserat på filtering
-        List<Vehicle> vehicles = Database.getVehicles();
-        for (Vehicle vehicle : vehicles){
-            Node vehicleCard = VehicleCard.getCard(vehicle);
+        for (Vehicle vehicle : garageSystem.getVehicles()){
+            Customer customer = garageSystem.getCustomer(vehicle.getCustomerId()).orElse(null);
+            VehicleCard vehicleCard = new VehicleCard(vehicle, customer);
+            vehicleCard.setOnMouseClicked(e-> vehicleDetails.populate(vehicle, customer));
             vehiclesBox.getChildren().add(vehicleCard);
         }
-        layout.getChildren().add(vehiclesBoxScroll);
 
-        //Knapp för att skapa bil
-        Button createVehicleBtn = new Button("Skapa ny bil");
-        createVehicleBtn.getStyleClass().add("create-btn");
+        //Make them as big as allowed
+        mainContent.add(vehiclesBoxScroll, 0, 0);
+        mainContent.add(vehicleDetails, 1, 0);
+        GridPane.setVgrow(vehiclesBox, Priority.ALWAYS);
+        GridPane.setVgrow(vehicleDetails, Priority.ALWAYS);
+        VBox.setVgrow(mainContent, Priority.ALWAYS);
+        VBox.setVgrow(vehiclesBoxScroll, Priority.ALWAYS);
 
-        createVehicleBtn.setOnAction(e -> ViewManager.getInstance().showCreateVehiclePopup());
-        VBox actionBox = new VBox(createVehicleBtn);
-        layout.getChildren().add(actionBox);
-
+        layout.getChildren().addAll(mainContent);
         return layout;
+    }
+
+    private Node getHeader(){
+        BorderPane headerPane = new BorderPane();
+        Label title = new Label("Vehicles");
+        title.getStyleClass().setAll("page-title");
+        Button createBookingBtn = new Button("Create new vehicle");
+        createBookingBtn.getStyleClass().addAll("create-btn");
+        createBookingBtn.setOnAction(e -> ViewManager.getInstance().showCreateVehiclePopup());
+        headerPane.setCenter(title);
+        headerPane.setRight(createBookingBtn);
+        return headerPane;
     }
 }

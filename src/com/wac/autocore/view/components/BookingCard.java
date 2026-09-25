@@ -14,22 +14,18 @@ import javafx.scene.layout.VBox;
 
 public class BookingCard extends HBox {
     public BookingCard(Booking booking, Vehicle vehicle, Mechanic mechanic){
-        VBox vehicleCard = new VBox();
-        vehicleCard.setStyle("-fx-border-color: blue");
-        vehicleCard.getStyleClass().add("vehicle-card");
-
         //date
         Label date = new Label(booking.getDate().toString());
         VBox dateBox = new VBox(date);
 
         //Info about booked vehicle
-        ImageView vehicleIcon = new ImageView("resources/imgs/car-solid.png");
-        vehicleIcon.setFitHeight(40);
-        vehicleIcon.setFitWidth(40);
-
+        ImageView vehicleIcon = new IconImageView("resources/imgs/car-solid.png", 40,40);
         Label regNumberLabel = new Label(vehicle.getRegistrationNumber());
-        Label brandModelYearLabel = new Label(String.format("%s - %2s, %d",
-                vehicle.getBrand(), vehicle.getModel(), vehicle.getYear()));
+        Label brandModelYearLabel = new Label(String.format(
+                "%s - %2s, %d",
+                vehicle.getBrand(),
+                vehicle.getModel(),
+                vehicle.getYear()));
         VBox vehicleInfoBox = new VBox(regNumberLabel, brandModelYearLabel);
 
         HBox vehicleBox = new HBox(vehicleIcon, vehicleInfoBox);
@@ -47,12 +43,8 @@ public class BookingCard extends HBox {
         HBox buttonBox = new HBox(createWorkOrderBtn);
         buttonBox.setAlignment(Pos.BASELINE_RIGHT);
 
-        ImageView editIcon = new ImageView("resources/imgs/pen-to-square-solid.png");
-        editIcon.setFitHeight(30);
-        editIcon.setFitWidth(30);
-        ImageView deleteIcon = new ImageView("resources/imgs/trash-solid.png");
-        deleteIcon.setFitHeight(30);
-        deleteIcon.setFitWidth(30);
+        ImageView editIcon = new IconImageView("resources/imgs/pen-to-square-solid.png", 30,30);
+        ImageView deleteIcon = new IconImageView("resources/imgs/trash-solid.png", 30,30);
 
         Button editBookingBtn = new Button("redigera", editIcon);
         editBookingBtn.getStyleClass().addAll("edit-card-btn");
@@ -67,10 +59,14 @@ public class BookingCard extends HBox {
         );
         VBox actionableBox = new VBox(editBookingBtn, deleteBookingBtn);
 
-        vehicleCard.getChildren().add(dateBox);
-        vehicleCard.getChildren().add(vehicleBox);
-        vehicleCard.getChildren().add(mechanicLink);
-        vehicleCard.getChildren().add(buttonBox);
-        this.getChildren().addAll(vehicleCard, actionableBox);
+        VBox bookingCard = new VBox();
+        bookingCard.setStyle("-fx-border-color: blue");
+        bookingCard.getStyleClass().add("vehicle-card");
+
+        bookingCard.getChildren().add(dateBox);
+        bookingCard.getChildren().add(vehicleBox);
+        bookingCard.getChildren().add(customerInfoBox);
+        bookingCard.getChildren().add(buttonBox);
+        this.getChildren().addAll(bookingCard, actionableBox);
     }
 }
