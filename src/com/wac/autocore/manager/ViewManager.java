@@ -6,12 +6,12 @@ import com.wac.autocore.view.ShowBookingsView;
 import com.wac.autocore.view.ShowVehicleView;
 import com.wac.autocore.view.SideNav;
 import com.wac.autocore.view.components.CreateVehicleForm;
+import com.wac.autocore.view.components.CreateWorkOrderForm;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -120,9 +120,9 @@ public class ViewManager {
 
     public void showCreateWorkOrderPopup(int bookingId) {
         Stage popup = new Stage();
-        //Parent content = new CreateWorkOrderForm(popup).show();
+        Parent content = new CreateWorkOrderForm(popup).show(bookingId);
 
-        showPopup(popup, "Create new Work Order", new HBox(new Label("Create Work Order placeholder")), null);
+        showPopup(popup, "Create new Work Order", content, this::showWorkOrders);
     }
 
     public void exit() {

@@ -88,8 +88,8 @@ public class ShowWorkOrdersView {
         return getWorkOrderCardsFromList(completedWorkOrders);
     }
 
-    private HBox getWorkOrderCardsFromList(List<WorkOrder> workOrders) {
-        HBox workOrderCards = new HBox();
+    private VBox getWorkOrderCardsFromList(List<WorkOrder> workOrders) {
+        VBox workOrderCards = new VBox();
         for(WorkOrder workOrder : workOrders) {
             Mechanic mechanic = garageSystem.getMechanic(workOrder.getMechanicId()).orElse(null);
             if(mechanic == null){
@@ -117,7 +117,7 @@ public class ShowWorkOrdersView {
         return workOrderCards;
     }
 
-    private Node getHeader() {
+    private BorderPane getHeader() {
         BorderPane header = new BorderPane();
         Label title = new Label("Work Orders");
         Button createWorkOrderBtn = new Button("See bookings");

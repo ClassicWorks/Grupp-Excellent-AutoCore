@@ -126,6 +126,21 @@ public class GarageSystem {
         }
     }
 
+    public List<ServiceItem> getServiceItems() {
+        if (Database.getServiceItems().isEmpty()) {
+            System.out.println("No services found.");
+            return new ArrayList<>();
+        }
+
+        return Database.getServiceItems();
+    }
+
+    public Optional<ServiceItem> getServiceItem(int id){
+        return Database.getServiceItems().stream()
+                .filter(serviceItem -> serviceItem.getId() == id)
+                .findFirst();
+    }
+
     public void showMechanics() {
         System.out.println();
         System.out.println("=== MECHANICS ===");
