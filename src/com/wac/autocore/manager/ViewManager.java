@@ -1,5 +1,6 @@
 package com.wac.autocore.manager;
 
+import com.wac.autocore.view.ShowMechanicsView;
 import com.wac.autocore.view.ShowVehicleView;
 import com.wac.autocore.view.SideNav;
 import com.wac.autocore.view.components.CreateVehicleForm;
@@ -80,7 +81,7 @@ public class ViewManager {
     }
 
     public void showMechanics() {
-        showView(new Label("Mechanics - placeholder"));
+        showView(new ShowMechanicsView().show());
     }
 
     public void showServices() {
