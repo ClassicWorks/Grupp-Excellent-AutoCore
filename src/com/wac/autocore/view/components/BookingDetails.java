@@ -18,9 +18,9 @@ public class BookingDetails extends BorderPane {
     private Label registrationNumber = new Label();
     private Label brandModelYear = new Label();
     private Label bookingId = new Label();
-    private Hyperlink customerName = new Hyperlink();
+    private CustomerHyperLink customerLink;
     private Label customerInfo = new Label();
-    private Hyperlink mechanicName = new Hyperlink();
+    private MechanicHyperLink mechanicLink;
     private Label description = new Label();
     private Button editBtn = new Button("Edit");
     private Button deleteBtn = new Button("Delete");
@@ -35,16 +35,11 @@ public class BookingDetails extends BorderPane {
         VBox vehicleText = new VBox(registrationNumber, brandModelYear);
         HBox vehicleBox = new HBox(vehicleIcon, vehicleText);
 
-        ImageView customerIcon = new ImageView("resources/imgs/user-solid.png");
-        customerIcon.setFitWidth(20);
-        customerIcon.setFitHeight(20);
-        VBox customerText = new VBox(customerName, customerInfo);
-        HBox customerBox = new HBox(customerIcon, customerText);
+        customerLink = new CustomerHyperLink(null);
+        VBox customerBox = new VBox(customerLink, customerInfo);
 
-        ImageView mechanicIcon = new ImageView("resources/imgs/wrench-solid.png");
-        mechanicIcon.setFitWidth(20);
-        mechanicIcon.setFitHeight(20);
-        HBox mechanicBox = new HBox(mechanicIcon, mechanicName);
+        mechanicLink = new MechanicHyperLink(null);
+        HBox mechanicBox = new HBox(mechanicLink);
 
         HBox descriptionBox = new HBox(description);
 
@@ -66,8 +61,9 @@ public class BookingDetails extends BorderPane {
 
         bookingId.setText(String.format("Boknings ID: %d", booking.getId()));
 
-        customerName.setText(customer.getName());
-        customerName.setOnAction(e ->
+        customerLink.setCustomer(customer);
+        customerLink.setText(customer.getName());
+        customerLink.setOnAction(e ->
                 System.out.printf("Should call to ViewManager.getInstance().showCustomers(%d)",
                         customer.getId())
         );
@@ -76,15 +72,7 @@ public class BookingDetails extends BorderPane {
                 customer.getEmail(), customer.getPhone())
         );
 
-        if(mechanic != null) {
-            mechanicName.setText(mechanic.getName());
-            mechanicName.setOnAction(e ->
-                    System.out.printf("Should call out to ViewManager.getInstance().showMechanics(%s)",
-                            mechanic.getId())
-            );
-        }else{
-            mechanicName.setText("No mechanic assigned");
-        }
+        mechanicLink.setMechanic(mechanic);
 
         description.setText(String.format("Description from customer: %s",booking.getDescription()));
 

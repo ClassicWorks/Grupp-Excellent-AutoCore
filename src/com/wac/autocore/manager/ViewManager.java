@@ -1,5 +1,7 @@
 package com.wac.autocore.manager;
 
+import com.wac.autocore.view.ShowWorkOrdersView;
+import com.wac.autocore.view.components.CreateBookingForm;
 import com.wac.autocore.view.ShowMechanicsView;
 import com.wac.autocore.view.ShowBookingsView;
 import com.wac.autocore.view.ShowPaymentsView;
@@ -7,6 +9,7 @@ import com.wac.autocore.view.ShowVehicleView;
 import com.wac.autocore.view.SideNav;
 import com.wac.autocore.view.components.CreateInvoiceForm;
 import com.wac.autocore.view.components.CreateVehicleForm;
+import com.wac.autocore.view.components.CreateWorkOrderForm;
 import com.wac.autocore.view.components.CreateCustomer;
 import com.wac.autocore.view.components.ProcessPaymentForm;
 import javafx.scene.Node;
@@ -96,7 +99,7 @@ public class ViewManager {
     }
 
     public void showWorkOrders() {
-        showView(new Label("Work orders - placeholder"));
+        showView(new ShowWorkOrdersView().show());
     }
 
     public void showInvoices() {
@@ -112,36 +115,41 @@ public class ViewManager {
   /*showNewWindow(
             new CreateBookingForm().show());*/
     } // la till detta
+  
+    public void showCreateWorkOrderPopup(int bookingId) {
+        Stage popup = new Stage();
+        Parent content = new CreateWorkOrderForm(popup).show(bookingId);
 
-        public void showCreateVehiclePopup() {
+        showPopup(popup, "Create new Work Order", content, this::showWorkOrders);
+    }
+    public void showCreateVehiclePopup() {
             Stage popup = new Stage();
             Parent content = new CreateVehicleForm(popup).show();
-
             showPopup(popup, "Create new vehicle", content, this::showVehicles);
-        }
-
-        public void showCreateCustomerPopup() {
-            Stage popup = new Stage();
-            Parent content = new CreateCustomer(popup, null).show();
-
-            showPopup(popup, "Skapa ny kund", content, this::showCustomers);
-        }
-
-         public void showProcessPaymentPopup() {
-            Stage popup = new Stage();
-            Parent content = new ProcessPaymentForm(popup).show();
-
-            showPopup(popup, "Process payment", content, this::showPayments);
-        }
-
-        public void showCreateInvoicePopup() {
-            Stage popup = new Stage();
-            Parent content = new CreateInvoiceForm(popup).show();
-
-            showPopup(popup, "Create invoice", content, this::showInvoices);
-        }
-
-        public void exit() {
-            primaryStage.close();
-        }
     }
+
+    public void showCreateCustomerPopup() {
+        Stage popup = new Stage();
+        Parent content = new CreateCustomer(popup, null).show();
+
+        showPopup(popup, "Skapa ny kund", content, this::showCustomers);
+    }
+
+     public void showProcessPaymentPopup() {
+        Stage popup = new Stage();
+        Parent content = new ProcessPaymentForm(popup).show();
+
+        showPopup(popup, "Process payment", content, this::showPayments);
+    }
+
+    public void showCreateInvoicePopup() {
+        Stage popup = new Stage();
+        Parent content = new CreateInvoiceForm(popup).show();
+
+        showPopup(popup, "Create invoice", content, this::showInvoices);
+    }
+  
+    public void exit() {
+        primaryStage.close();
+    }
+}
