@@ -4,7 +4,7 @@ import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.view.components.KanbanGridUtil;
-import com.wac.autocore.view.components.WorkOrderCard;
+import com.wac.autocore.view.components.WorkOrderCardWithActionBtns;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ShowWorkOrdersView {
@@ -91,28 +92,27 @@ public class ShowWorkOrdersView {
     private VBox getWorkOrderCardsFromList(List<WorkOrder> workOrders) {
         VBox workOrderCards = new VBox();
         for(WorkOrder workOrder : workOrders) {
-            Mechanic mechanic = garageSystem.getMechanic(workOrder.getMechanicId()).orElse(null);
-            if(mechanic == null){
+            //Check if necessary objects exists
+            Optional<Mechanic> optionalMechanic = garageSystem.getMechanic(workOrder.getMechanicId());
+            if(!optionalMechanic.isPresent()){
                 workOrderCards.getChildren().add(new Label("Mechanic not found"));
                 continue;
             }
-            Booking booking = garageSystem.getBooking(workOrder.getBookingId()).orElse(null);
-            if(booking == null){
+            Mechanic mechanic = optionalMechanic.get();
+            Optional<Booking> optionalBooking = garageSystem.getBooking(workOrder.getBookingId());
+            if(!optionalBooking.isPresent()){
                 workOrderCards.getChildren().add(new Label("Booking not found"));
                 continue;
             }
-            Vehicle vehicle = garageSystem.getVehicle(booking.getVehicleId()).orElse(null);
-            if(vehicle == null){
+            Booking booking = optionalBooking.get();
+            Optional<Vehicle> optionalVehicle = garageSystem.getVehicle(booking.getVehicleId());
+            if(!optionalVehicle.isPresent()){
                 workOrderCards.getChildren().add(new Label("Vehicle not found"));
                 continue;
             }
-            Customer customer = garageSystem.getCustomer(vehicle.getCustomerId()).orElse(null);
-            if(customer == null){
-                workOrderCards.getChildren().add(new Label("Customer not found"));
-                continue;
-            }
+            Vehicle vehicle = optionalVehicle.get();
 
-            workOrderCards.getChildren().add(new WorkOrderCard(workOrder, booking, vehicle,mechanic));
+            workOrderCards.getChildren().add(new WorkOrderCardWithActionBtns(workOrder, booking, vehicle,mechanic));
         }
         return workOrderCards;
     }
