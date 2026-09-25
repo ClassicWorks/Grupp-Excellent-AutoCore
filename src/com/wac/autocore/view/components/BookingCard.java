@@ -31,21 +31,7 @@ public class BookingCard extends HBox {
         HBox vehicleBox = new HBox(vehicleIcon, vehicleInfoBox);
 
         //Info about mechanic
-        ImageView mechanicIcon = new IconImageView("resources/imgs/wrench-solid.png", 20,20);
-        HBox customerInfoBox = new HBox(mechanicIcon);
-
-        if(mechanic != null){
-            Hyperlink mechanicLink = new Hyperlink(mechanic.getName());
-            mechanicLink.setOnAction(e ->
-                    System.out.printf(
-                        "Calling ViewManager.getInstance().showMechanicsView(%d)\n",
-                        mechanic.getId())
-            );
-            customerInfoBox.getChildren().add(mechanicLink);
-        } else {
-            Label mechanicLabel = new Label("No mechanic assigned");
-            customerInfoBox.getChildren().add(mechanicLabel);
-        }
+        Hyperlink mechanicLink = new MechanicHyperLink(mechanic);
 
         //Actionable buttons
         Button createWorkOrderBtn = new Button("Create work order");
