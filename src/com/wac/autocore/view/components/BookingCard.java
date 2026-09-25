@@ -65,7 +65,7 @@ public class BookingCard extends HBox {
 
         bookingCard.getChildren().add(dateBox);
         bookingCard.getChildren().add(vehicleBox);
-        bookingCard.getChildren().add(customerInfoBox);
+        bookingCard.getChildren().add(mechanicLink);
         bookingCard.getChildren().add(buttonBox);
         this.getChildren().addAll(bookingCard, actionableBox);
     }
