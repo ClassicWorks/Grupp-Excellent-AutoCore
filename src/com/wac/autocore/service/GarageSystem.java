@@ -106,6 +106,12 @@ public class GarageSystem {
         return Database.getBookings();
     }
 
+    public Optional<Booking> getBooking(int id){
+        return Database.getBookings().stream()
+                .filter(booking -> booking.getId() == id)
+                .findFirst();
+    }
+
     public void showServiceItems() {
         System.out.println();
         System.out.println("=== SERVICES ===");
@@ -161,6 +167,21 @@ public class GarageSystem {
         for (WorkOrder workOrder : Database.getWorkOrders()) {
             System.out.println(workOrder);
         }
+    }
+
+    public List<WorkOrder> getWorkOrders() {
+        if (Database.getWorkOrders().isEmpty()) {
+            System.out.println("No work orders found.");
+            return new ArrayList<>();
+        }
+
+        return Database.getWorkOrders();
+    }
+
+    public Optional<WorkOrder> getWorkOrder(int id){
+        return Database.getWorkOrders().stream()
+                .filter(w -> w.getId() == id)
+                .findFirst();
     }
 
     public void showInvoices() {

@@ -1,5 +1,6 @@
 package com.wac.autocore.manager;
 
+import com.wac.autocore.view.ShowWorkOrdersView;
 import com.wac.autocore.view.components.CreateBookingForm;
 import com.wac.autocore.view.ShowBookingsView;
 import com.wac.autocore.view.ShowVehicleView;
@@ -90,7 +91,7 @@ public class ViewManager {
     }
 
     public void showWorkOrders() {
-        showView(new Label("Work orders - placeholder"));
+        showView(new ShowWorkOrdersView().show());
     }
 
     public void showInvoices() {
