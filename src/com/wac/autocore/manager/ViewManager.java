@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -115,6 +116,13 @@ public class ViewManager {
         Parent content = new CreateVehicleForm(popup).show();
 
         showPopup(popup, "Create new vehicle", content, this::showVehicles);
+    }
+
+    public void showCreateWorkOrderPopup(int bookingId) {
+        Stage popup = new Stage();
+        //Parent content = new CreateWorkOrderForm(popup).show();
+
+        showPopup(popup, "Create new Work Order", new HBox(new Label("Create Work Order placeholder")), null);
     }
 
     public void exit() {
