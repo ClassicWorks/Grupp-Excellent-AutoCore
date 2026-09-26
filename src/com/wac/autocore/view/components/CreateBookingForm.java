@@ -1,6 +1,5 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
@@ -32,7 +31,6 @@ public class CreateBookingForm {
     private final ObjectProperty<Vehicle> selectedVehicle =
             new SimpleObjectProperty<>();
 
-    private final VBox customerResults = new VBox();
     private final VBox vehicleResults = new VBox();
     private final VBox bookingInformation = new VBox();
 
@@ -52,7 +50,11 @@ public class CreateBookingForm {
         VBox layout = new VBox();
 
         layout.getChildren().add(createTitle());
-        layout.getChildren().add(createCustomerSelection());
+        layout.getChildren().add(
+                new CustomerSelection(
+                        garageSystem.getCustomers(),
+                        this::showVehiclesOfCustomer)
+        );
         layout.getChildren().add(vehicleResults);
         layout.getChildren().add(createBookingInformation());
         layout.getChildren().add(createActionButtons());
@@ -101,54 +103,6 @@ public class CreateBookingForm {
     private Label createTitle() {
         return new Label("Create booking");
     }
-
-    // =========================================================
-    // CUSTOMER SELECTION
-    // =========================================================
-
-    private Node createCustomerSelection() {
-        Label label = new Label("Choose customer");
-        TextField searchField = new TextField();
-
-        searchField.textProperty().addListener(
-                (observable, oldValue, newValue) ->
-                        updateCustomerResults(newValue)
-        );
-
-        return new VBox(label, searchField, customerResults);
-    }
-
-
-    private void updateCustomerResults(String query) {
-        customerResults.getChildren().clear();
-
-        garageSystem.getCustomers().stream()
-                .filter(customer ->
-                        customer.getName()
-                                .toLowerCase()
-                                .contains(query.toLowerCase())
-                )
-                .forEach(customer ->
-                        customerResults.getChildren()
-                                .add(createCustomerResult(customer))
-                );
-    }
-
-
-    private Node createCustomerResult(Customer customer) {
-        Button button = new Button(
-                String.format(
-                        "ID: %d - %s",
-                        customer.getId(),
-                        customer.getName()
-                )
-        );
-
-        button.setOnAction(e -> showVehiclesOfCustomer(customer));
-
-        return button;
-    }
-
 
     private void showVehiclesOfCustomer(Customer customer) {
         vehicleResults.getChildren().clear();
