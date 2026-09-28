@@ -10,6 +10,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 public class KanbanGridUtil {
+    /**
+     * Returns a column with at Node that is scrollable. Title on top. The scrollable node will fill the
+     * rest of the height of the parent.
+     * @param columnTitle Title of column
+     * @param childInScroll Node to be scrollable
+     * @return
+     */
     public static VBox getScrollableColumnWithTitle(String columnTitle, Node childInScroll) {
         Label columnHeader = getColumnHeader(columnTitle);
         ScrollPane scrollPane = new ScrollPane(childInScroll);
@@ -31,6 +38,12 @@ public class KanbanGridUtil {
         return column;
     }
 
+    /**
+     * Return a GridPane with a set number of columns. The Grid fills the parent's width.
+     * The columns will all be equal widths
+     * @param numberOfColumns A set number of columns
+     * @return GridPane with aset number of columns that are equally wide
+     */
     public static GridPane getKanbanGrid(int numberOfColumns) {
         GridPane kanbanGrid = new GridPane();
 
