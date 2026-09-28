@@ -21,6 +21,16 @@ public class KanbanGridUtil {
         return column;
     }
 
+    public static VBox getScrollableColumnWithTopNode(Node columnHeader, Node childInScroll) {
+        ScrollPane scrollPane = new ScrollPane(childInScroll);
+        scrollPane.setFitToWidth(true);
+
+        VBox column = new VBox(columnHeader, scrollPane);
+        //Make scrollpane fill column
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+        return column;
+    }
+
     public static GridPane getKanbanGrid(int numberOfColumns) {
         GridPane kanbanGrid = new GridPane();
 

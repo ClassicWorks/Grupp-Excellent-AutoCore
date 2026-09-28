@@ -27,24 +27,15 @@ public class VehicleCard extends HBox{
         HBox vehicleBox = new HBox(vehicleIcon, vehicleInfoBox);
 
         //Info om kund
-        ImageView customerIcon = new IconImageView("resources/imgs/user-solid.png", 20, 20);
-
-        HBox customerInfoBox = new HBox(customerIcon);
-        if(vehicle.getCustomerId() <= 0 || customer == null) {
-            Label noCustomer = new Label("No customer connected");
-            customerInfoBox.getChildren().add(noCustomer);
-        }
-        else {
-            Hyperlink customerLink = new Hyperlink(customer.getName());
-            customerLink.setOnAction(e -> System.out.printf("Calling ViewManager.showCustomer(%d)\n", vehicle.getCustomerId()));
-            customerInfoBox.getChildren().add(customerLink);
-        }
+        HBox customerInfoBox = new HBox(new CustomerHyperLink(customer));
 
         //Actionable buttons
         Button bookingBtn = new Button("Boka");
         bookingBtn.getStyleClass().addAll("create-btn");
 
-        bookingBtn.setOnAction(e -> ViewManager.getInstance().showCreateBooking(vehicle.getId()));
+        bookingBtn.setOnAction(e ->
+                ViewManager.getInstance().showCreateBooking(vehicle.getId())
+        );
         HBox buttonBox = new HBox(bookingBtn);
         buttonBox.setAlignment(Pos.BASELINE_RIGHT);
 

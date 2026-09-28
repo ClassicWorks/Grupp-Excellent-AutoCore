@@ -14,7 +14,6 @@ import javafx.scene.layout.*;
 
 public class ShowVehicleView {
     private final GarageSystem garageSystem;
-    private final VehicleDetails vehicleDetails = new VehicleDetails();
 
     public ShowVehicleView() {
         garageSystem = new GarageSystem();
@@ -42,13 +41,23 @@ public class ShowVehicleView {
         VBox vehiclesBox = new VBox();
 
         //Show details of car
-        vehicleDetails.setMaxHeight(Double.MAX_VALUE);
 
         //TODO listan ska kunna uppdateras baserat på filtering
         for (Vehicle vehicle : garageSystem.getVehicles()){
             Customer customer = garageSystem.getCustomer(vehicle.getCustomerId()).orElse(null);
             VehicleCard vehicleCard = new VehicleCard(vehicle, customer);
-            vehicleCard.setOnMouseClicked(e-> vehicleDetails.populate(vehicle, customer));
+            vehicleCard.setOnMouseClicked(e-> {
+
+                VehicleDetails  vehicleDetails = new VehicleDetails(vehicle, customer);
+                vehicleDetails.setMaxHeight(Double.MAX_VALUE);
+
+                mainContent.add(
+                        vehicleDetails,
+                        1, 0
+                );
+                //Make vehicleDetail as big as allowed (vehicleScroll has already from KanbanGridUtil)
+                GridPane.setVgrow(vehicleDetails, Priority.ALWAYS);
+            });
             vehiclesBox.getChildren().add(vehicleCard);
         }
 
@@ -57,15 +66,13 @@ public class ShowVehicleView {
         mainContent.add(
                 vehiclesScroll,
                 0, 0);
-        mainContent.add(
-                vehicleDetails,
-                1, 0);
-
-        //Make vehicleDetail as big as allowed (vehicleScroll has already from KanbanGridUtil)
-        GridPane.setVgrow(vehicleDetails, Priority.ALWAYS);
 
         layout.setCenter(mainContent);
         return layout;
+    }
+
+    private VehicleDetails createVehicleDetails(Vehicle vehicle, Customer customer) {
+        return null;
     }
 
     private Node getHeader(){

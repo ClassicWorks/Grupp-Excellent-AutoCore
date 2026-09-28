@@ -1,82 +1,119 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
+import com.wac.autocore.service.GarageSystem;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.Optional;
+
 public class BookingDetails extends BorderPane {
-    private Label date = new Label();
-    private Label registrationNumber = new Label();
-    private Label brandModelYear = new Label();
-    private Label bookingId = new Label();
-    private CustomerHyperLink customerLink;
-    private Label customerInfo = new Label();
-    private MechanicHyperLink mechanicLink;
-    private Label description = new Label();
-    private Button editBtn = new Button("Edit");
-    private Button deleteBtn = new Button("Delete");
-    private Button createWorkOrderBtn = new Button("create work order");
+    private GarageSystem garageSystem = new GarageSystem();
 
-    public BookingDetails() {
-        HBox topBox = new HBox(10, date, bookingId);
+    private Booking booking;
+    private Vehicle vehicle;
+    private Mechanic currentMechanic;
+    private String description;
 
-        ImageView vehicleIcon = new IconImageView("resources/imgs/car-solid.png", 40, 40);
-        VBox vehicleText = new VBox(registrationNumber, brandModelYear);
-        HBox vehicleBox = new HBox(vehicleIcon, vehicleText);
+    private ComboBox<Mechanic> mechanicComboBox;
+    private TextArea descriptionField;
 
-        customerLink = new CustomerHyperLink(null);
-        VBox customerBox = new VBox(customerLink, customerInfo);
+    public BookingDetails(Booking booking) {
+        this.booking = booking;
+        HBox topBox = new HBox(10,
+                new Label(String.format("Date: %s", booking.getDate().toString())),
+                new Label(String.format("ID: %d",booking.getId()))
+        );
 
-        mechanicLink = new MechanicHyperLink(null);
-        HBox mechanicBox = new HBox(mechanicLink);
+        Optional<Vehicle> optionalVehicle = garageSystem.getVehicle(booking.getVehicleId());
+        if(!optionalVehicle.isPresent()){
+            this.setTop(topBox);
+            this.setCenter(new Label("No vehicle connected to booking"));
+            return;
+        }
 
-        HBox descriptionBox = new HBox(description);
+        this.vehicle = optionalVehicle.get();
+        if(booking.getMechanicId() != 0) {
+            Optional<Mechanic> optionalMechanic = garageSystem.getMechanic(booking.getMechanicId());
+            optionalMechanic.ifPresent(mechanic -> this.currentMechanic = mechanic);
+        }
 
-        HBox actionableButtons = new HBox(20, deleteBtn, editBtn, createWorkOrderBtn);
+        this.description = booking.getDescription();
+
+        //TODO Should booking work if vehicleOwner is null?
+        Customer vehicleOwner = garageSystem.getCustomer(vehicle.getCustomerId()).orElse(null);
+        HBox vehicleBox = new VehicleCard(vehicle, vehicleOwner);
+
+        mechanicComboBox = createMechanicComboBox(currentMechanic);
+        HBox mechanicBox = new HBox(mechanicComboBox);
+
+        descriptionField = new TextArea(description);
+        HBox descriptionBox = new HBox(descriptionField);
+
+        HBox actionableButtons = new HBox(20,
+                createDeleteBtn(), createSaveBtn(), createWorkOrderBtn());
 
         this.setTop(topBox);
-        this.setCenter(new VBox(vehicleBox, customerBox, mechanicBox, descriptionBox));
+        this.setCenter(new VBox(vehicleBox, mechanicBox, descriptionBox));
         this.setBottom(actionableButtons);
-        this.setVisible(false);
     }
 
-    public void populate(Booking booking, Customer customer, Vehicle vehicle, Mechanic mechanic){
-        date.setText(String.format("date: %s",booking.getDate().toString()));
+    private ComboBox<Mechanic> createMechanicComboBox(Mechanic currentMechanic) {
+        ObservableList<Mechanic> mechanics =
+                FXCollections.observableArrayList(garageSystem.getMechanics());
 
-        registrationNumber.setText(vehicle.getRegistrationNumber());
+        ComboBox<Mechanic> comboBox =
+                new ComboBox<>(mechanics);
 
-        brandModelYear.setText(String.format("%s - %2s, %d",
-                vehicle.getBrand(), vehicle.getModel(), vehicle.getYear()));
+        comboBox.setPromptText("Choose mechanic");
 
-        bookingId.setText(String.format("Boknings ID: %d", booking.getId()));
+        if(currentMechanic != null){
+            comboBox.setValue(currentMechanic);
+        }
 
-        customerLink.setCustomer(customer);
-        customerLink.setText(customer.getName());
-        customerLink.setOnAction(e ->
-                System.out.printf("Should call to ViewManager.getInstance().showCustomers(%d)",
-                        customer.getId())
+        return comboBox;
+    }
+
+    private Button createWorkOrderBtn() {
+        Button bookVehicleBtn = new Button("Create Workorder");
+        bookVehicleBtn.setOnAction(e ->
+                ViewManager.getInstance().showCreateWorkOrderPopup(booking.getId())
         );
+        return bookVehicleBtn;
+    }
 
-        customerInfo.setText(String.format("mail: %s phone: %2s",
-                customer.getEmail(), customer.getPhone())
+    private Button createSaveBtn() {
+        Button saveBtn = new Button("Save changes");
+
+
+        //TODO savefunction
+        saveBtn.setOnAction(e ->{
+            currentMechanic = mechanicComboBox.getValue();
+            description = descriptionField.getText();
+            Booking newBooking = new Booking(booking.getId(), booking.getVehicleId(), booking.getDate(), description);
+            newBooking.setMechanicId(currentMechanic.getId());
+
+            System.out.printf("Should call ViewManager.getInstance.saveBooking(%d, %s)", booking.getId(), newBooking);
+        });
+
+        return saveBtn;
+    }
+
+    private Button createDeleteBtn() {
+        Button deleteBtn = new Button("Delete");
+
+        deleteBtn.setOnAction(e ->
+                System.out.printf("Should call ViewManager.getInstance.confirmDelete(vehicle, garagesystem.deleteBooking(%d)",
+                        booking.getId())
         );
-
-        mechanicLink.setMechanic(mechanic);
-
-        description.setText(String.format("Description from customer: %s",booking.getDescription()));
-
-        deleteBtn.setOnAction(e -> System.out.printf("Should call ViewManager.getInstance.deleteBooking(%d)", booking.getId()));
-        editBtn.setOnAction(e -> System.out.printf("Should call ViewManager.getInstance.editBooking(%d)", booking.getId()));
-        createWorkOrderBtn.setOnAction(e -> System.out.printf("Should call ViewManager.getInstance.createWorkorder(%d)", booking.getId()));
-
-        this.setVisible(true);
+        return deleteBtn;
     }
 }
