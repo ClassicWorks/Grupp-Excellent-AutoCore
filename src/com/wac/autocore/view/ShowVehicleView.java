@@ -51,6 +51,11 @@ public class ShowVehicleView {
                 VehicleDetails  vehicleDetails = new VehicleDetails(vehicle, customer);
                 vehicleDetails.setMaxHeight(Double.MAX_VALUE);
 
+                //If anything is in right column, remove content
+                mainContent.getChildren().removeIf(node ->
+                        GridPane.getColumnIndex(node) != null
+                                && GridPane.getColumnIndex(node) == 1);
+
                 mainContent.add(
                         vehicleDetails,
                         1, 0

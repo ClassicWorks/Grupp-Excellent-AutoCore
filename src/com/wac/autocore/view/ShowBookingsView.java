@@ -9,8 +9,6 @@ import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.view.components.BookingCard;
 import com.wac.autocore.view.components.BookingDetails;
 import com.wac.autocore.view.components.KanbanGridUtil;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -70,6 +68,11 @@ public class ShowBookingsView {
                 bookingCard.setOnMouseClicked(e -> {
                     BookingDetails bookingDetails = new BookingDetails(booking);
                     bookingDetails.setMaxHeight(Double.MAX_VALUE);
+
+                    //If anything is in right column, remove content
+                    mainContent.getChildren().removeIf(node ->
+                            GridPane.getColumnIndex(node) != null
+                    && GridPane.getColumnIndex(node) == 1);
 
                     mainContent.add(
                             bookingDetails,
