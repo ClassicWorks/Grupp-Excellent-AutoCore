@@ -31,7 +31,7 @@ public class WorkOrderCard extends VBox {
         HBox statusInfo = new HBox(idsLabel, statusLabel);
 
         //VehicleInfo
-        ImageView vehicleIcon = new ImageView("resources/imgs/car-solid.png");
+        ImageView vehicleIcon = new ImageView("/imgs/car-solid.png");
         vehicleIcon.setFitHeight(40);
         vehicleIcon.setFitWidth(40);
         Label registrationNumber = new Label(vehicle.getRegistrationNumber());

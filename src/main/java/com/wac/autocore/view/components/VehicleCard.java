@@ -14,7 +14,7 @@ import javafx.scene.layout.VBox;
 public class VehicleCard extends HBox{
     public VehicleCard(Vehicle vehicle, Customer customer){
         //Info om bilen
-        ImageView vehicleIcon = new IconImageView("resources/imgs/car-solid.png", 40, 40);
+        ImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40, 40);
 
         Label regNumberLabel = new Label(vehicle.getRegistrationNumber());
         Label brandModelYearLabel = new Label(String.format("%s - %2s, %d",
@@ -39,8 +39,8 @@ public class VehicleCard extends HBox{
         HBox buttonBox = new HBox(bookingBtn);
         buttonBox.setAlignment(Pos.BASELINE_RIGHT);
 
-/*        ImageView editIcon = new IconImageView("resources/imgs/pen-to-square-solid.png", 30, 30);
-        ImageView deleteIcon = new IconImageView("resources/imgs/trash-solid.png", 30, 30);
+/*        ImageView editIcon = new IconImageView("/imgs/pen-to-square-solid.png", 30, 30);
+        ImageView deleteIcon = new IconImageView("/imgs/trash-solid.png", 30, 30);
         Button editVehicleBtn = new Button("Edit", editIcon);
         Button deleteVehicleBtn = new Button("Delete", deleteIcon);
         deleteVehicleBtn.getStyleClass().addAll("delete-card-btn");
@@ -59,7 +59,7 @@ public class VehicleCard extends HBox{
     }
 
     public VehicleCard(Vehicle vehicle) {
-        ImageView vehicleIcon = new IconImageView("resources/imgs/car-solid.png", 40,40);
+        ImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40,40);
 
         Label registrationNumber =
                 new Label(vehicle.getRegistrationNumber());

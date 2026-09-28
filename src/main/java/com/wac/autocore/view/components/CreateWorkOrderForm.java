@@ -108,9 +108,7 @@ public class CreateWorkOrderForm {
         VBox dateBox = new VBox(date);
 
         //Info about booked vehicle
-        ImageView vehicleIcon = new ImageView("resources/imgs/car-solid.png");
-        vehicleIcon.setFitHeight(40);
-        vehicleIcon.setFitWidth(40);
+        IconImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40, 40);
 
         Label regNumberLabel = new Label(vehicle.getRegistrationNumber());
         Label brandModelYearLabel = new Label(String.format("%s - %2s, %d",

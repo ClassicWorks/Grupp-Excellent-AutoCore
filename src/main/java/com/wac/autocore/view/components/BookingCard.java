@@ -1,5 +1,6 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
@@ -19,7 +20,7 @@ public class BookingCard extends HBox {
         VBox dateBox = new VBox(date);
 
         //Info about booked vehicle
-        ImageView vehicleIcon = new IconImageView("resources/imgs/car-solid.png", 40,40);
+        ImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40,40);
         Label regNumberLabel = new Label(vehicle.getRegistrationNumber());
         Label brandModelYearLabel = new Label(String.format(
                 "%s - %2s, %d",
@@ -38,26 +39,10 @@ public class BookingCard extends HBox {
         createWorkOrderBtn.getStyleClass().add("create-btn");
 
         createWorkOrderBtn.setOnAction(e ->
-                System.out.printf("Calling ViewManager.createWorkOrder(%d)\n",booking.getId())
+                ViewManager.getInstance().showCreateWorkOrderPopup(booking.getId())
         );
         HBox buttonBox = new HBox(createWorkOrderBtn);
         buttonBox.setAlignment(Pos.BASELINE_RIGHT);
-
-/*        ImageView editIcon = new IconImageView("resources/imgs/pen-to-square-solid.png", 30,30);
-        ImageView deleteIcon = new IconImageView("resources/imgs/trash-solid.png", 30,30);
-
-        Button editBookingBtn = new Button("redigera", editIcon);
-        editBookingBtn.getStyleClass().addAll("edit-card-btn");
-        editBookingBtn.setOnAction(e ->
-                System.out.printf("Calling ViewManager.editBooking(%d)\n",booking.getId())
-        );
-
-        Button deleteBookingBtn = new Button("Radera", deleteIcon);
-        deleteBookingBtn.getStyleClass().addAll("delete-card-btn");
-        deleteBookingBtn.setOnAction(e ->
-                System.out.printf("Calling ViewManager.deleteBooking(%d)\n",booking.getId())
-        );
-        VBox actionableBox = new VBox(editBookingBtn, deleteBookingBtn);*/
 
         VBox bookingCard = new VBox();
         bookingCard.setStyle("-fx-border-color: blue");

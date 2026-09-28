@@ -26,7 +26,7 @@ public class MechanicHyperLink extends Hyperlink {
     public MechanicHyperLink(Mechanic mechanic) {
         this.mechanic = mechanic;
         //TODO change to component
-        ImageView imageView = new ImageView("resources/imgs/wrench-solid.png");
+        ImageView imageView = new ImageView("/imgs/wrench-solid.png");
         imageView.setFitHeight(20);
         imageView.setFitWidth(20);
         this.setGraphic(imageView);

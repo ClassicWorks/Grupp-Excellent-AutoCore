@@ -37,10 +37,10 @@ public class WorkOrderCardWithActionBtns extends HBox {
         card.getChildren().add(buttonBox);
 
         //Add Edit and Delete Btns to card
-        ImageView editIcon = new ImageView("resources/imgs/pen-to-square-solid.png");
+        ImageView editIcon = new ImageView("/imgs/pen-to-square-solid.png");
         editIcon.setFitHeight(30);
         editIcon.setFitWidth(30);
-        ImageView deleteIcon = new ImageView("resources/imgs/trash-solid.png");
+        ImageView deleteIcon = new ImageView("/imgs/trash-solid.png");
         deleteIcon.setFitHeight(30);
         deleteIcon.setFitWidth(30);
 

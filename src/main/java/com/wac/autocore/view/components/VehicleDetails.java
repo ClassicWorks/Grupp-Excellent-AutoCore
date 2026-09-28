@@ -56,14 +56,14 @@ public class VehicleDetails extends BorderPane {
 
     private void createCustomerSection() {
         IconImageView customerIcon = new IconImageView(
-                "resources/imgs/user-solid.png", 20, 20
+                "/imgs/user-solid.png", 20, 20
         );
 
         Label isChangedNotification = new Label();
         VBox customerText = new VBox(customerName, customerInfo, isChangedNotification);
 
         IconImageView editIcon = new IconImageView(
-                "resources/imgs/pen-to-square-solid.png", 20, 20
+                "/imgs/pen-to-square-solid.png", 20, 20
         );
 
         Button editCustomerBtn = new Button("Edit customer", editIcon);
@@ -111,7 +111,7 @@ public class VehicleDetails extends BorderPane {
     }
 
     private HBox createVehicleEditForm() {
-        IconImageView vehicleIcon = new IconImageView("resources/imgs/car-solid.png", 40, 40);
+        IconImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40, 40);
 
         vehicleIdLabel.setText(String.format("Fordons ID: %d", vehicle.getId()));
 

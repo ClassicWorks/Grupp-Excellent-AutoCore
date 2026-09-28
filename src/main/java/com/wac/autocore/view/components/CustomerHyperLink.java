@@ -12,7 +12,7 @@ public class CustomerHyperLink extends Hyperlink {
         this.customer = customer;
 
         //TODO change to component
-        ImageView imageView = new ImageView("resources/imgs/user-solid.png");
+        ImageView imageView = new ImageView("/imgs/user-solid.png");
         imageView.setFitHeight(20);
         imageView.setFitWidth(20);
         this.setGraphic(imageView);

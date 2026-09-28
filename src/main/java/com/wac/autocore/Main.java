@@ -1,3 +1,4 @@
+package com.wac.autocore;
 
 import com.wac.autocore.manager.ViewManager;
 import javafx.application.Application;
