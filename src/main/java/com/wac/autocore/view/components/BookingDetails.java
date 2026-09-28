@@ -93,7 +93,6 @@ public class BookingDetails extends BorderPane {
     private Button createSaveBtn() {
         Button saveBtn = new Button("Save changes");
 
-
         //TODO savefunction
         saveBtn.setOnAction(e ->{
             currentMechanic = mechanicComboBox.getValue();
