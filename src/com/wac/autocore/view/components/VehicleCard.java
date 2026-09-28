@@ -39,14 +39,14 @@ public class VehicleCard extends HBox{
         HBox buttonBox = new HBox(bookingBtn);
         buttonBox.setAlignment(Pos.BASELINE_RIGHT);
 
-        ImageView editIcon = new IconImageView("resources/imgs/pen-to-square-solid.png", 30, 30);
+/*        ImageView editIcon = new IconImageView("resources/imgs/pen-to-square-solid.png", 30, 30);
         ImageView deleteIcon = new IconImageView("resources/imgs/trash-solid.png", 30, 30);
         Button editVehicleBtn = new Button("Edit", editIcon);
         Button deleteVehicleBtn = new Button("Delete", deleteIcon);
         deleteVehicleBtn.getStyleClass().addAll("delete-card-btn");
         editVehicleBtn.getStyleClass().addAll("edit-card-btn");
 
-        VBox actionableBox = new VBox(editVehicleBtn, deleteVehicleBtn);
+        VBox actionableBox = new VBox(editVehicleBtn, deleteVehicleBtn);*/
 
         VBox vehicleCard = new VBox();
         vehicleCard.setStyle("-fx-border-color: blue");
@@ -55,7 +55,7 @@ public class VehicleCard extends HBox{
         vehicleCard.getChildren().add(vehicleBox);
         vehicleCard.getChildren().add(customerInfoBox);
         vehicleCard.getChildren().add(buttonBox);
-        this.getChildren().addAll(vehicleCard, actionableBox);
+        this.getChildren().addAll(vehicleCard);
     }
 
     public VehicleCard(Vehicle vehicle) {

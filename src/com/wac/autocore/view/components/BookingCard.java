@@ -43,7 +43,7 @@ public class BookingCard extends HBox {
         HBox buttonBox = new HBox(createWorkOrderBtn);
         buttonBox.setAlignment(Pos.BASELINE_RIGHT);
 
-        ImageView editIcon = new IconImageView("resources/imgs/pen-to-square-solid.png", 30,30);
+/*        ImageView editIcon = new IconImageView("resources/imgs/pen-to-square-solid.png", 30,30);
         ImageView deleteIcon = new IconImageView("resources/imgs/trash-solid.png", 30,30);
 
         Button editBookingBtn = new Button("redigera", editIcon);
@@ -57,7 +57,7 @@ public class BookingCard extends HBox {
         deleteBookingBtn.setOnAction(e ->
                 System.out.printf("Calling ViewManager.deleteBooking(%d)\n",booking.getId())
         );
-        VBox actionableBox = new VBox(editBookingBtn, deleteBookingBtn);
+        VBox actionableBox = new VBox(editBookingBtn, deleteBookingBtn);*/
 
         VBox bookingCard = new VBox();
         bookingCard.setStyle("-fx-border-color: blue");
@@ -67,6 +67,6 @@ public class BookingCard extends HBox {
         bookingCard.getChildren().add(vehicleBox);
         bookingCard.getChildren().add(mechanicLink);
         bookingCard.getChildren().add(buttonBox);
-        this.getChildren().addAll(bookingCard, actionableBox);
+        this.getChildren().addAll(bookingCard);
     }
 }
