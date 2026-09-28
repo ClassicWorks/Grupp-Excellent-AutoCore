@@ -12,12 +12,22 @@ import javafx.scene.layout.VBox;
 public class KanbanGridUtil {
     public static VBox getScrollableColumnWithTitle(String columnTitle, Node childInScroll) {
         Label columnHeader = getColumnHeader(columnTitle);
-        ScrollPane workOrdersScroll = new ScrollPane(childInScroll);
-        workOrdersScroll.setFitToWidth(true);
+        ScrollPane scrollPane = new ScrollPane(childInScroll);
+        scrollPane.setFitToWidth(true);
 
-        VBox column = new VBox(columnHeader, workOrdersScroll);
+        VBox column = new VBox(columnHeader, scrollPane);
         //Make scrollpane fill column
-        VBox.setVgrow(workOrdersScroll, Priority.ALWAYS);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+        return column;
+    }
+
+    public static VBox getScrollableColumnWithTopNode(Node columnHeader, Node childInScroll) {
+        ScrollPane scrollPane = new ScrollPane(childInScroll);
+        scrollPane.setFitToWidth(true);
+
+        VBox column = new VBox(columnHeader, scrollPane);
+        //Make scrollpane fill column
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
         return column;
     }
 

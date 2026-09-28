@@ -27,35 +27,26 @@ public class VehicleCard extends HBox{
         HBox vehicleBox = new HBox(vehicleIcon, vehicleInfoBox);
 
         //Info om kund
-        ImageView customerIcon = new IconImageView("resources/imgs/user-solid.png", 20, 20);
-
-        HBox customerInfoBox = new HBox(customerIcon);
-        if(vehicle.getCustomerId() <= 0 || customer == null) {
-            Label noCustomer = new Label("No customer connected");
-            customerInfoBox.getChildren().add(noCustomer);
-        }
-        else {
-            Hyperlink customerLink = new Hyperlink(customer.getName());
-            customerLink.setOnAction(e -> System.out.printf("Calling ViewManager.showCustomer(%d)\n", vehicle.getCustomerId()));
-            customerInfoBox.getChildren().add(customerLink);
-        }
+        HBox customerInfoBox = new HBox(new CustomerHyperLink(customer));
 
         //Actionable buttons
         Button bookingBtn = new Button("Boka");
         bookingBtn.getStyleClass().addAll("create-btn");
 
-        bookingBtn.setOnAction(e -> ViewManager.getInstance().showCreateBooking(vehicle.getId()));
+        bookingBtn.setOnAction(e ->
+                ViewManager.getInstance().showCreateBooking(vehicle.getId())
+        );
         HBox buttonBox = new HBox(bookingBtn);
         buttonBox.setAlignment(Pos.BASELINE_RIGHT);
 
-        ImageView editIcon = new IconImageView("resources/imgs/pen-to-square-solid.png", 30, 30);
+/*        ImageView editIcon = new IconImageView("resources/imgs/pen-to-square-solid.png", 30, 30);
         ImageView deleteIcon = new IconImageView("resources/imgs/trash-solid.png", 30, 30);
         Button editVehicleBtn = new Button("Edit", editIcon);
         Button deleteVehicleBtn = new Button("Delete", deleteIcon);
         deleteVehicleBtn.getStyleClass().addAll("delete-card-btn");
         editVehicleBtn.getStyleClass().addAll("edit-card-btn");
 
-        VBox actionableBox = new VBox(editVehicleBtn, deleteVehicleBtn);
+        VBox actionableBox = new VBox(editVehicleBtn, deleteVehicleBtn);*/
 
         VBox vehicleCard = new VBox();
         vehicleCard.setStyle("-fx-border-color: blue");
@@ -64,7 +55,7 @@ public class VehicleCard extends HBox{
         vehicleCard.getChildren().add(vehicleBox);
         vehicleCard.getChildren().add(customerInfoBox);
         vehicleCard.getChildren().add(buttonBox);
-        this.getChildren().addAll(vehicleCard, actionableBox);
+        this.getChildren().addAll(vehicleCard);
     }
 
     public VehicleCard(Vehicle vehicle) {
