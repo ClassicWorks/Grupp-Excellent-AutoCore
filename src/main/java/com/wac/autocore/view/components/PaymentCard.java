@@ -11,7 +11,7 @@ public class PaymentCard extends HBox {
         VBox paymentCard = new VBox();
         paymentCard.getStyleClass().add("payment-card");
 
-        Label invoiceLabel = new Label("Invoice #" + payment.getInvoiceId());
+        Label invoiceLabel = new Label("Invoice #" + payment.getInvoice().getId());
         Label amountLabel = new Label(payment.getAmount() + " SEK");
         Label typeLabel = new Label(payment.getPaymentType());
         Label dateLabel = new Label(payment.getPaymentDate().toString());

@@ -1,12 +1,10 @@
 package com.wac.autocore.data;
 
 import com.wac.autocore.model.Mechanic;
-import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +17,16 @@ public class MechanicRepoImpl implements MechanicRepo {
             transaction.commit();
             return m;
         }    }
+
+    @Override
+    public Mechanic update(Mechanic m) {
+        try (Session s = HibernateUtil.getSessionFactory().openSession()){
+            Transaction transaction = s.beginTransaction();
+            Mechanic saved = (Mechanic)s.merge(m);
+            transaction.commit();
+            return saved;
+        }
+    }
 
     @Override
     public List<Mechanic> getAll() {

@@ -21,24 +21,32 @@ public class GarageSystem {
     private final CustomerRepo customerRepo;
     private final MechanicRepo mechanicRepo;
     private final ServiceItemRepo serviceItemRepo;
+    private final BookingRepo bookingRepo;
+    private final WorkOrderRepo workOrderRepo;
+    private final InvoiceRepo invoiceRepo;
+    private final PaymentRepo paymentRepo;
 
     public GarageSystem() {
         vehicleRepo = new VehicleRepoImpl();
         customerRepo = new CustomerRepoImpl();
         mechanicRepo = new MechanicRepoImpl();
         serviceItemRepo = new ServiceItemRepoImpl();
+        bookingRepo = new BookingRepoImpl();
+        workOrderRepo = new WorkOrderRepoImpl();
+        invoiceRepo = new InvoiceRepoImpl();
+        paymentRepo  = new PaymentRepoImpl();
     }
 
     public void showCustomers() {
         System.out.println();
         System.out.println("=== CUSTOMERS ===");
 
-        if (Database.getCustomers().isEmpty()) {
+        if (customerRepo.getAll().isEmpty()) {
             System.out.println("No customers found.");
             return;
         }
 
-        for (Customer customer : Database.getCustomers()) {
+        for (Customer customer : customerRepo.getAll()) {
             System.out.println(customer);
         }
     }
@@ -60,12 +68,12 @@ public class GarageSystem {
         System.out.println();
         System.out.println("=== VEHICLES ===");
 
-        if (Database.getVehicles().isEmpty()) {
+        if (vehicleRepo.getAll().isEmpty()) {
             System.out.println("No vehicles found.");
             return;
         }
 
-        for (Vehicle vehicle : Database.getVehicles()) {
+        for (Vehicle vehicle : vehicleRepo.getAll()) {
             System.out.println(vehicle);
         }
     }
@@ -93,45 +101,44 @@ public class GarageSystem {
         System.out.println();
         System.out.println("=== BOOKINGS ===");
 
-        if (Database.getBookings().isEmpty()) {
+        if (bookingRepo.getAll().isEmpty()) {
             System.out.println("No bookings found.");
             return;
         }
 
-        for (Booking booking : Database.getBookings()) {
+        for (Booking booking : bookingRepo.getAll()) {
             System.out.println(booking);
         }
     }
 
     public List<Booking> getBookings() {
 
-        if (Database.getBookings().isEmpty()) {
+        List<Booking> bookings = bookingRepo.getAll();
+        if (bookings.isEmpty()) {
             System.out.println("No bookings found.");
             return new ArrayList<>();
         }
 
-        return Database.getBookings();
+        return bookings;
     }
 
     public Optional<Booking> getBooking(int id){
-        return Database.getBookings().stream()
-                .filter(booking -> booking.getId() == id)
-                .findFirst();
+        return bookingRepo.get(id);
     }
 
-    /*public void showServiceItems() {
+    public void showServiceItems() {
         System.out.println();
         System.out.println("=== SERVICES ===");
 
-        if (Database.getServiceItems().isEmpty()) {
+        if (serviceItemRepo.getAll().isEmpty()) {
             System.out.println("No services found.");
             return;
         }
 
-        for (ServiceItem serviceItem : Database.getServiceItems()) {
+        for (ServiceItem serviceItem : serviceItemRepo.getAll()) {
             System.out.println(serviceItem);
         }
-    }*/
+    }
 
     public List<ServiceItem> getServiceItems() {
         List<ServiceItem> serviceItems = serviceItemRepo.getAll();
@@ -151,12 +158,12 @@ public class GarageSystem {
         System.out.println();
         System.out.println("=== MECHANICS ===");
 
-        if (Database.getMechanics().isEmpty()) {
+        if (mechanicRepo.getAll().isEmpty()) {
             System.out.println("No mechanics found.");
             return;
         }
 
-        for (Mechanic mechanic : Database.getMechanics()) {
+        for (Mechanic mechanic : mechanicRepo.getAll()) {
             System.out.println(mechanic);
         }
     }
@@ -189,66 +196,100 @@ public class GarageSystem {
         System.out.println();
         System.out.println("=== WORK ORDERS ===");
 
-        if (Database.getWorkOrders().isEmpty()) {
+        if (workOrderRepo.getAll().isEmpty()) {
             System.out.println("No work orders found.");
             return;
         }
 
-        for (WorkOrder workOrder : Database.getWorkOrders()) {
+        for (WorkOrder workOrder : workOrderRepo.getAll()) {
             System.out.println(workOrder);
         }
     }
 
     public List<WorkOrder> getWorkOrders() {
-        if (Database.getWorkOrders().isEmpty()) {
+        List<WorkOrder> workOrders = workOrderRepo.getAll();
+        if (workOrders.isEmpty()) {
             System.out.println("No work orders found.");
             return new ArrayList<>();
         }
 
-        return Database.getWorkOrders();
+        return workOrders;
     }
 
     public Optional<WorkOrder> getWorkOrder(int id){
-        return Database.getWorkOrders().stream()
-                .filter(w -> w.getId() == id)
-                .findFirst();
+        return workOrderRepo.get(id);
+    }
+
+    private Optional<WorkOrder> getWorkOrderWithServiceItems(int workOrderId) {
+        return workOrderRepo.getWithServiceItems(workOrderId);
     }
 
     public void showInvoices() {
         System.out.println();
         System.out.println("=== INVOICES ===");
 
-        if (Database.getInvoices().isEmpty()) {
+        List<Invoice> invoices = invoiceRepo.getAll();
+        if (invoices.isEmpty()) {
             System.out.println("No invoices found.");
             return;
         }
 
-        for (Invoice invoice : Database.getInvoices()) {
+        for (Invoice invoice : invoices) {
             System.out.println(invoice);
         }
+    }
+
+    public List<Invoice> getInvoices(){
+        List<Invoice> invoices = invoiceRepo.getAll();
+        if (invoices.isEmpty()) {
+            System.out.println("No invoices found.");
+            return new ArrayList<>();
+        }
+        return invoices;
+    }
+
+    public Optional<Invoice> getInvoice(int id){
+        return invoiceRepo.get(id);
     }
 
     public void showPayments() {
         System.out.println();
         System.out.println("=== PAYMENTS ===");
 
-        if (Database.getPayments().isEmpty()) {
+        List<Payment> payments = paymentRepo.getAll();
+        if (payments.isEmpty()) {
             System.out.println("No payments found.");
             return;
         }
 
-        for (Payment payment : Database.getPayments()) {
+        for (Payment payment : payments) {
             System.out.println(payment);
         }
+    }
+
+    public List<Payment> getPayments(){
+        List<Payment> payments = paymentRepo.getAll();
+        if (payments.isEmpty()) {
+            System.out.println("No payments found.");
+            return new ArrayList<>();
+        }
+
+        return payments;
+    }
+
+    public Optional<Payment> getPayment(int id){
+        return paymentRepo.get(id);
     }
 
     public Customer createCustomer(String name, String phone, String email) {
         Customer customer = new Customer(name, phone, email);
 
-        System.out.println("Customer created successfully.");
-        System.out.println(customer);
+        Customer savedCustomer = customerRepo.save(customer);
 
-        return customer;
+        System.out.println("Customer created successfully.");
+        System.out.println(savedCustomer);
+
+        return savedCustomer;
     }
 
     public Vehicle createVehicle(String registrationNumber,
@@ -293,31 +334,31 @@ public class GarageSystem {
             return null;
         }
 
-        int id = Database.getBookings().size() + 1;
-
         Booking booking = new Booking(
-                id,
-                vehicleId,
+                optionalVehicle.get(),
                 date,
                 description
         );
 
-        Database.getBookings().add(booking);
+        Booking savedBooking = bookingRepo.save(booking);
 
         System.out.println("Booking created successfully.");
-        System.out.println(booking);
+        System.out.println(savedBooking);
 
-        return booking;
+        return savedBooking;
     }
 
+    @Deprecated
     public Booking createBooking(int vehicleId,
                                  LocalDate date,
                                  String description,
                                  int mechanicId) {
         Booking booking = createBooking(vehicleId, date, description);
-        if (booking != null) {
-            booking.setMechanicId(mechanicId);
-        }
+        //TODO should not be use
+        /*if (booking != null) {
+
+            booking.setMechanic(mechanicId);
+        }*/
         return booking;
     }
 
@@ -346,6 +387,11 @@ public class GarageSystem {
             return null;
         }
 
+        WorkOrder workOrder = new WorkOrder(
+                booking,
+                mechanic
+        );
+
         for (int serviceItemId : serviceItemIds) {
             Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
             if (!optionalServiceItem.isPresent()) {
@@ -354,28 +400,18 @@ public class GarageSystem {
                 );
                 return null;
             }
+            workOrder.addServiceItem(optionalServiceItem.get());
         }
 
-        int id = Database.getWorkOrders().size() + 1;
 
-        WorkOrder workOrder = new WorkOrder(
-                id,
-                bookingId,
-                mechanicId
-        );
-
-        for (int serviceItemId : serviceItemIds) {
-            workOrder.addServiceItem(serviceItemId);
-        }
-
-        Database.getWorkOrders().add(workOrder);
-
+        WorkOrder savedWorkOrder = workOrderRepo.save(workOrder);
         booking.setStatus("WORK_ORDER_CREATED");
+        bookingRepo.update(booking);
 
         System.out.println("Work order created successfully.");
-        System.out.println(workOrder);
+        System.out.println(savedWorkOrder);
 
-        return workOrder;
+        return savedWorkOrder;
     }
 
     public void startWorkOrder(int workOrderId) {
@@ -392,18 +428,19 @@ public class GarageSystem {
             return;
         }
 
-        Optional<Mechanic> mechanic = getMechanic(workOrder.getMechanicId());
-        Optional<Booking> booking = getBooking(workOrder.getBookingId());
+        Mechanic mechanic = workOrder.getMechanic();
+        Booking booking = workOrder.getBooking();
 
-        if (mechanic.isPresent()) {
-            mechanic.get().setAvailable(false);
+        if (mechanic != null) {
+            mechanic.setAvailable(false);
         }
 
-        if (booking.isPresent()) {
-            booking.get().setStatus("IN_PROGRESS");
+        if (booking != null) {
+            booking.setStatus("IN_PROGRESS");
         }
 
         workOrder.setStatus("IN_PROGRESS");
+        workOrderRepo.update(workOrder);
 
         System.out.println("Work order " + workOrderId + " has been started.");
     }
@@ -422,24 +459,25 @@ public class GarageSystem {
             return;
         }
 
-        Optional<Mechanic> mechanic = getMechanic(workOrder.getMechanicId());
-        Optional<Booking> booking = getBooking(workOrder.getBookingId());
+        Mechanic mechanic = workOrder.getMechanic();
+        Booking booking = workOrder.getBooking();
+
+        if (mechanic != null) {
+            mechanic.setAvailable(true);
+        }
+
+        if (booking != null) {
+            booking.setStatus("COMPLETED");
+        }
 
         workOrder.setStatus("COMPLETED");
-
-        if (mechanic.isPresent()) {
-            mechanic.get().setAvailable(true);
-        }
-
-        if (booking.isPresent()) {
-            booking.get().setStatus("COMPLETED");
-        }
+        workOrderRepo.update(workOrder);
 
         System.out.println("Work order " + workOrderId + " has been completed.");
     }
 
     public Invoice createInvoice(int workOrderId, String discountCode) {
-        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithServiceItems(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
             System.out.println("Work order with ID " + workOrderId + " does not exist.");
@@ -454,29 +492,21 @@ public class GarageSystem {
 
         double amount = 0.0;
 
-        for (Integer serviceItemId : workOrder.getServiceItemIds()) {
-            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
-
-            if (optionalServiceItem.isPresent()) {
-                amount += optionalServiceItem.get().getPrice();
-            }
+        for (ServiceItem serviceItem : workOrder.getServiceItems()) {
+                amount += serviceItem.getPrice();
         }
 
         double discount = 0.0;
 
-        Optional<Booking> optionalBooking = getBooking(workOrder.getBookingId());
+        Booking booking = workOrder.getBooking();
 
-        if (optionalBooking.isPresent()) {
-            Optional<Vehicle> optionalVehicle = getVehicle(optionalBooking.get().getVehicleId());
+        if (booking != null
+                && booking.getVehicle() != null
+                && booking.getVehicle().getCustomer() != null
+                && booking.getVehicle().getCustomer().isVip()) {
 
-            if (optionalVehicle.isPresent()) {
-                Customer customer = optionalVehicle.get().getCustomer();
-
-                if (customer != null && customer.isVip()) {
-                    discount += amount * 0.10;
-                    System.out.println("VIP discount applied: 10%");
-                }
-            }
+            discount += amount * 0.10;
+            System.out.println("VIP discount applied: 10%");
         }
 
         if (discountCode != null && !discountCode.trim().isEmpty()) {
@@ -498,46 +528,42 @@ public class GarageSystem {
             discount = amount;
         }
 
-        int id = Database.getInvoices().size() + 1;
 
         Invoice invoice = new Invoice(
-                id,
-                workOrderId,
+                workOrder,
                 LocalDate.now(),
                 amount
         );
 
         invoice.setDiscount(discount);
 
-        Database.getInvoices().add(invoice);
+        Invoice savedInvoice = invoiceRepo.save(invoice);
 
         System.out.println("Invoice created successfully.");
-        System.out.println(invoice);
+        System.out.println(savedInvoice);
 
         System.out.println("Sending invoice notification to customer...");
         System.out.println("Notification sent.");
 
-        return invoice;
+        return savedInvoice;
     }
 
     public Payment processPayment(int invoiceId, String paymentType) {
-        Invoice invoice = findInvoice(invoiceId);
+        Optional<Invoice> optionalInvoice = getInvoice(invoiceId);
 
-        if (invoice == null) {
+        if (!optionalInvoice.isPresent()) {
             System.out.println("Invoice with ID " + invoiceId + " does not exist.");
             return null;
         }
+        Invoice invoice = optionalInvoice.get();
 
         if (invoice.isPaid()) {
             System.out.println("Invoice has already been paid.");
             return null;
         }
 
-        int id = Database.getPayments().size() + 1;
-
         Payment payment = new Payment(
-                id,
-                invoiceId,
+                invoice,
                 invoice.getTotalAmount(),
                 paymentType
         );
@@ -567,10 +593,11 @@ public class GarageSystem {
         }
 
         payment.setSuccessful(successful);
-        Database.getPayments().add(payment);
+        Payment savedPayment = paymentRepo.save(payment);
 
         if (successful) {
             invoice.setPaid(true);
+            invoiceRepo.update(invoice);
 
             System.out.println("Payment completed successfully.");
             System.out.println("Sending payment confirmation to customer...");
@@ -579,16 +606,6 @@ public class GarageSystem {
             System.out.println("Payment failed.");
         }
 
-        return payment;
-    }
-
-    private Invoice findInvoice(int id) {
-        for (Invoice invoice : Database.getInvoices()) {
-            if (invoice.getId() == id) {
-                return invoice;
-            }
-        }
-
-        return null;
+        return savedPayment;
     }
 }

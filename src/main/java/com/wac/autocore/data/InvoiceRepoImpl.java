@@ -1,48 +1,49 @@
 package com.wac.autocore.data;
 
-import com.wac.autocore.model.Customer;
+import com.wac.autocore.model.Invoice;
+import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class CustomerRepoImpl implements CustomerRepo{
-
+public class InvoiceRepoImpl implements InvoiceRepo{
     @Override
-    public Customer save(Customer c) {
+    public Invoice save(Invoice i) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
-            s.persist(c);
+            s.persist(i);
             transaction.commit();
-            return c;
+            return i;
         }
     }
 
     @Override
-    public Customer update(Customer c) {
+    public Invoice update(Invoice i) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
-            Customer saved = (Customer) s.merge(c);
+            Invoice saved = (Invoice) s.merge(i);
             transaction.commit();
             return saved;
         }
     }
 
     @Override
-    public List<Customer> getAll() {
+    public List<Invoice> getAll() {
         try(Session s = HibernateUtil.getSessionFactory().openSession()){
-            return s.createQuery("from Customer", Customer.class)
+            return s.createQuery("from Invoice", Invoice.class)
                     .list();
         }
     }
 
     @Override
-    public Optional<Customer> get(int id) {
-        try(Session s = HibernateUtil.getSessionFactory().openSession()) {
+    public Optional<Invoice> get(int id) {
+        try (Session s = HibernateUtil.getSessionFactory().openSession()) {
             return s.createQuery(
-                            "from Customer c where c.id = :id" ,Customer.class)
+                            "from Invoice i where i.id = :id", Invoice.class)
                     .setParameter("id", id)
                     .uniqueResultOptional();
         }

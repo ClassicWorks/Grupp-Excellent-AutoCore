@@ -6,7 +6,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -42,15 +41,14 @@ public class CreateWorkOrderForm {
             return root;
         }
         Booking booking = optionalBooking.get();
-        Optional<Vehicle> optionalVehicle = garageSystem.getVehicle(booking.getVehicleId());
-        if(!optionalVehicle.isPresent()){
+        Vehicle vehicle = booking.getVehicle();
+        if(vehicle == null){
             root.setCenter(new Label("Error: Vehicle not found!"));
             root.setBottom(cancelBtn);
             return root;
         }
-        Vehicle vehicle = optionalVehicle.get();
 
-        Mechanic mechanic = garageSystem.getMechanic(booking.getMechanicId()).orElse(null);
+        Mechanic mechanic = booking.getMechanic();
 
         VBox bookingCard = createBookingCard(booking, vehicle, mechanic);
 
