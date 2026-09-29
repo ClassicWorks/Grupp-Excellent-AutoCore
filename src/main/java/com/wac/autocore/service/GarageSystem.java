@@ -10,7 +10,6 @@ import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.model.WorkOrder;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +24,7 @@ public class GarageSystem {
     private final BookingRepo bookingRepo;
     private final WorkOrderRepo workOrderRepo;
     private final InvoiceRepo invoiceRepo;
+    private final PaymentRepo paymentRepo;
 
     public GarageSystem() {
         vehicleRepo = new VehicleRepoImpl();
@@ -34,6 +34,7 @@ public class GarageSystem {
         bookingRepo = new BookingRepoImpl();
         workOrderRepo = new WorkOrderRepoImpl();
         invoiceRepo = new InvoiceRepoImpl();
+        paymentRepo  = new PaymentRepoImpl();
     }
 
     public void showCustomers() {
@@ -255,14 +256,29 @@ public class GarageSystem {
         System.out.println();
         System.out.println("=== PAYMENTS ===");
 
-        if (Database.getPayments().isEmpty()) {
+        List<Payment> payments = paymentRepo.getAll();
+        if (payments.isEmpty()) {
             System.out.println("No payments found.");
             return;
         }
 
-        for (Payment payment : Database.getPayments()) {
+        for (Payment payment : payments) {
             System.out.println(payment);
         }
+    }
+
+    public List<Payment> getPayments(){
+        List<Payment> payments = paymentRepo.getAll();
+        if (payments.isEmpty()) {
+            System.out.println("No payments found.");
+            return new ArrayList<>();
+        }
+
+        return payments;
+    }
+
+    public Optional<Payment> getPayment(int id){
+        return paymentRepo.get(id);
     }
 
     public Customer createCustomer(String name, String phone, String email) {
@@ -546,11 +562,8 @@ public class GarageSystem {
             return null;
         }
 
-        int id = Database.getPayments().size() + 1;
-
         Payment payment = new Payment(
-                id,
-                invoiceId,
+                invoice,
                 invoice.getTotalAmount(),
                 paymentType
         );
@@ -580,10 +593,11 @@ public class GarageSystem {
         }
 
         payment.setSuccessful(successful);
-        Database.getPayments().add(payment);
+        Payment savedPayment = paymentRepo.save(payment);
 
         if (successful) {
             invoice.setPaid(true);
+            invoiceRepo.update(invoice);
 
             System.out.println("Payment completed successfully.");
             System.out.println("Sending payment confirmation to customer...");
@@ -592,6 +606,6 @@ public class GarageSystem {
             System.out.println("Payment failed.");
         }
 
-        return payment;
+        return savedPayment;
     }
 }

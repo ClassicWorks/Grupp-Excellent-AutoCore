@@ -111,3 +111,7 @@ INSERT INTO invoices (work_order_id, invoice_date, amount, discount, total_amoun
 
 -- Invoice för WorkOrder 6: Obetald, 0 % rabatt
 INSERT INTO invoices (work_order_id, invoice_date, amount, discount, total_amount, paid) VALUES (6, '2026-09-29', 3495.00, 0.00, 3495.00, FALSE);
+
+-- Payment för invoice 2
+INSERT INTO payments (invoice_id, amount, payment_type, payment_date, successful) VALUES (1, 3495.00, 'CARD', '2026-09-30', FALSE);
+INSERT INTO payments (invoice_id, amount, payment_type, payment_date, successful) VALUES (1, 3495.00, 'CASH', '2026-09-30', TRUE);

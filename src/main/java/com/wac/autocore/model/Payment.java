@@ -1,24 +1,50 @@
 package com.wac.autocore.model;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "payments")
 public class Payment {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    //Cascade merge och persist
-    private int invoiceId;
+
+    @ManyToOne
+    @JoinColumn(name = "invoice_id")
+    private Invoice invoice;
+
+    @Column(name = "amount")
     private double amount;
+
+    @Column(name = "payment_type", length = 25)
     private String paymentType;
+
+    @Column(name = "payment_date")
     private LocalDateTime paymentDate;
+
+    @Column(name = "successful")
     private boolean successful;
 
-    public Payment(int id, int invoiceId, double amount, String paymentType) {
+    public Payment(int id, Invoice invoice, double amount, String paymentType) {
         this.id = id;
-        this.invoiceId = invoiceId;
+        this.invoice = invoice;
         this.amount = amount;
         this.paymentType = paymentType;
         this.paymentDate = LocalDateTime.now();
         this.successful = false;
+    }
+
+    public Payment(Invoice invoice, double amount, String paymentType) {
+        this.invoice = invoice;
+        this.amount = amount;
+        this.paymentType = paymentType;
+        this.paymentDate = LocalDateTime.now();
+        this.successful = false;
+    }
+
+    protected Payment() {
     }
 
     public int getId() {
@@ -29,12 +55,12 @@ public class Payment {
         this.id = id;
     }
 
-    public int getInvoiceId() {
-        return invoiceId;
+    public Invoice getInvoice() {
+        return invoice;
     }
 
-    public void setInvoiceId(int invoiceId) {
-        this.invoiceId = invoiceId;
+    public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
     }
 
     public double getAmount() {
@@ -72,7 +98,7 @@ public class Payment {
     @Override
     public String toString() {
         return id +
-                " - Invoice ID: " + invoiceId +
+                " - Invoice ID: " + invoice +
                 " | Amount: " + amount + " SEK" +
                 " | Payment type: " + paymentType +
                 " | Date: " + paymentDate +
