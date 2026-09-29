@@ -1,27 +1,30 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Mechanic;
-import javafx.scene.Node;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.function.Consumer;
 
-public class MechanicCard {
+public class MechanicCard extends HBox {
 
-    public static Node getCard(Mechanic mechanic, Consumer<Mechanic> onCardClick) {
-
-        VBox card = new VBox(5);
-        card.setStyle("-fx-border-color: gray; -fx-padding: 10;");
+    public MechanicCard(Mechanic mechanic, Consumer<Mechanic> onCardClick) {
+        ImageView mechanicIcon = new IconImageView("/imgs/wrench-solid.png", 40, 40);
 
         Label nameLabel = new Label(mechanic.getName());
-        Label specializationLabel = new Label(mechanic.getSpecialization());
+        Label specializationlabel = new Label(mechanic.getSpecialization());
+        Label availabilityLabel = new Label(mechanic.isAvailable() ? "Available" : "Busy");
 
-        card.getChildren().addAll(nameLabel, specializationLabel);
+        VBox mechanicInfo = new VBox(nameLabel, specializationlabel, availabilityLabel);
 
-        card.setOnMouseClicked((MouseEvent event) -> onCardClick.accept(mechanic));
+        this.getChildren().addAll(mechanicIcon, mechanicInfo);
+        this.setAlignment(Pos.CENTER_LEFT);
+        this.setStyle("-fx-border-color: blue;");
+        this.getStyleClass().addAll("mechanic-card", "card");
 
-        return card;
+        this.setOnMouseClicked(e -> onCardClick.accept(mechanic));
     }
 }
