@@ -17,5 +17,6 @@
         <mapping class="com.wac.autocore.model.Vehicle"/>
         <mapping class="com.wac.autocore.model.Mechanic"/>
         <mapping class="com.wac.autocore.model.Customer"/>
+        <mapping class="com.wac.autocore.model.ServiceItem"/>
     </session-factory>
 </hibernate-configuration>

@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface CustomerRepo {
     Customer save(Customer customer);
-    List<Customer> getCustomers();
-    Optional<Customer> getCustomer(int id);
+    List<Customer> getAll();
+    Optional<Customer> get(int id);
 }

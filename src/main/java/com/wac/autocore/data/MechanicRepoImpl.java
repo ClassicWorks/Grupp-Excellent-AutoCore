@@ -21,7 +21,7 @@ public class MechanicRepoImpl implements MechanicRepo {
         }    }
 
     @Override
-    public List<Mechanic> getMechanics() {
+    public List<Mechanic> getAll() {
         try(Session s = HibernateUtil.getSessionFactory().openSession()){
             return s.createQuery("from Mechanic", Mechanic.class)
                     .list();
@@ -29,7 +29,7 @@ public class MechanicRepoImpl implements MechanicRepo {
     }
 
     @Override
-    public List<Mechanic> getAvailableMechanics() {
+    public List<Mechanic> getAllAvailable() {
         try (Session s = HibernateUtil.getSessionFactory().openSession()) {
             return s.createQuery("from Mechanic m where m.available = true", Mechanic.class)
                     .list();
@@ -37,7 +37,7 @@ public class MechanicRepoImpl implements MechanicRepo {
     }
 
     @Override
-    public Optional<Mechanic> getMechanic(int id) {
+    public Optional<Mechanic> get(int id) {
         try(Session s = HibernateUtil.getSessionFactory().openSession()) {
             return s.createQuery(
                             "from Mechanic m where m.id = :id", Mechanic.class)

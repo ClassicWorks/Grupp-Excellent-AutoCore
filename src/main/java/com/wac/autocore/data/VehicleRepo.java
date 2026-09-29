@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface VehicleRepo {
-    Vehicle saveVehicle(Vehicle v);
-    List<Vehicle> getVehicles();
-    Optional<Vehicle> getVehicle(int id);
+    Vehicle save(Vehicle v);
+    List<Vehicle> getAll();
+    Optional<Vehicle> get(int id);
 }

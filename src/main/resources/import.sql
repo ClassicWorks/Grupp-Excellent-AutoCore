@@ -22,8 +22,19 @@ INSERT INTO vehicles (brand, model, registration_number, year, customer_id) VALU
 INSERT INTO vehicles (brand, model, registration_number, year, customer_id) VALUES ('Skoda', 'Octavia', 'VWX234', 2023, 4);
 INSERT INTO vehicles (brand, model, registration_number, year, customer_id) VALUES ('Ford', 'Focus', 'YZA567', 2017, 4);
 
+-- Mechanics
 INSERT INTO mechanics (name, phone, specialization, available) VALUES ('Johan Karlsson', '070-5551111', 'General service', 1);
 
 INSERT INTO mechanics (name, phone, specialization, available) VALUES ('Sara Nilsson', '070-5552222', 'Brakes', 1);
 
 INSERT INTO mechanics (name, phone, specialization, available) VALUES ('Mikael Berg', '070-5553333', 'Diagnostics', 1);
+
+
+-- Service items
+INSERT INTO service_item (name, description, price, estimated_minutes) VALUES ('Oil change', 'Engine oil and oil filter replacement', 1295.0, 45);
+
+INSERT INTO service_item (name, description, price, estimated_minutes) VALUES ('Brake service', 'Inspection and replacement of front brake pads', 2495.0, 90);
+
+INSERT INTO service_item (name, description, price, estimated_minutes) VALUES ('Diagnostics', 'Electronic fault code diagnostics', 995.0, 60);
+
+INSERT INTO service_item (name, description, price, estimated_minutes) VALUES ('Annual service', 'Standard annual vehicle service', 3495.0, 120);

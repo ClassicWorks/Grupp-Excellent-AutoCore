@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface MechanicRepo {
     Mechanic save(Mechanic m);
-    List<Mechanic> getMechanics();
-    List<Mechanic> getAvailableMechanics();
-    Optional<Mechanic> getMechanic(int id);
+    List<Mechanic> getAll();
+    List<Mechanic> getAllAvailable();
+    Optional<Mechanic> get(int id);
 }
