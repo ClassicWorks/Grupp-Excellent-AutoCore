@@ -53,7 +53,7 @@ public class Database {
 
         customers.get(1).setVip(true);
 
-        vehicles.add(new Vehicle(
+        /*vehicles.add(new Vehicle(
                 1,
                 "ABC123",
                 "Volvo",
@@ -87,7 +87,7 @@ public class Database {
                 "X4",
                 2014,
                 3
-        ));
+        ));*/
 
         serviceItems.add(new ServiceItem(
                 1,

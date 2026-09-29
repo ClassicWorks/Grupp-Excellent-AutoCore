@@ -1,11 +1,25 @@
 package com.wac.autocore.model;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "mechanics")
 public class Mechanic {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
+
+    @Column(name = "phone", length = 20)
     private String phone;
+
+    @Column(name = "specialization", length = 50)
     private String specialization;
+
+    @Column(name = "available")
     private boolean available;
 
     public Mechanic(int id, String name, String phone, String specialization) {
@@ -14,6 +28,16 @@ public class Mechanic {
         this.phone = phone;
         this.specialization = specialization;
         this.available = true;
+    }
+
+    public Mechanic(String name, String phone, String specialization) {
+        this.name = name;
+        this.phone = phone;
+        this.specialization = specialization;
+        this.available = true;
+    }
+
+    protected Mechanic() {
     }
 
     public int getId() {

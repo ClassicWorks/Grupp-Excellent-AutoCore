@@ -21,3 +21,9 @@ INSERT INTO vehicles (brand, model, registration_number, year, customer_id) VALU
 -- Johan har 2 bilar
 INSERT INTO vehicles (brand, model, registration_number, year, customer_id) VALUES ('Skoda', 'Octavia', 'VWX234', 2023, 4);
 INSERT INTO vehicles (brand, model, registration_number, year, customer_id) VALUES ('Ford', 'Focus', 'YZA567', 2017, 4);
+
+INSERT INTO mechanics (name, phone, specialization, available) VALUES ('Johan Karlsson', '070-5551111', 'General service', 1);
+
+INSERT INTO mechanics (name, phone, specialization, available) VALUES ('Sara Nilsson', '070-5552222', 'Brakes', 1);
+
+INSERT INTO mechanics (name, phone, specialization, available) VALUES ('Mikael Berg', '070-5553333', 'Diagnostics', 1);

@@ -1,9 +1,6 @@
 package com.wac.autocore.service;
 
-import com.wac.autocore.data.CustomerRepo;
-import com.wac.autocore.data.CustomerRepoImpl;
-import com.wac.autocore.data.Database;
-import com.wac.autocore.data.VehicleRepoImpl;
+import com.wac.autocore.data.*;
 import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Invoice;
@@ -22,6 +19,7 @@ import java.util.stream.Collectors;
 public class GarageSystem {
     private VehicleRepoImpl vehicleRepoImpl = new VehicleRepoImpl();
     private CustomerRepo customerRepo = new CustomerRepoImpl();
+    private MechanicRepo mechanicRepo = new MechanicRepoImpl();
 
     public void showCustomers() {
         System.out.println();
@@ -157,18 +155,27 @@ public class GarageSystem {
     }
 
     public List<Mechanic> getMechanics() {
-        if (Database.getMechanics().isEmpty()) {
+        List<Mechanic> mechanics = mechanicRepo.getMechanics();
+        if (mechanics.isEmpty()) {
             System.out.println("No mechanics found.");
             return new ArrayList<>();
         }
 
-        return Database.getMechanics();
+        return mechanics;
+    }
+
+    public List<Mechanic> getAvailableMechanics() {
+        List<Mechanic> mechanics = mechanicRepo.getAvailableMechanics();
+        if (mechanics.isEmpty()) {
+            System.out.println("No available mechanics found.");
+            return new ArrayList<>();
+        }
+
+        return mechanics;
     }
 
     public Optional<Mechanic> getMechanic(int id){
-        return Database.getMechanics().stream()
-                .filter(m -> m.getId() == id)
-                .findFirst();
+        return mechanicRepo.getMechanic(id);
     }
 
     public void showWorkOrders() {
@@ -229,10 +236,7 @@ public class GarageSystem {
     }
 
     public Customer createCustomer(String name, String phone, String email) {
-        int id = Database.getCustomers().size() + 1;
-
         Customer customer = new Customer(name, phone, email);
-        //Database.getCustomers().add(customer);
 
         System.out.println("Customer created successfully.");
         System.out.println(customer);
@@ -263,7 +267,6 @@ public class GarageSystem {
         );
 
         Vehicle savedVehicle = vehicleRepoImpl.saveVehicle(vehicle);
-        //Database.getVehicles().add(vehicle);
 
         System.out.println("Vehicle created successfully.");
         System.out.println(savedVehicle);
