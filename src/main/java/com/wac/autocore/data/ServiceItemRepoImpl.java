@@ -1,6 +1,6 @@
 package com.wac.autocore.data;
 
-import com.wac.autocore.model.Customer;
+import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -8,31 +8,29 @@ import org.hibernate.Transaction;
 import java.util.List;
 import java.util.Optional;
 
-public class CustomerRepoImpl implements CustomerRepo{
-
+public class ServiceItemRepoImpl implements ServiceItemRepo {
     @Override
-    public Customer save(Customer c) {
+    public ServiceItem save(ServiceItem si) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
-            s.persist(c);
+            s.persist(si);
             transaction.commit();
-            return c;
+            return si;
         }
     }
 
     @Override
-    public List<Customer> getAll() {
+    public List<ServiceItem> getAll() {
         try(Session s = HibernateUtil.getSessionFactory().openSession()){
-            return s.createQuery("from Customer", Customer.class)
+            return s.createQuery("from ServiceItem", ServiceItem.class)
                     .list();
-        }
-    }
+        }    }
 
     @Override
-    public Optional<Customer> get(int id) {
+    public Optional<ServiceItem> get(int id) {
         try(Session s = HibernateUtil.getSessionFactory().openSession()) {
             return s.createQuery(
-                            "from Customer c where c.id = :id" ,Customer.class)
+                            "from ServiceItem si where si.id = :id" ,ServiceItem.class)
                     .setParameter("id", id)
                     .uniqueResultOptional();
         }

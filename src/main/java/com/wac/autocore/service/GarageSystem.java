@@ -1,9 +1,6 @@
 package com.wac.autocore.service;
 
-import com.wac.autocore.data.CustomerRepo;
-import com.wac.autocore.data.CustomerRepoImpl;
-import com.wac.autocore.data.Database;
-import com.wac.autocore.data.VehicleRepoImpl;
+import com.wac.autocore.data.*;
 import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Invoice;
@@ -20,8 +17,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GarageSystem {
-    private VehicleRepoImpl vehicleRepoImpl = new VehicleRepoImpl();
-    private CustomerRepo customerRepo = new CustomerRepoImpl();
+    private final VehicleRepo vehicleRepo;
+    private final CustomerRepo customerRepo;
+    private final MechanicRepo mechanicRepo;
+    private final ServiceItemRepo serviceItemRepo;
+
+    public GarageSystem() {
+        vehicleRepo = new VehicleRepoImpl();
+        customerRepo = new CustomerRepoImpl();
+        mechanicRepo = new MechanicRepoImpl();
+        serviceItemRepo = new ServiceItemRepoImpl();
+    }
 
     public void showCustomers() {
         System.out.println();
@@ -38,16 +44,16 @@ public class GarageSystem {
     }
 
     public List<Customer> getCustomers() {
-        if (customerRepo.getCustomers().isEmpty()) {
+        if (customerRepo.getAll().isEmpty()) {
             System.out.println("No customers found.");
             return new ArrayList<>();
         }
 
-        return customerRepo.getCustomers();
+        return customerRepo.getAll();
     }
 
     public Optional<Customer> getCustomer(int id){
-        return customerRepo.getCustomer(id);
+        return customerRepo.get(id);
     }
 
     public void showVehicles() {
@@ -65,16 +71,16 @@ public class GarageSystem {
     }
 
     public List<Vehicle> getVehicles() {
-        if (vehicleRepoImpl.getVehicles().isEmpty()) {
+        if (vehicleRepo.getAll().isEmpty()) {
             System.out.println("No vehicles found.");
             return new ArrayList<>();
         }
 
-        return vehicleRepoImpl.getVehicles();
+        return vehicleRepo.getAll();
     }
 
     public Optional<Vehicle> getVehicle(int id){
-        return vehicleRepoImpl.getVehicle(id);
+        return vehicleRepo.get(id);
     }
 
     public List<Vehicle> getCustomersVehicle(int customerId){
@@ -113,7 +119,7 @@ public class GarageSystem {
                 .findFirst();
     }
 
-    public void showServiceItems() {
+    /*public void showServiceItems() {
         System.out.println();
         System.out.println("=== SERVICES ===");
 
@@ -125,21 +131,20 @@ public class GarageSystem {
         for (ServiceItem serviceItem : Database.getServiceItems()) {
             System.out.println(serviceItem);
         }
-    }
+    }*/
 
     public List<ServiceItem> getServiceItems() {
-        if (Database.getServiceItems().isEmpty()) {
+        List<ServiceItem> serviceItems = serviceItemRepo.getAll();
+        if (serviceItems.isEmpty()) {
             System.out.println("No services found.");
             return new ArrayList<>();
         }
 
-        return Database.getServiceItems();
+        return serviceItems;
     }
 
     public Optional<ServiceItem> getServiceItem(int id){
-        return Database.getServiceItems().stream()
-                .filter(serviceItem -> serviceItem.getId() == id)
-                .findFirst();
+        return serviceItemRepo.get(id);
     }
 
     public void showMechanics() {
@@ -157,18 +162,27 @@ public class GarageSystem {
     }
 
     public List<Mechanic> getMechanics() {
-        if (Database.getMechanics().isEmpty()) {
+        List<Mechanic> mechanics = mechanicRepo.getAll();
+        if (mechanics.isEmpty()) {
             System.out.println("No mechanics found.");
             return new ArrayList<>();
         }
 
-        return Database.getMechanics();
+        return mechanics;
+    }
+
+    public List<Mechanic> getAvailableMechanics() {
+        List<Mechanic> mechanics = mechanicRepo.getAllAvailable();
+        if (mechanics.isEmpty()) {
+            System.out.println("No available mechanics found.");
+            return new ArrayList<>();
+        }
+
+        return mechanics;
     }
 
     public Optional<Mechanic> getMechanic(int id){
-        return Database.getMechanics().stream()
-                .filter(m -> m.getId() == id)
-                .findFirst();
+        return mechanicRepo.get(id);
     }
 
     public void showWorkOrders() {
@@ -229,10 +243,7 @@ public class GarageSystem {
     }
 
     public Customer createCustomer(String name, String phone, String email) {
-        int id = Database.getCustomers().size() + 1;
-
         Customer customer = new Customer(name, phone, email);
-        //Database.getCustomers().add(customer);
 
         System.out.println("Customer created successfully.");
         System.out.println(customer);
@@ -246,12 +257,13 @@ public class GarageSystem {
                                  int year,
                                  int customerId) {
 
-        Customer customer = findCustomer(customerId);
+        Optional<Customer> optionalCustomer = getCustomer(customerId);
 
-        if (customer == null) {
+        if (!optionalCustomer.isPresent()) {
             System.out.println("Customer with ID " + customerId + " does not exist.");
             return null;
         }
+        Customer customer = optionalCustomer.get();
 
 
         Vehicle vehicle = new Vehicle(
@@ -262,8 +274,7 @@ public class GarageSystem {
                 customer
         );
 
-        Vehicle savedVehicle = vehicleRepoImpl.saveVehicle(vehicle);
-        //Database.getVehicles().add(vehicle);
+        Vehicle savedVehicle = vehicleRepo.save(vehicle);
 
         System.out.println("Vehicle created successfully.");
         System.out.println(savedVehicle);
@@ -275,9 +286,9 @@ public class GarageSystem {
                                  LocalDate date,
                                  String description) {
 
-        Vehicle vehicle = findVehicle(vehicleId);
+        Optional<Vehicle> optionalVehicle = getVehicle(vehicleId);
 
-        if (vehicle == null) {
+        if (!optionalVehicle.isPresent()) {
             System.out.println("Vehicle with ID " + vehicleId + " does not exist.");
             return null;
         }
@@ -314,19 +325,21 @@ public class GarageSystem {
                                      int mechanicId,
                                      int... serviceItemIds) {
 
-        Booking booking = findBooking(bookingId);
+        Optional<Booking> optionalBooking = getBooking(bookingId);
 
-        if (booking == null) {
+        if (!optionalBooking.isPresent()) {
             System.out.println("Booking with ID " + bookingId + " does not exist.");
             return null;
         }
+        Booking booking = optionalBooking.get();
 
-        Mechanic mechanic = findMechanic(mechanicId);
+        Optional<Mechanic> optionalMechanic = getMechanic(mechanicId);
 
-        if (mechanic == null) {
+        if (!optionalMechanic.isPresent()) {
             System.out.println("Mechanic with ID " + mechanicId + " does not exist.");
             return null;
         }
+        Mechanic mechanic = optionalMechanic.get();
 
         if (!mechanic.isAvailable()) {
             System.out.println("Mechanic " + mechanic.getName() + " is not available.");
@@ -334,7 +347,8 @@ public class GarageSystem {
         }
 
         for (int serviceItemId : serviceItemIds) {
-            if (findServiceItem(serviceItemId) == null) {
+            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
+            if (!optionalServiceItem.isPresent()) {
                 System.out.println(
                         "Service item with ID " + serviceItemId + " does not exist."
                 );
@@ -365,27 +379,28 @@ public class GarageSystem {
     }
 
     public void startWorkOrder(int workOrderId) {
-        WorkOrder workOrder = findWorkOrder(workOrderId);
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
-        if (workOrder == null) {
+        if (!optionalWorkOrder.isPresent()) {
             System.out.println("Work order with ID " + workOrderId + " does not exist.");
             return;
         }
+        WorkOrder workOrder = optionalWorkOrder.get();
 
         if (!workOrder.getStatus().equals("CREATED")) {
             System.out.println("Work order cannot be started.");
             return;
         }
 
-        Mechanic mechanic = findMechanic(workOrder.getMechanicId());
-        Booking booking = findBooking(workOrder.getBookingId());
+        Optional<Mechanic> mechanic = getMechanic(workOrder.getMechanicId());
+        Optional<Booking> booking = getBooking(workOrder.getBookingId());
 
-        if (mechanic != null) {
-            mechanic.setAvailable(false);
+        if (mechanic.isPresent()) {
+            mechanic.get().setAvailable(false);
         }
 
-        if (booking != null) {
-            booking.setStatus("IN_PROGRESS");
+        if (booking.isPresent()) {
+            booking.get().setStatus("IN_PROGRESS");
         }
 
         workOrder.setStatus("IN_PROGRESS");
@@ -394,41 +409,43 @@ public class GarageSystem {
     }
 
     public void completeWorkOrder(int workOrderId) {
-        WorkOrder workOrder = findWorkOrder(workOrderId);
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
-        if (workOrder == null) {
+        if (!optionalWorkOrder.isPresent()) {
             System.out.println("Work order with ID " + workOrderId + " does not exist.");
             return;
         }
+        WorkOrder workOrder = optionalWorkOrder.get();
 
         if (!workOrder.getStatus().equals("IN_PROGRESS")) {
             System.out.println("Only work orders in progress can be completed.");
             return;
         }
 
-        Mechanic mechanic = findMechanic(workOrder.getMechanicId());
-        Booking booking = findBooking(workOrder.getBookingId());
+        Optional<Mechanic> mechanic = getMechanic(workOrder.getMechanicId());
+        Optional<Booking> booking = getBooking(workOrder.getBookingId());
 
         workOrder.setStatus("COMPLETED");
 
-        if (mechanic != null) {
-            mechanic.setAvailable(true);
+        if (mechanic.isPresent()) {
+            mechanic.get().setAvailable(true);
         }
 
-        if (booking != null) {
-            booking.setStatus("COMPLETED");
+        if (booking.isPresent()) {
+            booking.get().setStatus("COMPLETED");
         }
 
         System.out.println("Work order " + workOrderId + " has been completed.");
     }
 
     public Invoice createInvoice(int workOrderId, String discountCode) {
-        WorkOrder workOrder = findWorkOrder(workOrderId);
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
-        if (workOrder == null) {
+        if (!optionalWorkOrder.isPresent()) {
             System.out.println("Work order with ID " + workOrderId + " does not exist.");
             return null;
         }
+        WorkOrder workOrder = optionalWorkOrder.get();
 
         if (!workOrder.getStatus().equals("COMPLETED")) {
             System.out.println("Invoice can only be created for a completed work order.");
@@ -438,22 +455,22 @@ public class GarageSystem {
         double amount = 0.0;
 
         for (Integer serviceItemId : workOrder.getServiceItemIds()) {
-            ServiceItem serviceItem = findServiceItem(serviceItemId);
+            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
 
-            if (serviceItem != null) {
-                amount += serviceItem.getPrice();
+            if (optionalServiceItem.isPresent()) {
+                amount += optionalServiceItem.get().getPrice();
             }
         }
 
         double discount = 0.0;
 
-        Booking booking = findBooking(workOrder.getBookingId());
+        Optional<Booking> optionalBooking = getBooking(workOrder.getBookingId());
 
-        if (booking != null) {
-            Vehicle vehicle = findVehicle(booking.getVehicleId());
+        if (optionalBooking.isPresent()) {
+            Optional<Vehicle> optionalVehicle = getVehicle(optionalBooking.get().getVehicleId());
 
-            if (vehicle != null) {
-                Customer customer = findCustomer(vehicle.getCustomer().getId());
+            if (optionalVehicle.isPresent()) {
+                Customer customer = optionalVehicle.get().getCustomer();
 
                 if (customer != null && customer.isVip()) {
                     discount += amount * 0.10;
@@ -563,66 +580,6 @@ public class GarageSystem {
         }
 
         return payment;
-    }
-
-    private Customer findCustomer(int id) {
-        for (Customer customer : Database.getCustomers()) {
-            if (customer.getId() == id) {
-                return customer;
-            }
-        }
-
-        return null;
-    }
-
-    private Vehicle findVehicle(int id) {
-        for (Vehicle vehicle : Database.getVehicles()) {
-            if (vehicle.getId() == id) {
-                return vehicle;
-            }
-        }
-
-        return null;
-    }
-
-    private Booking findBooking(int id) {
-        for (Booking booking : Database.getBookings()) {
-            if (booking.getId() == id) {
-                return booking;
-            }
-        }
-
-        return null;
-    }
-
-    private Mechanic findMechanic(int id) {
-        for (Mechanic mechanic : Database.getMechanics()) {
-            if (mechanic.getId() == id) {
-                return mechanic;
-            }
-        }
-
-        return null;
-    }
-
-    private ServiceItem findServiceItem(int id) {
-        for (ServiceItem serviceItem : Database.getServiceItems()) {
-            if (serviceItem.getId() == id) {
-                return serviceItem;
-            }
-        }
-
-        return null;
-    }
-
-    private WorkOrder findWorkOrder(int id) {
-        for (WorkOrder workOrder : Database.getWorkOrders()) {
-            if (workOrder.getId() == id) {
-                return workOrder;
-            }
-        }
-
-        return null;
     }
 
     private Invoice findInvoice(int id) {

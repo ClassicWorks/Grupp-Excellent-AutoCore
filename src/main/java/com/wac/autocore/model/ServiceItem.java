@@ -1,11 +1,22 @@
 package com.wac.autocore.model;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "service_item")
 public class ServiceItem {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
+    @Column(name = "description", nullable = false, length = 255)
     private String description;
+    @Column(name = "price", nullable = false)
     private double price;
+    @Column(name = "estimated_minutes", nullable = false)
     private int estimatedMinutes;
 
     public ServiceItem(int id, String name, String description,
@@ -15,6 +26,17 @@ public class ServiceItem {
         this.description = description;
         this.price = price;
         this.estimatedMinutes = estimatedMinutes;
+    }
+
+    public ServiceItem(String name, String description,
+                       double price, int estimatedMinutes) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.estimatedMinutes = estimatedMinutes;
+    }
+
+    protected ServiceItem() {
     }
 
     public int getId() {

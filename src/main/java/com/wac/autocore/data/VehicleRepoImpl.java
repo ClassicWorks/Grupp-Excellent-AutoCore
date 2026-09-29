@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class VehicleRepoImpl implements VehicleRepo{
-    public Vehicle saveVehicle(Vehicle v){
+    public Vehicle save(Vehicle v){
         try (Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
             s.persist(v);
@@ -18,14 +18,14 @@ public class VehicleRepoImpl implements VehicleRepo{
         }
     }
 
-    public List<Vehicle> getVehicles(){
+    public List<Vehicle> getAll(){
         try(Session s = HibernateUtil.getSessionFactory().openSession()){
             return s.createQuery("from Vehicle", Vehicle.class)
                     .list();
         }
     }
 
-    public Optional<Vehicle> getVehicle(int id){
+    public Optional<Vehicle> get(int id){
         try(Session s = HibernateUtil.getSessionFactory().openSession()) {
             return s.createQuery(
                     "from Vehicle v where v.id = :id" ,Vehicle.class)
