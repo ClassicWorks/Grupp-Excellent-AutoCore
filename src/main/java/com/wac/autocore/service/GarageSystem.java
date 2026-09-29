@@ -1,6 +1,9 @@
 package com.wac.autocore.service;
 
+import com.wac.autocore.data.CustomerRepo;
+import com.wac.autocore.data.CustomerRepoImpl;
 import com.wac.autocore.data.Database;
+import com.wac.autocore.data.VehicleRepoImpl;
 import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Invoice;
@@ -17,6 +20,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GarageSystem {
+    private VehicleRepoImpl vehicleRepoImpl = new VehicleRepoImpl();
+    private CustomerRepo customerRepo = new CustomerRepoImpl();
 
     public void showCustomers() {
         System.out.println();
@@ -33,18 +38,16 @@ public class GarageSystem {
     }
 
     public List<Customer> getCustomers() {
-        if (Database.getCustomers().isEmpty()) {
+        if (customerRepo.getCustomers().isEmpty()) {
             System.out.println("No customers found.");
             return new ArrayList<>();
         }
 
-        return Database.getCustomers();
+        return customerRepo.getCustomers();
     }
 
     public Optional<Customer> getCustomer(int id){
-        return Database.getCustomers().stream()
-                .filter(c -> id == c.getId() )
-                .findFirst();
+        return customerRepo.getCustomer(id);
     }
 
     public void showVehicles() {
@@ -62,23 +65,21 @@ public class GarageSystem {
     }
 
     public List<Vehicle> getVehicles() {
-        if (Database.getVehicles().isEmpty()) {
+        if (vehicleRepoImpl.getVehicles().isEmpty()) {
             System.out.println("No vehicles found.");
             return new ArrayList<>();
         }
 
-        return Database.getVehicles();
+        return vehicleRepoImpl.getVehicles();
     }
 
     public Optional<Vehicle> getVehicle(int id){
-        return Database.getVehicles().stream()
-                .filter(v -> id == v.getId() )
-                .findFirst();
+        return vehicleRepoImpl.getVehicle(id);
     }
 
     public List<Vehicle> getCustomersVehicle(int customerId){
         return getVehicles().stream()
-                .filter(v -> customerId == v.getCustomerId())
+                .filter(v -> customerId == v.getCustomer().getId())
                 .collect(Collectors.toList());
     }
 
@@ -230,8 +231,8 @@ public class GarageSystem {
     public Customer createCustomer(String name, String phone, String email) {
         int id = Database.getCustomers().size() + 1;
 
-        Customer customer = new Customer(id, name, phone, email);
-        Database.getCustomers().add(customer);
+        Customer customer = new Customer(name, phone, email);
+        //Database.getCustomers().add(customer);
 
         System.out.println("Customer created successfully.");
         System.out.println(customer);
@@ -252,23 +253,22 @@ public class GarageSystem {
             return null;
         }
 
-        int id = Database.getVehicles().size() + 1;
 
         Vehicle vehicle = new Vehicle(
-                id,
                 registrationNumber,
                 brand,
                 model,
                 year,
-                customerId
+                customer
         );
 
-        Database.getVehicles().add(vehicle);
+        Vehicle savedVehicle = vehicleRepoImpl.saveVehicle(vehicle);
+        //Database.getVehicles().add(vehicle);
 
         System.out.println("Vehicle created successfully.");
-        System.out.println(vehicle);
+        System.out.println(savedVehicle);
 
-        return vehicle;
+        return savedVehicle;
     }
 
     public Booking createBooking(int vehicleId,
@@ -453,7 +453,7 @@ public class GarageSystem {
             Vehicle vehicle = findVehicle(booking.getVehicleId());
 
             if (vehicle != null) {
-                Customer customer = findCustomer(vehicle.getCustomerId());
+                Customer customer = findCustomer(vehicle.getCustomer().getId());
 
                 if (customer != null && customer.isVip()) {
                     discount += amount * 0.10;

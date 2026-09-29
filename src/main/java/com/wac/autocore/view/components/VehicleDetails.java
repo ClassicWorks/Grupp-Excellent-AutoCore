@@ -83,7 +83,7 @@ public class VehicleDetails extends BorderPane {
                     vehicleOwner.getPhone()
             ));
 
-            if(vehicleOwner.getId() != vehicle.getCustomerId()){
+            if(vehicleOwner.getId() != vehicle.getCustomer().getId()){
                 isChangedNotification.setText("Vehicle needs to be saved to set new vehicle owner");
             }
         } else {
@@ -167,7 +167,7 @@ public class VehicleDetails extends BorderPane {
                     brandField.getText(),
                     modelField.getText(),
                     Integer.parseInt(yearField.getText()),
-                    vehicleOwner.getId()
+                    vehicleOwner
             );
             System.out.printf("Should call ViewManager.getInstance.saveVehicle(%d, %s)", vehicle.getId(), newVehicle);
 

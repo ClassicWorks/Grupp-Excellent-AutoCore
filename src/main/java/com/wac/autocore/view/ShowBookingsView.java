@@ -56,8 +56,6 @@ public class ShowBookingsView {
                 }
                 Vehicle vehicle = garageSystem.getVehicle(booking.getVehicleId())
                         .orElseThrow(() -> new NullPointerException(String.format("No vehicle with id %d found.", booking.getVehicleId())));
-                Customer customer = garageSystem.getCustomer(vehicle.getCustomerId())
-                        .orElseThrow(() -> new NullPointerException(String.format("No customer with id %d found.", vehicle.getCustomerId())));
                 Mechanic mechanic = garageSystem.getMechanic(booking.getMechanicId()).orElse(null);
 
                 BookingCard bookingCard = new BookingCard(

@@ -44,7 +44,7 @@ public class ShowVehicleView {
 
         //TODO listan ska kunna uppdateras baserat på filtering
         for (Vehicle vehicle : garageSystem.getVehicles()){
-            Customer customer = garageSystem.getCustomer(vehicle.getCustomerId()).orElse(null);
+            Customer customer = vehicle.getCustomer();
             VehicleCard vehicleCard = new VehicleCard(vehicle, customer);
             vehicleCard.setOnMouseClicked(e-> {
 

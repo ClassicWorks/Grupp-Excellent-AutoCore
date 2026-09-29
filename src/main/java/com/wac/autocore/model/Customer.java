@@ -1,11 +1,25 @@
 package com.wac.autocore.model;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "customers")
 public class Customer {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "phone")
     private String phone;
+
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "vip")
     private boolean vip;
 
     public Customer(int id, String name, String phone, String email) {
@@ -14,6 +28,15 @@ public class Customer {
         this.phone = phone;
         this.email = email;
         this.vip = false;
+    }
+
+    public Customer(String name, String phone, String email) {
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+    }
+
+    protected Customer() {
     }
 
     public int getId() {

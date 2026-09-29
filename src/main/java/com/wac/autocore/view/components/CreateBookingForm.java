@@ -76,9 +76,10 @@ public class CreateBookingForm {
             return new ScrollPane(new Label("No vehicle found."));
         }
 
-        Customer customer = garageSystem
+        Customer customer = vehicle.getCustomer();
+        /*Customer customer = garageSystem
                 .getCustomer(vehicle.getCustomerId())
-                .orElse(null);
+                .orElse(null);*/
 
         if (customer == null) {
             //TODO dialog window with error message
@@ -169,8 +170,6 @@ public class CreateBookingForm {
                 mechanicLabel,
                 mechanicComboBox
         );
-
-        bookingInformation.setVisible(true);
 
         return bookingInformation;
     }
