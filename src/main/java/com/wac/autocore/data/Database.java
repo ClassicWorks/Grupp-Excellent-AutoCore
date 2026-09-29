@@ -9,7 +9,6 @@ import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.model.WorkOrder;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,29 +140,29 @@ public class Database {
                 "070-5553333",
                 "Diagnostics"
         ));
-
+/*
         bookings.add(new Booking(
                 1,
                 1,
                 LocalDate.now().plusDays(2),
                 "Annual service and general inspection"
         ));
-        bookings.get(0).setMechanicId(0);
+        bookings.get(0).setMechanic(0);
 
         bookings.add(new Booking(
                 2,
                 2,
                 LocalDate.now().plusDays(4),
                 "Noise from front brakes"
-        ));
+        ));*/
 
-        workOrders.add(new WorkOrder(
+        /*workOrders.add(new WorkOrder(
                 1,
                 1,
                 1
         ));
         bookings.get(0).setStatus("WORK_ORDER_CREATED");
-        workOrders.get(0).addServiceItem(1);
+        workOrders.get(0).addServiceItem(1);*/
     }
 
     public static List<Customer> getCustomers() {

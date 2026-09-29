@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface VehicleRepo {
     Vehicle save(Vehicle v);
+    Vehicle update(Vehicle v);
     List<Vehicle> getAll();
     Optional<Vehicle> get(int id);
 }

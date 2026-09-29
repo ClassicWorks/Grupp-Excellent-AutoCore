@@ -18,5 +18,7 @@
         <mapping class="com.wac.autocore.model.Mechanic"/>
         <mapping class="com.wac.autocore.model.Customer"/>
         <mapping class="com.wac.autocore.model.ServiceItem"/>
+        <mapping class="com.wac.autocore.model.WorkOrder"/>
+        <mapping class="com.wac.autocore.model.Booking"/>
     </session-factory>
 </hibernate-configuration>

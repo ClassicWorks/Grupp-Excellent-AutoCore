@@ -1,23 +1,49 @@
 package com.wac.autocore.model;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "bookings")
 public class Booking {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private int vehicleId;
+
+    @ManyToOne
+    @JoinColumn(name = "vehicle_id")
+    private Vehicle vehicle;
+    @ManyToOne
+    @JoinColumn(name = "mechanic_id")
     // Optional; 0 means no mechanic has been assigned.
-    private int mechanicId;
+    private Mechanic mechanic;
+
+    @Column(name = "date")
     private LocalDate date;
+
+    @Column(name = "description")
     private String description;
+
+    @Column(name = "status", nullable = false, length = 30)
     private String status;
 
-    public Booking(int id, int vehicleId, LocalDate date, String description) {
+    /*public Booking(int id, int vehicle, LocalDate date, String description) {
         this.id = id;
-        this.vehicleId = vehicleId;
+        this.vehicle = vehicle;
         this.date = date;
         this.description = description;
         this.status = "BOOKED";
+    }*/
+
+    public Booking(Vehicle vehicle, LocalDate date, String description) {
+        this.vehicle = vehicle;
+        this.date = date;
+        this.description = description;
+        this.status = "BOOKED";
+    }
+
+    protected Booking() {
     }
 
     public int getId() {
@@ -28,20 +54,20 @@ public class Booking {
         this.id = id;
     }
 
-    public int getVehicleId() {
-        return vehicleId;
+    public Vehicle getVehicle() {
+        return vehicle;
     }
 
-    public void setVehicleId(int vehicleId) {
-        this.vehicleId = vehicleId;
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
     }
 
-    public int getMechanicId() {
-        return mechanicId;
+    public Mechanic getMechanic() {
+        return mechanic;
     }
 
-    public void setMechanicId(int mechanicId) {
-        this.mechanicId = mechanicId;
+    public void setMechanic(Mechanic mechanic) {
+        this.mechanic = mechanic;
     }
 
     public LocalDate getDate() {
@@ -70,7 +96,7 @@ public class Booking {
 
     @Override
     public String toString() {
-        return id + " - Vehicle ID: " + vehicleId +
+        return id + " - Vehicle ID: " + vehicle +
                 " | Date: " + date +
                 " | Description: " + description +
                 " | Status: " + status;

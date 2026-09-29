@@ -2,7 +2,6 @@ package com.wac.autocore.view;
 
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Booking;
-import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
@@ -54,9 +53,13 @@ public class ShowBookingsView {
                 if(!booking.getStatus().equalsIgnoreCase("BOOKED")) {
                     continue;
                 }
-                Vehicle vehicle = garageSystem.getVehicle(booking.getVehicleId())
-                        .orElseThrow(() -> new NullPointerException(String.format("No vehicle with id %d found.", booking.getVehicleId())));
-                Mechanic mechanic = garageSystem.getMechanic(booking.getMechanicId()).orElse(null);
+
+                Vehicle vehicle = booking.getVehicle();
+                if(vehicle == null){
+                    throw new NullPointerException("No vehicle found.");
+                }
+
+                Mechanic mechanic = booking.getMechanic();
 
                 BookingCard bookingCard = new BookingCard(
                         booking,

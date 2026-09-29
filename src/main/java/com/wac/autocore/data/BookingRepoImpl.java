@@ -1,6 +1,6 @@
 package com.wac.autocore.data;
 
-import com.wac.autocore.model.Customer;
+import com.wac.autocore.model.Booking;
 import com.wac.autocore.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -8,43 +8,40 @@ import org.hibernate.Transaction;
 import java.util.List;
 import java.util.Optional;
 
-public class CustomerRepoImpl implements CustomerRepo{
-
+public class BookingRepoImpl implements BookingRepo{
     @Override
-    public Customer save(Customer c) {
+    public Booking save(Booking b) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
-            s.persist(c);
+            s.persist(b);
             transaction.commit();
-            return c;
+            return b;
         }
     }
 
     @Override
-    public Customer update(Customer c) {
+    public Booking update(Booking b) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
-            Customer saved = (Customer) s.merge(c);
+            Booking savedBooking = (Booking)s.merge(b);
             transaction.commit();
-            return saved;
+            return savedBooking;
         }
     }
 
     @Override
-    public List<Customer> getAll() {
+    public List<Booking> getAll() {
         try(Session s = HibernateUtil.getSessionFactory().openSession()){
-            return s.createQuery("from Customer", Customer.class)
+            return s.createQuery("from Booking ", Booking.class)
                     .list();
-        }
-    }
+        }    }
 
     @Override
-    public Optional<Customer> get(int id) {
+    public Optional<Booking> get(int id) {
         try(Session s = HibernateUtil.getSessionFactory().openSession()) {
             return s.createQuery(
-                            "from Customer c where c.id = :id" ,Customer.class)
+                            "from Booking b where b.id = :id" , Booking.class)
                     .setParameter("id", id)
                     .uniqueResultOptional();
-        }
-    }
+        }    }
 }
