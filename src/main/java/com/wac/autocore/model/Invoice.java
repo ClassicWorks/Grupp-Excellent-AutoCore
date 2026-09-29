@@ -1,25 +1,54 @@
 package com.wac.autocore.model;
 
+import javax.persistence.*;
 import java.time.LocalDate;
-
+@Entity
+@Table(name = "invoices")
 public class Invoice {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private int workOrderId;
+
+    @OneToOne
+    @JoinColumn(name = "work_order_id")
+    private WorkOrder workOrder;
+
+    @Column(name = "invoice_date")
     private LocalDate invoiceDate;
+
+    @Column(name = "amount")
     private double amount;
+
+    @Column(name = "discount")
     private double discount;
+
+    @Column(name = "total_amount")
     private double totalAmount;
+
+    @Column(name = "paid")
     private boolean paid;
 
-    public Invoice(int id, int workOrderId, LocalDate invoiceDate, double amount) {
+    public Invoice(int id, WorkOrder workOrder, LocalDate invoiceDate, double amount) {
         this.id = id;
-        this.workOrderId = workOrderId;
+        this.workOrder = workOrder;
         this.invoiceDate = invoiceDate;
         this.amount = amount;
         this.discount = 0.0;
         this.totalAmount = amount;
         this.paid = false;
+    }
+
+    public Invoice(WorkOrder workOrder, LocalDate invoiceDate, double amount) {
+        this.workOrder = workOrder;
+        this.invoiceDate = invoiceDate;
+        this.amount = amount;
+        this.discount = 0.0;
+        this.totalAmount = amount;
+        this.paid = false;
+    }
+
+    protected Invoice() {
     }
 
     public int getId() {
@@ -30,12 +59,12 @@ public class Invoice {
         this.id = id;
     }
 
-    public int getWorkOrderId() {
-        return workOrderId;
+    public WorkOrder getWorkOrder() {
+        return workOrder;
     }
 
-    public void setWorkOrderId(int workOrderId) {
-        this.workOrderId = workOrderId;
+    public void setWorkOrder(WorkOrder workOrder) {
+        this.workOrder = workOrder;
     }
 
     public LocalDate getInvoiceDate() {
@@ -83,7 +112,7 @@ public class Invoice {
     @Override
     public String toString() {
         return id +
-                " - Work order ID: " + workOrderId +
+                " - Work order ID: " + workOrder +
                 " | Date: " + invoiceDate +
                 " | Amount: " + amount + " SEK" +
                 " | Discount: " + discount + " SEK" +

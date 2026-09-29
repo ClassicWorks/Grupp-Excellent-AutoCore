@@ -104,3 +104,10 @@ INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES
 
 -- WorkOrder 6: ServiceItem 4
 INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (6, 4);
+
+-- Invoices
+-- Invoice för WorkOrder 3: Betald, 10 % rabatt
+INSERT INTO invoices (work_order_id, invoice_date, amount, discount, total_amount, paid) VALUES (3, '2026-09-29', 5785.00, 578.50, 5206.50, TRUE);
+
+-- Invoice för WorkOrder 6: Obetald, 0 % rabatt
+INSERT INTO invoices (work_order_id, invoice_date, amount, discount, total_amount, paid) VALUES (6, '2026-09-29', 3495.00, 0.00, 3495.00, FALSE);

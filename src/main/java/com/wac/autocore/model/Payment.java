@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 public class Payment {
 
     private int id;
+    //Cascade merge och persist
     private int invoiceId;
     private double amount;
     private String paymentType;

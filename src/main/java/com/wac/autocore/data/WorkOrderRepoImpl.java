@@ -34,7 +34,8 @@ public class WorkOrderRepoImpl implements WorkOrderRepo {
         try(Session s = HibernateUtil.getSessionFactory().openSession()){
             return s.createQuery("from WorkOrder", WorkOrder.class)
                     .list();
-        }    }
+        }
+    }
 
     @Override
     public Optional<WorkOrder> get(int id) {
@@ -43,5 +44,18 @@ public class WorkOrderRepoImpl implements WorkOrderRepo {
                             "from WorkOrder wo where wo.id = :id" ,WorkOrder.class)
                     .setParameter("id", id)
                     .uniqueResultOptional();
-        }    }
+        }
+    }
+
+    @Override
+    public Optional<WorkOrder> getWithServiceItems(int id) {
+        try(Session s = HibernateUtil.getSessionFactory().openSession()) {
+            return s.createQuery(
+                            "select distinct wo from WorkOrder wo " +
+                                    "left join fetch wo.serviceItems " +
+                                    "where wo.id = :id" ,WorkOrder.class)
+                    .setParameter("id", id)
+                    .uniqueResultOptional();
+        }
+    }
 }

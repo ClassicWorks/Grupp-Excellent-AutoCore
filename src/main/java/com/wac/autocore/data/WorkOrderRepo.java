@@ -10,4 +10,5 @@ public interface WorkOrderRepo {
     WorkOrder update(WorkOrder wo);
     List<WorkOrder> getAll();
     Optional<WorkOrder> get(int id);
+    Optional<WorkOrder> getWithServiceItems(int id);
 }

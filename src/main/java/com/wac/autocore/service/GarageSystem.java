@@ -10,6 +10,7 @@ import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.model.WorkOrder;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class GarageSystem {
     private final ServiceItemRepo serviceItemRepo;
     private final BookingRepo bookingRepo;
     private final WorkOrderRepo workOrderRepo;
+    private final InvoiceRepo invoiceRepo;
 
     public GarageSystem() {
         vehicleRepo = new VehicleRepoImpl();
@@ -31,6 +33,7 @@ public class GarageSystem {
         serviceItemRepo = new ServiceItemRepoImpl();
         bookingRepo = new BookingRepoImpl();
         workOrderRepo = new WorkOrderRepoImpl();
+        invoiceRepo = new InvoiceRepoImpl();
     }
 
     public void showCustomers() {
@@ -216,18 +219,36 @@ public class GarageSystem {
         return workOrderRepo.get(id);
     }
 
+    private Optional<WorkOrder> getWorkOrderWithServiceItems(int workOrderId) {
+        return workOrderRepo.getWithServiceItems(workOrderId);
+    }
+
     public void showInvoices() {
         System.out.println();
         System.out.println("=== INVOICES ===");
 
-        if (Database.getInvoices().isEmpty()) {
+        List<Invoice> invoices = invoiceRepo.getAll();
+        if (invoices.isEmpty()) {
             System.out.println("No invoices found.");
             return;
         }
 
-        for (Invoice invoice : Database.getInvoices()) {
+        for (Invoice invoice : invoices) {
             System.out.println(invoice);
         }
+    }
+
+    public List<Invoice> getInvoices(){
+        List<Invoice> invoices = invoiceRepo.getAll();
+        if (invoices.isEmpty()) {
+            System.out.println("No invoices found.");
+            return new ArrayList<>();
+        }
+        return invoices;
+    }
+
+    public Optional<Invoice> getInvoice(int id){
+        return invoiceRepo.get(id);
     }
 
     public void showPayments() {
@@ -367,8 +388,9 @@ public class GarageSystem {
         }
 
 
-        booking.setStatus("WORK_ORDER_CREATED");
         WorkOrder savedWorkOrder = workOrderRepo.save(workOrder);
+        booking.setStatus("WORK_ORDER_CREATED");
+        bookingRepo.update(booking);
 
         System.out.println("Work order created successfully.");
         System.out.println(savedWorkOrder);
@@ -439,7 +461,7 @@ public class GarageSystem {
     }
 
     public Invoice createInvoice(int workOrderId, String discountCode) {
-        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithServiceItems(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
             System.out.println("Work order with ID " + workOrderId + " does not exist.");
@@ -490,35 +512,34 @@ public class GarageSystem {
             discount = amount;
         }
 
-        int id = Database.getInvoices().size() + 1;
 
         Invoice invoice = new Invoice(
-                id,
-                workOrderId,
+                workOrder,
                 LocalDate.now(),
                 amount
         );
 
         invoice.setDiscount(discount);
 
-        Database.getInvoices().add(invoice);
+        Invoice savedInvoice = invoiceRepo.save(invoice);
 
         System.out.println("Invoice created successfully.");
-        System.out.println(invoice);
+        System.out.println(savedInvoice);
 
         System.out.println("Sending invoice notification to customer...");
         System.out.println("Notification sent.");
 
-        return invoice;
+        return savedInvoice;
     }
 
     public Payment processPayment(int invoiceId, String paymentType) {
-        Invoice invoice = findInvoice(invoiceId);
+        Optional<Invoice> optionalInvoice = getInvoice(invoiceId);
 
-        if (invoice == null) {
+        if (!optionalInvoice.isPresent()) {
             System.out.println("Invoice with ID " + invoiceId + " does not exist.");
             return null;
         }
+        Invoice invoice = optionalInvoice.get();
 
         if (invoice.isPaid()) {
             System.out.println("Invoice has already been paid.");
@@ -572,15 +593,5 @@ public class GarageSystem {
         }
 
         return payment;
-    }
-
-    private Invoice findInvoice(int id) {
-        for (Invoice invoice : Database.getInvoices()) {
-            if (invoice.getId() == id) {
-                return invoice;
-            }
-        }
-
-        return null;
     }
 }
