@@ -41,25 +41,25 @@ INSERT INTO service_item (name, description, price, estimated_minutes) VALUES ('
 
 -- Bookings
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (1, '2026-10-01', 'Oil change and routine inspection', 'BOOKED');
+INSERT INTO bookings (vehicle_id, date, description, status) VALUES (1, '2026-09-01', 'Oil change and routine inspection', 'WORK_ORDER_CREATED');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (2, '2026-10-02', 'Brake inspection and service', 'BOOKED');
+INSERT INTO bookings (vehicle_id, date, description, status) VALUES (2, '2026-09-02', 'Brake inspection and service', 'IN_PROGRESS');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (3, '2026-10-03', 'Electrical system diagnostics', 'BOOKED');
+INSERT INTO bookings (vehicle_id, date, description, status) VALUES (3, '2026-09-03', 'Electrical system diagnostics', 'COMPLETED');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (4, '2026-10-05', 'Engine performance inspection', 'BOOKED');
+INSERT INTO bookings (vehicle_id, date, description, status) VALUES (4, '2026-09-05', 'Engine performance inspection', 'BOOKED');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (5, '2026-10-06', 'Annual vehicle service', 'BOOKED');
+INSERT INTO bookings (vehicle_id, date, description, status) VALUES (5, '2026-09-06', 'Annual vehicle service', 'WORK_ORDER_CREATED');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (6, '2026-10-07', 'Brake pads inspection', 'BOOKED');
+INSERT INTO bookings (vehicle_id, date, description, status) VALUES (6, '2026-09-07', 'Brake pads inspection', 'BOOKED');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (7, '2026-10-08', 'Oil change and filter replacement', 'BOOKED');
+INSERT INTO bookings (vehicle_id, date, description, status) VALUES (7, '2026-09-08', 'Oil change and filter replacement', 'IN_PROGRESS');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (8, '2026-10-09', 'Annual service and safety inspection', 'BOOKED');
+INSERT INTO bookings (vehicle_id, date, description, status) VALUES (8, '2026-09-09', 'Annual service and safety inspection', 'BOOKED');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (9, '2026-10-12', 'Diagnostic scan and fault investigation', 'BOOKED');
+INSERT INTO bookings (vehicle_id, date, description, status) VALUES (9, '2026-09-12', 'Diagnostic scan and fault investigation', 'COMPLETED');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (1, '2026-10-14', 'Follow-up vehicle inspection', 'BOOKED');
+INSERT INTO bookings (vehicle_id, date, description, status) VALUES (1, '2026-09-14', 'Follow-up vehicle inspection', 'BOOKED');
 
 -- Workorders
 -- WorkOrder 1: En tjänst, ännu inte påbörjad

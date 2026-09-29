@@ -367,10 +367,8 @@ public class GarageSystem {
         }
 
 
-        WorkOrder savedWorkOrder = workOrderRepo.save(workOrder);
-
         booking.setStatus("WORK_ORDER_CREATED");
-        bookingRepo.update(booking);
+        WorkOrder savedWorkOrder = workOrderRepo.save(workOrder);
 
         System.out.println("Work order created successfully.");
         System.out.println(savedWorkOrder);
@@ -397,12 +395,10 @@ public class GarageSystem {
 
         if (mechanic != null) {
             mechanic.setAvailable(false);
-            mechanicRepo.update(mechanic);
         }
 
         if (booking != null) {
             booking.setStatus("IN_PROGRESS");
-            bookingRepo.update(booking);
         }
 
         workOrder.setStatus("IN_PROGRESS");
@@ -430,12 +426,10 @@ public class GarageSystem {
 
         if (mechanic != null) {
             mechanic.setAvailable(true);
-            mechanicRepo.update(mechanic);
         }
 
         if (booking != null) {
             booking.setStatus("COMPLETED");
-            bookingRepo.update(booking);
         }
 
         workOrder.setStatus("COMPLETED");
