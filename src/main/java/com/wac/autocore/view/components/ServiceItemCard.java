@@ -22,7 +22,7 @@ public class ServiceItemCard extends VBox {
 
         //Remove later when CSS-sheet exists.
         this.setStyle("-fx-border-color: blue;");
-        
+
         this.setCursor(Cursor.HAND);
 
         this.setOnMouseClicked(e -> onCardClick.accept(serviceItem));
