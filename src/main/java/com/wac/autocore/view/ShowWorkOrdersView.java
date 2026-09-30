@@ -12,7 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ShowWorkOrdersView {
@@ -93,25 +92,23 @@ public class ShowWorkOrdersView {
         VBox workOrderCards = new VBox();
         for(WorkOrder workOrder : workOrders) {
             //Check if necessary objects exists
-            Optional<Mechanic> optionalMechanic = garageSystem.getMechanic(workOrder.getMechanicId());
-            if(!optionalMechanic.isPresent()){
+            Mechanic mechanic = workOrder.getMechanic();
+            if(mechanic == null){
                 workOrderCards.getChildren().add(new Label("Mechanic not found"));
                 continue;
             }
-            Mechanic mechanic = optionalMechanic.get();
-            Optional<Booking> optionalBooking = garageSystem.getBooking(workOrder.getBookingId());
-            if(!optionalBooking.isPresent()){
+            Booking booking = workOrder.getBooking();
+            if(booking == null){
                 workOrderCards.getChildren().add(new Label("Booking not found"));
                 continue;
             }
-            Booking booking = optionalBooking.get();
-            Optional<Vehicle> optionalVehicle = garageSystem.getVehicle(booking.getVehicleId());
-            if(!optionalVehicle.isPresent()){
+            Vehicle vehicle = booking.getVehicle();
+            if(vehicle == null){
                 workOrderCards.getChildren().add(new Label("Vehicle not found"));
                 continue;
             }
-            Vehicle vehicle = optionalVehicle.get();
 
+            //TODO take the simple instead
             workOrderCards.getChildren().add(new WorkOrderCardWithActionBtns(workOrder, booking, vehicle,mechanic));
         }
         return workOrderCards;

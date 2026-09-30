@@ -13,8 +13,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.util.Optional;
-
 public class BookingDetails extends BorderPane {
     private GarageSystem garageSystem = new GarageSystem();
 
@@ -33,17 +31,16 @@ public class BookingDetails extends BorderPane {
                 new Label(String.format("ID: %d",booking.getId()))
         );
 
-        Optional<Vehicle> optionalVehicle = garageSystem.getVehicle(booking.getVehicleId());
-        if(!optionalVehicle.isPresent()){
+        this.vehicle = booking.getVehicle();
+        if(vehicle == null){
             this.setTop(topBox);
             this.setCenter(new Label("No vehicle connected to booking"));
             return;
         }
 
-        this.vehicle = optionalVehicle.get();
-        if(booking.getMechanicId() != 0) {
-            Optional<Mechanic> optionalMechanic = garageSystem.getMechanic(booking.getMechanicId());
-            optionalMechanic.ifPresent(mechanic -> this.currentMechanic = mechanic);
+
+        if(booking.getMechanic() != null) {
+            this.currentMechanic = booking.getMechanic();
         }
 
         this.description = booking.getDescription();
@@ -94,12 +91,13 @@ public class BookingDetails extends BorderPane {
     private Button createSaveBtn() {
         Button saveBtn = new Button("Save changes");
 
+        //TODO check if everything is added
         //TODO savefunction
         saveBtn.setOnAction(e ->{
             currentMechanic = mechanicComboBox.getValue();
             description = descriptionField.getText();
-            Booking newBooking = new Booking(booking.getId(), booking.getVehicleId(), booking.getDate(), description);
-            newBooking.setMechanicId(currentMechanic.getId());
+            Booking newBooking = new Booking(vehicle, booking.getDate(), description);
+            //newBooking.setMechanic(currentMechanic.getId());
 
             System.out.printf("Should call ViewManager.getInstance.saveBooking(%d, %s)", booking.getId(), newBooking);
         });

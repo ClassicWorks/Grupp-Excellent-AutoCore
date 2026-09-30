@@ -10,7 +10,7 @@
         <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password">root</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</property>
-        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.show_sql">false</property>
         <property name="hibernate.format_sql">true</property>
         <property name="hibernate.hbm2ddl.auto">create</property>
 
@@ -18,5 +18,9 @@
         <mapping class="com.wac.autocore.model.Mechanic"/>
         <mapping class="com.wac.autocore.model.Customer"/>
         <mapping class="com.wac.autocore.model.ServiceItem"/>
+        <mapping class="com.wac.autocore.model.WorkOrder"/>
+        <mapping class="com.wac.autocore.model.Booking"/>
+        <mapping class="com.wac.autocore.model.Payment"/>
+        <mapping class="com.wac.autocore.model.Invoice"/>
     </session-factory>
 </hibernate-configuration>

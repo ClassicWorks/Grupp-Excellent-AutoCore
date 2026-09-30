@@ -1,5 +1,6 @@
 package com.wac.autocore.data;
 
+import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.util.HibernateUtil;
 import org.hibernate.Session;
@@ -15,6 +16,16 @@ public class VehicleRepoImpl implements VehicleRepo{
             s.persist(v);
             transaction.commit();
             return v;
+        }
+    }
+
+    @Override
+    public Vehicle update(Vehicle v) {
+        try (Session s = HibernateUtil.getSessionFactory().openSession()){
+            Transaction transaction = s.beginTransaction();
+            Vehicle saved = (Vehicle) s.merge(v);
+            transaction.commit();
+            return saved;
         }
     }
 

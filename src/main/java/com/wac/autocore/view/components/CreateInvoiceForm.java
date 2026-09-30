@@ -34,13 +34,13 @@ public class CreateInvoiceForm {
 
         Label title = new Label("Create invoice");
 
-        List<Integer> invoicedWorkOrderIds = Database.getInvoices().stream()
-                .map(Invoice::getWorkOrderId)
+        List<WorkOrder> invoicesWorkOrders = Database.getInvoices().stream()
+                .map(Invoice::getWorkOrder)
                 .collect(Collectors.toList());
 
         List<WorkOrder> availableWorkOrders = Database.getWorkOrders().stream()
                 .filter(workOrder -> workOrder.getStatus().equalsIgnoreCase("COMPLETED"))
-                .filter(workOrder -> !invoicedWorkOrderIds.contains(workOrder.getId()))
+                .filter(workOrder -> !invoicesWorkOrders.contains(workOrder))
                 .collect(Collectors.toList());
 
         ObservableList<WorkOrder> workOrderItems = FXCollections.observableArrayList(availableWorkOrders);

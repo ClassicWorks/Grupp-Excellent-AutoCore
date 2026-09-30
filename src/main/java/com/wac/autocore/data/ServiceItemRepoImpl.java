@@ -20,6 +20,15 @@ public class ServiceItemRepoImpl implements ServiceItemRepo {
     }
 
     @Override
+    public ServiceItem update(ServiceItem si) {
+        try (Session s = HibernateUtil.getSessionFactory().openSession()){
+            Transaction transaction = s.beginTransaction();
+            ServiceItem saved = (ServiceItem) s.merge(si);
+            transaction.commit();
+            return saved;
+        }    }
+
+    @Override
     public List<ServiceItem> getAll() {
         try(Session s = HibernateUtil.getSessionFactory().openSession()){
             return s.createQuery("from ServiceItem", ServiceItem.class)
