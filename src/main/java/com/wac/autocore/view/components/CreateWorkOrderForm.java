@@ -99,7 +99,7 @@ public class CreateWorkOrderForm {
         return root;
     }
 
-    //TODO split BookingCard into BookingCardWithActionButtons and BookingCardSimple and use that instead
+
     private VBox createBookingCard(Booking booking, Vehicle vehicle, Mechanic mechanic){
         //date
         Label date = new Label(booking.getDate().toString());
