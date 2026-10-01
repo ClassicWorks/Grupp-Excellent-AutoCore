@@ -13,8 +13,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-
-
 public class ShowBookingsView {
     private final GarageSystem garageSystem;
 
@@ -61,13 +59,19 @@ public class ShowBookingsView {
 
                 Mechanic mechanic = booking.getMechanic();
 
+                //TODO Include consumer in constructor
                 BookingCard bookingCard = new BookingCard(
                         booking,
                         vehicle,
                         mechanic);
 
                 bookingCard.setOnMouseClicked(e -> {
-                    BookingDetails bookingDetails = new BookingDetails(booking);
+                    BookingDetails bookingDetails = new BookingDetails(
+                            booking,
+                            garageSystem.getAvailableMechanics(),
+                            this::saveBooking,
+                            this::deleteBooking
+                    );
                     bookingDetails.setMaxHeight(Double.MAX_VALUE);
 
                     //If anything is in right column, remove content
@@ -113,5 +117,17 @@ public class ShowBookingsView {
         headerPane.setCenter(title);
         headerPane.setRight(createBookingBtn);
         return headerPane;
+    }
+
+    private Booking saveBooking(Booking updatedBooking){
+        System.out.printf("Should call ViewManager.getInstance.saveBooking(%d, %s)\n", updatedBooking.getId(), updatedBooking);
+        //garageSystem.updateBooking(updatedBooking.getId(), updatedBooking);
+        return updatedBooking;
+    }
+
+    private void deleteBooking(Booking booking){
+        System.out.printf("Should call ViewManager.getInstance.confirmDelete(vehicle, garagesystem.deleteBooking(%d)\n",
+                booking.getId());
+        //garageSystem.deleteBooking(booking.getId());
     }
 }

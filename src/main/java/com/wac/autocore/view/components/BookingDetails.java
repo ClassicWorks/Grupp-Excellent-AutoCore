@@ -5,7 +5,6 @@ import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
-import com.wac.autocore.service.GarageSystem;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
@@ -13,19 +12,28 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.List;
+import java.util.function.Consumer;
+
 public class BookingDetails extends BorderPane {
-    private GarageSystem garageSystem = new GarageSystem();
+    Consumer<Booking> onSave;
+    Consumer<Booking> onDelete;
 
     private Booking booking;
     private Vehicle vehicle;
-    private Mechanic currentMechanic;
     private String description;
+    private Mechanic currentMechanic;
+    private List<Mechanic> choosableMechanics;
 
     private ComboBox<Mechanic> mechanicComboBox;
     private TextArea descriptionField;
 
-    public BookingDetails(Booking booking) {
+    public BookingDetails(Booking booking, List<Mechanic> choosableMechanics,
+                          Consumer<Booking> onSave, Consumer<Booking> onDelete) {
         this.booking = booking;
+        this.choosableMechanics = choosableMechanics;
+        this.onSave = onSave;
+        this.onDelete = onDelete;
         HBox topBox = new HBox(10,
                 new Label(String.format("Date: %s", booking.getDate().toString())),
                 new Label(String.format("ID: %d",booking.getId()))
@@ -50,7 +58,7 @@ public class BookingDetails extends BorderPane {
         //Customer vehicleOwner = garageSystem.getCustomer(vehicle.getCustomerId()).orElse(null);
         HBox vehicleBox = new VehicleCard(vehicle, vehicleOwner);
 
-        mechanicComboBox = createMechanicComboBox(currentMechanic);
+        mechanicComboBox = createMechanicComboBox();
         HBox mechanicBox = new HBox(mechanicComboBox);
 
         descriptionField = new TextArea(description);
@@ -64,9 +72,9 @@ public class BookingDetails extends BorderPane {
         this.setBottom(actionableButtons);
     }
 
-    private ComboBox<Mechanic> createMechanicComboBox(Mechanic currentMechanic) {
+    private ComboBox<Mechanic> createMechanicComboBox() {
         ObservableList<Mechanic> mechanics =
-                FXCollections.observableArrayList(garageSystem.getMechanics());
+                FXCollections.observableArrayList(choosableMechanics);
 
         ComboBox<Mechanic> comboBox =
                 new ComboBox<>(mechanics);
@@ -99,7 +107,7 @@ public class BookingDetails extends BorderPane {
             Booking newBooking = new Booking(vehicle, booking.getDate(), description);
             //newBooking.setMechanic(currentMechanic.getId());
 
-            System.out.printf("Should call ViewManager.getInstance.saveBooking(%d, %s)", booking.getId(), newBooking);
+            onSave.accept(newBooking);
         });
 
         return saveBtn;
@@ -109,8 +117,8 @@ public class BookingDetails extends BorderPane {
         Button deleteBtn = new Button("Delete");
 
         deleteBtn.setOnAction(e ->
-                System.out.printf("Should call ViewManager.getInstance.confirmDelete(vehicle, garagesystem.deleteBooking(%d)",
-                        booking.getId())
+                onDelete.accept(booking)
+
         );
         return deleteBtn;
     }
