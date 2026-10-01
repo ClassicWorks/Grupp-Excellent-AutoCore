@@ -48,11 +48,11 @@ public class WorkOrderRepoImpl implements WorkOrderRepo {
     }
 
     @Override
-    public Optional<WorkOrder> getWithServiceItems(int id) {
+    public Optional<WorkOrder> getWithItems(int id) {
         try(Session s = HibernateUtil.getSessionFactory().openSession()) {
             return s.createQuery(
                             "select distinct wo from WorkOrder wo " +
-                                    "left join fetch wo.serviceItems " +
+                                    "left join fetch wo.items " +
                                     "where wo.id = :id" ,WorkOrder.class)
                     .setParameter("id", id)
                     .uniqueResultOptional();

@@ -20,29 +20,15 @@ public class WorkOrder {
     @JoinColumn(name = "mechanic_id")
     private Mechanic mechanic;
 
-    @ManyToMany
-    @JoinTable(
-            name = "join_work_order_service_item",
-            joinColumns = @JoinColumn(name = "work_order_id"),
-            inverseJoinColumns = @JoinColumn(name = "service_item_id")
-    )
-    private List<ServiceItem> serviceItems;
+    @OneToMany(mappedBy = "workOrder", cascade = CascadeType.ALL)
+    private List<WorkOrderItem> items = new ArrayList<>();
 
     @Column(name = "status", nullable = false, length = 15)
     private String status;
 
-    /*public WorkOrder(int id, int bookingId, int Mechanic) {
-        this.id = id;
-        this.bookingId = bookingId;
-        this.Mechanic = Mechanic;
-        this.serviceItemIds = new ArrayList<Integer>();
-        this.status = "CREATED";
-    }*/
-
     public WorkOrder(Booking booking, Mechanic mechanic) {
         this.booking = booking;
         this.mechanic = mechanic;
-        this.serviceItems = new ArrayList<>();
         this.status = "CREATED";
     }
 
@@ -73,14 +59,6 @@ public class WorkOrder {
         this.mechanic = mechanic;
     }
 
-    public List<ServiceItem> getServiceItems() {
-        return serviceItems;
-    }
-
-    public void setServiceItems(List<ServiceItem> serviceItems) {
-        this.serviceItems = serviceItems;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -89,12 +67,12 @@ public class WorkOrder {
         this.status = status;
     }
 
-    public void addServiceItem(ServiceItem serviceItem) {
-        serviceItems.add(serviceItem);
+    public void addItem(ServiceItem serviceItem, double priceAtOrder) {
+        items.add(new WorkOrderItem(this, serviceItem, priceAtOrder));
     }
 
-    public void removeServiceItem(ServiceItem serviceItem) {
-        serviceItems.remove(serviceItem);
+    public List<WorkOrderItem> getItems() {
+        return items;
     }
 
     @Override
@@ -102,7 +80,6 @@ public class WorkOrder {
         return id +
                 " - Booking ID: " + booking +
                 " | Mechanic ID: " + mechanic +
-                //" | Services: " + getServiceItems() +
                 " | Status: " + status;
     }
 }

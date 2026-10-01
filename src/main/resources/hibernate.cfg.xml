@@ -22,5 +22,6 @@
         <mapping class="com.wac.autocore.model.Booking"/>
         <mapping class="com.wac.autocore.model.Payment"/>
         <mapping class="com.wac.autocore.model.Invoice"/>
+        <mapping class="com.wac.autocore.model.WorkOrderItem"/>
     </session-factory>
 </hibernate-configuration>
