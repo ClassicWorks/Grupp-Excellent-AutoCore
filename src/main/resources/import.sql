@@ -105,6 +105,33 @@ INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES
 -- WorkOrder 6: ServiceItem 4
 INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (6, 4);
 
+-- Work order items (orderrader med fryst pris)
+-- WorkOrder 1: Oil change
+INSERT INTO work_order_items (work_order_id, service_item_id, price_at_order) VALUES (1, 1, 1295.0);
+
+-- WorkOrder 2: Brake service, Diagnostics
+INSERT INTO work_order_items (work_order_id, service_item_id, price_at_order) VALUES (2, 2, 2495.0);
+INSERT INTO work_order_items (work_order_id, service_item_id, price_at_order) VALUES (2, 3, 995.0);
+
+-- WorkOrder 3: Oil change, Diagnostics, Annual service
+INSERT INTO work_order_items (work_order_id, service_item_id, price_at_order) VALUES (3, 1, 1295.0);
+INSERT INTO work_order_items (work_order_id, service_item_id, price_at_order) VALUES (3, 3, 995.0);
+INSERT INTO work_order_items (work_order_id, service_item_id, price_at_order) VALUES (3, 4, 3495.0);
+
+-- WorkOrder 4: Oil change, Annual service
+-- Oil change bokades till ett äldre pris (1195 kr) innan prishöjningen till 1295 kr
+INSERT INTO work_order_items (work_order_id, service_item_id, price_at_order) VALUES (4, 1, 1195.0);
+INSERT INTO work_order_items (work_order_id, service_item_id, price_at_order) VALUES (4, 4, 3495.0);
+
+-- WorkOrder 5: Alla fyra tjänster
+INSERT INTO work_order_items (work_order_id, service_item_id, price_at_order) VALUES (5, 1, 1295.0);
+INSERT INTO work_order_items (work_order_id, service_item_id, price_at_order) VALUES (5, 2, 2495.0);
+INSERT INTO work_order_items (work_order_id, service_item_id, price_at_order) VALUES (5, 3, 995.0);
+INSERT INTO work_order_items (work_order_id, service_item_id, price_at_order) VALUES (5, 4, 3495.0);
+
+-- WorkOrder 6: Annual service
+INSERT INTO work_order_items (work_order_id, service_item_id, price_at_order) VALUES (6, 4, 3495.0);
+
 -- Invoices
 -- Invoice för WorkOrder 3: Betald, 10 % rabatt
 INSERT INTO invoices (work_order_id, invoice_date, amount, discount, total_amount, paid) VALUES (3, '2026-09-29', 5785.00, 578.50, 5206.50, TRUE);
