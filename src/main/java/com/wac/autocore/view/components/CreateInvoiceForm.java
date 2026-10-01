@@ -1,6 +1,5 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.data.Database;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.WorkOrder;
 import com.wac.autocore.service.GarageSystem;
@@ -34,13 +33,13 @@ public class CreateInvoiceForm {
 
         Label title = new Label("Create invoice");
 
-        List<WorkOrder> invoicesWorkOrders = Database.getInvoices().stream()
-                .map(Invoice::getWorkOrder)
+        List<Integer> invoicedWorkOrderIds = garageSystem.getInvoices().stream()
+                .map(invoice -> invoice.getWorkOrder().getId())
                 .collect(Collectors.toList());
 
-        List<WorkOrder> availableWorkOrders = Database.getWorkOrders().stream()
+        List<WorkOrder> availableWorkOrders = garageSystem.getWorkOrders().stream()
                 .filter(workOrder -> workOrder.getStatus().equalsIgnoreCase("COMPLETED"))
-                .filter(workOrder -> !invoicesWorkOrders.contains(workOrder))
+                .filter(workOrder -> !invoicedWorkOrderIds.contains(workOrder.getId()))
                 .collect(Collectors.toList());
 
         ObservableList<WorkOrder> workOrderItems = FXCollections.observableArrayList(availableWorkOrders);
