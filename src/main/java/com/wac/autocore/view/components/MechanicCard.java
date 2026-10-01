@@ -2,6 +2,7 @@ package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Mechanic;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -22,8 +23,12 @@ public class MechanicCard extends HBox {
 
         this.getChildren().addAll(mechanicIcon, mechanicInfo);
         this.setAlignment(Pos.CENTER_LEFT);
-        this.setStyle("-fx-border-color: blue;");
         this.getStyleClass().addAll("mechanic-card", "card");
+
+        //Remove later when CSS-sheet exists.
+        this.setStyle("-fx-border-color: blue;");
+
+        this.setCursor(Cursor.HAND);
 
         this.setOnMouseClicked(e -> onCardClick.accept(mechanic));
     }

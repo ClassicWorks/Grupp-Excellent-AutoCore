@@ -1,17 +1,7 @@
 package com.wac.autocore.manager;
 
-import com.wac.autocore.view.ShowWorkOrdersView;
-import com.wac.autocore.view.components.CreateBookingForm;
-import com.wac.autocore.view.ShowMechanicsView;
-import com.wac.autocore.view.ShowBookingsView;
-import com.wac.autocore.view.ShowPaymentsView;
-import com.wac.autocore.view.ShowVehicleView;
-import com.wac.autocore.view.SideNav;
-import com.wac.autocore.view.components.CreateInvoiceForm;
-import com.wac.autocore.view.components.CreateVehicleForm;
-import com.wac.autocore.view.components.CreateWorkOrderForm;
-import com.wac.autocore.view.components.CreateCustomer;
-import com.wac.autocore.view.components.ProcessPaymentForm;
+import com.wac.autocore.view.*;
+import com.wac.autocore.view.components.*;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -95,7 +85,7 @@ public class ViewManager {
     }
 
     public void showServices() {
-        showView(new Label("Services - placeholder"));
+        showView(new ShowServiceItemsView().show());
     }
 
     public void showWorkOrders() {
