@@ -90,7 +90,7 @@ public class ViewManager {
     }
 
     public void showServices() {
-        showView(new Label("Services - placeholder"));
+        showView(new ShowServiceItemsView().show());
     }
 
     public void showWorkOrders() {
