@@ -38,6 +38,16 @@ public class WorkOrderRepoImpl implements WorkOrderRepo {
     }
 
     @Override
+    public List<WorkOrder> getAllWithItems() {
+        try(Session s = HibernateUtil.getSessionFactory().openSession()){
+            return s.createQuery("select distinct wo from WorkOrder wo " +
+                            "left join fetch wo.items ",
+                            WorkOrder.class)
+                    .list();
+        }
+    }
+
+    @Override
     public Optional<WorkOrder> get(int id) {
         try(Session s = HibernateUtil.getSessionFactory().openSession()) {
             return s.createQuery(

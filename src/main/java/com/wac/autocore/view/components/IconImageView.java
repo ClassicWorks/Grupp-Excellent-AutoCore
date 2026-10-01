@@ -5,8 +5,6 @@ import javafx.scene.image.ImageView;
 
 public class IconImageView extends ImageView {
     public IconImageView(String url, double height, double width){
-        this.setImage(new Image(url));
-        this.setFitHeight(height);
-        this.setFitWidth(width);
+        this.setImage(new Image(url, width, height, true, false));
     }
 }

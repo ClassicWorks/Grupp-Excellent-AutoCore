@@ -5,13 +5,12 @@ import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class VehicleCard extends HBox{
+public class VehicleCard extends VBox{
     public VehicleCard(Vehicle vehicle, Customer customer){
         //Info om bilen
         ImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40, 40);
@@ -39,23 +38,14 @@ public class VehicleCard extends HBox{
         HBox buttonBox = new HBox(bookingBtn);
         buttonBox.setAlignment(Pos.BASELINE_RIGHT);
 
-/*        ImageView editIcon = new IconImageView("/imgs/pen-to-square-solid.png", 30, 30);
-        ImageView deleteIcon = new IconImageView("/imgs/trash-solid.png", 30, 30);
-        Button editVehicleBtn = new Button("Edit", editIcon);
-        Button deleteVehicleBtn = new Button("Delete", deleteIcon);
-        deleteVehicleBtn.getStyleClass().addAll("delete-card-btn");
-        editVehicleBtn.getStyleClass().addAll("edit-card-btn");
 
-        VBox actionableBox = new VBox(editVehicleBtn, deleteVehicleBtn);*/
+        this.setStyle("-fx-border-color: blue");
+        this.getStyleClass().add("vehicle-card");
 
-        VBox vehicleCard = new VBox();
-        vehicleCard.setStyle("-fx-border-color: blue");
-        vehicleCard.getStyleClass().add("vehicle-card");
-
-        vehicleCard.getChildren().add(vehicleBox);
-        vehicleCard.getChildren().add(customerInfoBox);
-        vehicleCard.getChildren().add(buttonBox);
-        this.getChildren().addAll(vehicleCard);
+        this.getChildren().add(vehicleBox);
+        this.getChildren().add(customerInfoBox);
+        this.getChildren().add(buttonBox);
+        this.setMaxWidth(Double.MAX_VALUE);
     }
 
     public VehicleCard(Vehicle vehicle) {
@@ -77,12 +67,15 @@ public class VehicleCard extends HBox{
                 vehicleInfo
         );
 
+        HBox vehicleInfoBox = new HBox(vehicleIcon,
+                information);
+
         this.getChildren().addAll(
-                vehicleIcon,
-                information
+                vehicleInfoBox
         );
 
         this.setStyle("-fx-border-color: blue");
-        this.getStyleClass().add("vehicle-card");
+        this.getStyleClass().add("card");
+        this.setMaxWidth(Double.MAX_VALUE);
     }
 }

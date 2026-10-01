@@ -9,6 +9,7 @@ public interface WorkOrderRepo {
     WorkOrder save(WorkOrder wo);
     WorkOrder update(WorkOrder wo);
     List<WorkOrder> getAll();
+    List<WorkOrder> getAllWithItems();
     Optional<WorkOrder> get(int id);
     Optional<WorkOrder> getWithItems(int id);
 }

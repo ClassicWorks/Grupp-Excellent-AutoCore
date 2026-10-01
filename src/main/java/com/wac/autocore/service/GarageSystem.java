@@ -209,6 +209,16 @@ public class GarageSystem {
         return workOrders;
     }
 
+    public List<WorkOrder> getWorkOrdersWithItems(){
+        List<WorkOrder> workOrders = workOrderRepo.getAllWithItems();
+        if (workOrders.isEmpty()) {
+            System.out.println("No work orders found.");
+            return new ArrayList<>();
+        }
+
+        return workOrders;
+    }
+
     public Optional<WorkOrder> getWorkOrder(int id){
         return workOrderRepo.get(id);
     }

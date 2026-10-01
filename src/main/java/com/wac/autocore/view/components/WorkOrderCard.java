@@ -1,16 +1,20 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.model.Booking;
-import com.wac.autocore.model.Mechanic;
-import com.wac.autocore.model.Vehicle;
-import com.wac.autocore.model.WorkOrder;
+import com.wac.autocore.manager.ViewManager;
+import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+
+import java.util.List;
 
 public class WorkOrderCard extends VBox {
     GarageSystem garageSystem = new GarageSystem();
@@ -19,39 +23,96 @@ public class WorkOrderCard extends VBox {
     private Vehicle vehicle;
     private Mechanic mechanic;
 
-    public WorkOrderCard(WorkOrder workOrder, Booking booking, Vehicle vehicle, Mechanic mechanic) {
+    public WorkOrderCard(WorkOrder workOrder, Booking booking, Vehicle vehicle, Mechanic mechanic, List<WorkOrderItem> workOrderItems) {
         this.workOrder = workOrder;
         this.booking = booking;
         this.vehicle = vehicle;
         this.mechanic = mechanic;
 
-        Label idsLabel = new Label(String.format("Work Order ID: %d, Booking ID: %d ",
-                workOrder.getId(), booking.getId()));
-        Label statusLabel = createStatusLabel();
-        HBox statusInfo = new HBox(idsLabel, statusLabel);
+        HBox statusInfo = getStatusInfo();
 
-        //VehicleInfo
-        ImageView vehicleIcon = new ImageView("/imgs/car-solid.png");
-        vehicleIcon.setFitHeight(40);
-        vehicleIcon.setFitWidth(40);
-        Label registrationNumber = new Label(vehicle.getRegistrationNumber());
-        Label brandModelYear = new Label(String.format("%s %s %d",
-                vehicle.getBrand(),
-                vehicle.getModel(),
-                vehicle.getYear()));
-        VBox vehicleText = new VBox(registrationNumber, brandModelYear);
-        HBox vehicleInfo = new HBox(vehicleIcon, vehicleText);
+        HBox vehicleInfo = getVehicleInfo();
 
         //mechanic info
         Hyperlink mechanicLink = new MechanicHyperLink(mechanic);
 
         Text description = new Text(booking.getDescription());
 
-        this.getStyleClass().add("work-order-card");
+        VBox serviceItemBox = getServiceItemBox(workOrderItems);
+
+        //Add OrderActionBtn to card
+        HBox buttonBox = new HBox();
+        buttonBox.setAlignment(Pos.BASELINE_RIGHT);
+        buttonBox.getChildren().add(createOrderActionBtn());
+
+
         this.getStyleClass().add("card");
         this.setMaxWidth(Double.MAX_VALUE);
 
-        this.getChildren().addAll(statusInfo, vehicleInfo, mechanicLink, description);
+        this.getChildren().addAll(statusInfo, vehicleInfo, mechanicLink, description, serviceItemBox, buttonBox);
+    }
+
+    private VBox getServiceItemBox(List<WorkOrderItem> workOrderItems) {
+        Label serviceItemsLabel = new Label("Service items");
+        if(workOrderItems.isEmpty()){
+            Label error = new Label("Service items not found");
+            return new VBox(serviceItemsLabel, error);
+        }
+        GridPane itemGrid = new GridPane();
+        int totalTime = 0;
+        for(int i = 0; i < workOrderItems.size(); i++){
+            WorkOrderItem item = workOrderItems.get(i);
+            ServiceItem serviceItem = item.getServiceItem();
+            if(serviceItem == null) {
+                System.out.println("service item not found: id %d");
+                Label error = new Label(String.format("Service item not found: workOrderItems id %d", item.getId()));
+                itemGrid.add(error, 0, i);
+            }else {
+                Label itemName = new Label(item.getServiceItem().getName());
+
+                totalTime += item.getServiceItem().getEstimatedMinutes();
+                IconImageView clockIcon = new IconImageView("imgs/clock-solid.png", 20, 20);
+                Label timeLabel = new Label(Integer.toString(item.getServiceItem().getEstimatedMinutes()),
+                        clockIcon);
+                timeLabel.setAlignment(Pos.CENTER_RIGHT);
+
+                itemGrid.add(itemName, 0, i);
+                itemGrid.add(timeLabel, 1, i);
+            }
+        }
+
+        itemGrid.add(new Label("Total time"), 0, workOrderItems.size());
+        itemGrid.add(new Label(Integer.toString(totalTime)), 1, workOrderItems.size());
+
+        VBox serviceItemBox = new VBox(serviceItemsLabel, itemGrid);
+        serviceItemBox.getStyleClass().add("card-info-box");
+        return serviceItemBox;
+    }
+
+    private HBox getVehicleInfo() {
+        ImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40, 40);
+
+        Label registrationNumber = new Label(vehicle.getRegistrationNumber());
+
+        Label brandModelYear = new Label(String.format("%s %s %d",
+                vehicle.getBrand(),
+                vehicle.getModel(),
+                vehicle.getYear())
+        );
+
+        VBox vehicleText = new VBox(registrationNumber, brandModelYear);
+        HBox vehicleInfo = new HBox(vehicleIcon, vehicleText);
+        vehicleInfo.getStyleClass().add("card-info-box");
+        return vehicleInfo;
+    }
+
+    private HBox getStatusInfo() {
+        HBox statusInfo;
+        Label idsLabel = new Label(String.format("Work Order ID: %d, Booking ID: %d ",
+                workOrder.getId(), booking.getId()));
+        Label statusLabel = createStatusLabel();
+        statusInfo = new HBox(idsLabel, statusLabel);
+        return statusInfo;
     }
 
     public Label createStatusLabel() {
@@ -88,5 +149,28 @@ public class WorkOrderCard extends VBox {
 
         statusLabel.getStyleClass().addAll("status-label");
         return statusLabel;
+    }
+
+    //TODO Move connection to GarageSystem to ShowWorkOrderView
+    private Node createOrderActionBtn(){
+        switch(workOrder.getStatus().toUpperCase()){
+            case "CREATED":
+                Button startWorkBtn = new Button("Start work");
+                startWorkBtn.setOnAction(e -> {
+                    garageSystem.startWorkOrder(workOrder.getId());
+                    ViewManager.getInstance().showWorkOrders();
+                });
+                startWorkBtn.getStyleClass().add("start-work-btn");
+                return startWorkBtn;
+            case "IN_PROGRESS":
+                Button completeWorkBtn = new Button("Complete work");
+                completeWorkBtn.setOnAction(e -> {
+                    garageSystem.completeWorkOrder(workOrder.getId());
+                    ViewManager.getInstance().showWorkOrders();
+                });
+                completeWorkBtn.getStyleClass().add("complete-work-btn");
+                return completeWorkBtn;
+        }
+        return new Label("No action required");
     }
 }

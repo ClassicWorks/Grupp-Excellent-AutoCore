@@ -56,7 +56,7 @@ public class BookingDetails extends BorderPane {
         //TODO Should booking work if vehicleOwner is null?
         Customer vehicleOwner = vehicle.getCustomer();
         //Customer vehicleOwner = garageSystem.getCustomer(vehicle.getCustomerId()).orElse(null);
-        HBox vehicleBox = new VehicleCard(vehicle, vehicleOwner);
+        VehicleCard vehicleBox = new VehicleCard(vehicle, vehicleOwner);
 
         mechanicComboBox = createMechanicComboBox();
         HBox mechanicBox = new HBox(mechanicComboBox);

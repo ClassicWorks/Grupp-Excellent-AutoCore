@@ -4,7 +4,7 @@ import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.view.components.KanbanGridUtil;
-import com.wac.autocore.view.components.WorkOrderCardWithActionBtns;
+import com.wac.autocore.view.components.WorkOrderCard;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -55,8 +55,9 @@ public class ShowWorkOrdersView {
         return root;
     }
 
+    //TODO move logic to garageSystem
     private Node getCompletedList() {
-        List<WorkOrder> completedWorkOrders = garageSystem.getWorkOrders().stream()
+        List<WorkOrder> completedWorkOrders = garageSystem.getWorkOrdersWithItems().stream()
                 .filter(wo -> wo.getStatus().equalsIgnoreCase("COMPLETED"))
                 .collect(Collectors.toList());
         if (completedWorkOrders.isEmpty()) {
@@ -67,7 +68,7 @@ public class ShowWorkOrdersView {
     }
 
     private Node getInProgressList() {
-        List<WorkOrder> completedWorkOrders = garageSystem.getWorkOrders().stream()
+        List<WorkOrder> completedWorkOrders = garageSystem.getWorkOrdersWithItems().stream()
                 .filter(wo -> wo.getStatus().equalsIgnoreCase("IN_PROGRESS"))
                 .collect(Collectors.toList());
         if (completedWorkOrders.isEmpty()) {
@@ -78,7 +79,7 @@ public class ShowWorkOrdersView {
     }
 
     private Node getIncomingList() {
-        List<WorkOrder> completedWorkOrders = garageSystem.getWorkOrders().stream()
+        List<WorkOrder> completedWorkOrders = garageSystem.getWorkOrdersWithItems().stream()
                 .filter(wo -> wo.getStatus().equalsIgnoreCase("CREATED"))
                 .collect(Collectors.toList());
         if (completedWorkOrders.isEmpty()) {
@@ -108,8 +109,9 @@ public class ShowWorkOrdersView {
                 continue;
             }
 
-            //TODO take the simple instead
-            workOrderCards.getChildren().add(new WorkOrderCardWithActionBtns(workOrder, booking, vehicle,mechanic));
+            List<WorkOrderItem> items = workOrder.getItems();
+
+            workOrderCards.getChildren().add(new WorkOrderCard(workOrder, booking, vehicle,mechanic, items));
         }
         return workOrderCards;
     }
