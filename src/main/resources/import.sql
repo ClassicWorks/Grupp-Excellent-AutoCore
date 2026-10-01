@@ -80,31 +80,6 @@ INSERT INTO work_orders (booking_id, mechanic_id, status) VALUES ( 7, 3, 'IN_PRO
 -- WorkOrder 6: En tjänst, arbetet är klart
 INSERT INTO work_orders (booking_id, mechanic_id, status) VALUES ( 9, 1, 'COMPLETED');
 
--- WorkOrder 1: ServiceItem 1
-INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (1, 1);
-
--- WorkOrder 2: ServiceItem 2 och 3
-INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (2, 2);
-INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (2, 3);
-
--- WorkOrder 3: ServiceItem 1, 3 och 4
-INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (3, 1);
-INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (3, 3);
-INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (3, 4);
-
--- WorkOrder 4: ServiceItem 1 och 4
-INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (4, 1);
-INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (4, 4);
-
--- WorkOrder 5: Alla fyra ServiceItems
-INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (5, 1);
-INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (5, 2);
-INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (5, 3);
-INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (5, 4);
-
--- WorkOrder 6: ServiceItem 4
-INSERT INTO join_work_order_service_item (work_order_id, service_item_id) VALUES (6, 4);
-
 -- Work order items (orderrader med fryst pris)
 -- WorkOrder 1: Oil change
 INSERT INTO work_order_items (work_order_id, service_item_id, price_at_order) VALUES (1, 1, 1295.0);
