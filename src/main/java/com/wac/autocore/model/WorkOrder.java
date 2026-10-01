@@ -28,6 +28,9 @@ public class WorkOrder {
     )
     private List<ServiceItem> serviceItems;
 
+    @OneToMany(mappedBy = "workOrder", cascade = CascadeType.ALL)
+    private List<WorkOrderItem> items = new ArrayList<>();
+
     @Column(name = "status", nullable = false, length = 15)
     private String status;
 
@@ -91,6 +94,14 @@ public class WorkOrder {
 
     public void addServiceItem(ServiceItem serviceItem) {
         serviceItems.add(serviceItem);
+    }
+
+    public void addItem(ServiceItem serviceItem, double priceAtOrder) {
+        items.add(new WorkOrderItem(this, serviceItem, priceAtOrder));
+    }
+
+    public List<WorkOrderItem> getItems() {
+        return items;
     }
 
     public void removeServiceItem(ServiceItem serviceItem) {
