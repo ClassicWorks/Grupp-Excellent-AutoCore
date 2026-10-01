@@ -45,28 +45,28 @@ public class ShowVehicleView {
         //TODO listan ska kunna uppdateras baserat på filtering
         for (Vehicle vehicle : garageSystem.getVehicles()){
             Customer customer = vehicle.getCustomer();
-            VehicleCard vehicleCard = new VehicleCard(vehicle, customer);
+            VehicleCard vehicleCard = new VehicleCard(vehicle, customer, v -> ViewManager.getInstance().showCreateBooking(v.getId()));
             vehicleCard.setOnMouseClicked(e-> {
-
-                VehicleDetails  vehicleDetails = new VehicleDetails(vehicle, customer);
-                vehicleDetails.setMaxHeight(Double.MAX_VALUE);
-
                 //If anything is in right column, remove content
                 mainContent.getChildren().removeIf(node ->
                         GridPane.getColumnIndex(node) != null
                                 && GridPane.getColumnIndex(node) == 1);
 
+                //Add vehicle details
+                VehicleDetails  vehicleDetails = new VehicleDetails(vehicle, customer);
+                vehicleDetails.setMaxHeight(Double.MAX_VALUE);
                 mainContent.add(
                         vehicleDetails,
                         1, 0
                 );
-                //Make vehicleDetail as big as allowed (vehicleScroll has already from KanbanGridUtil)
+                //Make vehicleDetail as big as allowed
                 GridPane.setVgrow(vehicleDetails, Priority.ALWAYS);
             });
             vehiclesBox.getChildren().add(vehicleCard);
         }
 
         VBox vehiclesScroll = KanbanGridUtil.getScrollableColumnWithTitle("", vehiclesBox);
+        GridPane.setVgrow(vehiclesScroll, Priority.ALWAYS);
 
         mainContent.add(
                 vehiclesScroll,
@@ -74,10 +74,6 @@ public class ShowVehicleView {
 
         layout.setCenter(mainContent);
         return layout;
-    }
-
-    private VehicleDetails createVehicleDetails(Vehicle vehicle, Customer customer) {
-        return null;
     }
 
     private Node getHeader(){
