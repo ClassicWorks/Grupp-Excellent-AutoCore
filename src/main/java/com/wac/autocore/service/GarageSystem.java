@@ -1,14 +1,7 @@
 package com.wac.autocore.service;
 
 import com.wac.autocore.data.*;
-import com.wac.autocore.model.Booking;
-import com.wac.autocore.model.Customer;
-import com.wac.autocore.model.Invoice;
-import com.wac.autocore.model.Mechanic;
-import com.wac.autocore.model.Payment;
-import com.wac.autocore.model.ServiceItem;
-import com.wac.autocore.model.Vehicle;
-import com.wac.autocore.model.WorkOrder;
+import com.wac.autocore.model.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -220,8 +213,8 @@ public class GarageSystem {
         return workOrderRepo.get(id);
     }
 
-    private Optional<WorkOrder> getWorkOrderWithServiceItems(int workOrderId) {
-        return workOrderRepo.getWithServiceItems(workOrderId);
+    private Optional<WorkOrder> getWorkOrderWithItems(int workOrderId) {
+        return workOrderRepo.getWithItems(workOrderId);
     }
 
     public void showInvoices() {
@@ -400,7 +393,8 @@ public class GarageSystem {
                 );
                 return null;
             }
-            workOrder.addServiceItem(optionalServiceItem.get());
+            ServiceItem serviceItem = optionalServiceItem.get();
+            workOrder.addItem(serviceItem, serviceItem.getPrice());
         }
 
 
@@ -477,7 +471,7 @@ public class GarageSystem {
     }
 
     public Invoice createInvoice(int workOrderId, String discountCode) {
-        Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithServiceItems(workOrderId);
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
             System.out.println("Work order with ID " + workOrderId + " does not exist.");
@@ -492,8 +486,8 @@ public class GarageSystem {
 
         double amount = 0.0;
 
-        for (ServiceItem serviceItem : workOrder.getServiceItems()) {
-                amount += serviceItem.getPrice();
+        for (WorkOrderItem item : workOrder.getItems()) {
+                amount += item.getPriceAtOrder();
         }
 
         double discount = 0.0;
