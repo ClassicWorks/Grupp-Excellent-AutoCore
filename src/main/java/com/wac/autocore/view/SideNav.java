@@ -1,8 +1,11 @@
 package com.wac.autocore.view;
 
 import com.wac.autocore.manager.ViewManager;
+import com.wac.autocore.view.components.IconImageView;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
@@ -27,7 +30,13 @@ public class SideNav {
     public Parent show(){
         //Create navPane
         BorderPane navPane = new BorderPane();
-        navPane.setId("navPane");
+        navPane.getStyleClass().add("side-bar");
+
+        //Create logo
+        ImageView logo = new ImageView(new Image("imgs/WCA logo.png", 100,100,true, false));
+
+        VBox logoBox = new VBox(logo);
+        logoBox.getStyleClass().add("logo-container");
 
         //Create all nav buttons
         Button customerBtn = new Button("Kunder");
@@ -40,15 +49,15 @@ public class SideNav {
         Button paymentBtn = new Button("Betalningar");
         Button exitBtn = new Button("Avsluta");
 
-        customerBtn.getStyleClass().addAll("nav-btn", "customer");
-        vehicleBtn.getStyleClass().addAll("nav-btn", "vehicle");
-        bookingBtn.getStyleClass().addAll("nav-btn", "booking");
-        mechanicsBtn.getStyleClass().addAll("nav-btn", "mechanics");
-        serviceBtn.getStyleClass().addAll("nav-btn", "services");
-        workOrderBtn.getStyleClass().addAll("nav-btn", "work-order");
-        invoiceBtn.getStyleClass().addAll("nav-btn", "invoice");
-        paymentBtn.getStyleClass().addAll("nav-btn", "payment");
-        exitBtn.getStyleClass().addAll("nav-btn", "destructive");
+        customerBtn.getStyleClass().addAll("menu-btn", "customer");
+        vehicleBtn.getStyleClass().addAll("menu-btn", "vehicle");
+        bookingBtn.getStyleClass().addAll("menu-btn", "booking");
+        mechanicsBtn.getStyleClass().addAll("menu-btn", "mechanics");
+        serviceBtn.getStyleClass().addAll("menu-btn", "services");
+        workOrderBtn.getStyleClass().addAll("menu-btn", "work-order");
+        invoiceBtn.getStyleClass().addAll("menu-btn", "invoice");
+        paymentBtn.getStyleClass().addAll("menu-btn", "payment");
+        exitBtn.getStyleClass().addAll("menu-btn", "destructive-btn");
 
 
         customerBtn.setOnAction(e -> ViewManager.getInstance().showCustomers());
@@ -72,6 +81,7 @@ public class SideNav {
                 invoiceBtn,
                 paymentBtn);
 
+        navPane.setTop(logoBox);
         navPane.setCenter(navBox);
         navPane.setBottom(exitBtn);
 
