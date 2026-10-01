@@ -1,0 +1,89 @@
+package com.wac.autocore.view;
+
+import com.wac.autocore.manager.ViewManager;
+import com.wac.autocore.model.Invoice;
+import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.view.components.InvoiceCard;
+import com.wac.autocore.view.components.KanbanGridUtil;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class ShowInvoicesView {
+    private final GarageSystem garageSystem;
+
+    public ShowInvoicesView() {
+        garageSystem = new GarageSystem();
+    }
+
+    public Parent show() {
+        BorderPane root = new BorderPane();
+        Node header = getHeader();
+
+        GridPane kanbanGrid = KanbanGridUtil.getKanbanGrid(2);
+
+        VBox unpaidView =
+                KanbanGridUtil.getScrollableColumnWithTitle("Unpaid", getUnpaidList());
+
+        VBox paidView =
+                KanbanGridUtil.getScrollableColumnWithTitle("Paid", getPaidList());
+
+        kanbanGrid.add(unpaidView, 0, 0);
+        kanbanGrid.add(paidView, 1, 0);
+
+        GridPane.setVgrow(unpaidView, Priority.ALWAYS);
+        GridPane.setVgrow(paidView, Priority.ALWAYS);
+
+        root.setTop(header);
+        root.setCenter(kanbanGrid);
+        return root;
+    }
+
+    private Node getUnpaidList() {
+        List<Invoice> unpaidInvoices = garageSystem.getInvoices().stream()
+                .filter(invoice -> !invoice.isPaid())
+                .collect(Collectors.toList());
+
+        if (unpaidInvoices.isEmpty()) {
+            return new Label("No unpaid invoices found");
+        }
+        return getInvoiceCardsFromList(unpaidInvoices);
+    }
+
+    private Node getPaidList() {
+        List<Invoice> paidInvoices = garageSystem.getInvoices().stream()
+                .filter(Invoice::isPaid)
+                .collect(Collectors.toList());
+
+        if (paidInvoices.isEmpty()) {
+            return new Label("No paid invoices found");
+        }
+        return getInvoiceCardsFromList(paidInvoices);
+    }
+
+    private VBox getInvoiceCardsFromList(List<Invoice> invoices) {
+        VBox invoiceCards = new VBox();
+        for (Invoice invoice : invoices) {
+            invoiceCards.getChildren().add(new InvoiceCard(invoice));
+        }
+        return invoiceCards;
+    }
+
+    private BorderPane getHeader() {
+        BorderPane header = new BorderPane();
+        Label title = new Label("Invoices");
+        Button createInvoiceBtn = new Button("Create invoice");
+        header.setCenter(title);
+        header.setRight(createInvoiceBtn);
+        createInvoiceBtn.setOnAction(e -> ViewManager.getInstance().showCreateInvoicePopup());
+        return header;
+    }
+}

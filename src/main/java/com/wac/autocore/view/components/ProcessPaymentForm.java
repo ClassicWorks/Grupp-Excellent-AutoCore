@@ -1,6 +1,5 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.data.Database;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.Payment;
 import com.wac.autocore.service.GarageSystem;
@@ -33,7 +32,7 @@ public class ProcessPaymentForm {
 
         Label title = new Label("Process payment");
 
-        List<Invoice> unpaidInvoices = Database.getInvoices().stream()
+        List<Invoice> unpaidInvoices = garageSystem.getInvoices().stream()
                 .filter(invoice -> !invoice.isPaid())
                 .collect(Collectors.toList());
 
