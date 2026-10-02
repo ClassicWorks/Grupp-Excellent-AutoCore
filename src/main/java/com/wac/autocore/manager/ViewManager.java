@@ -21,6 +21,7 @@ public class ViewManager {
 
     private Stage primaryStage;
     private BorderPane rootLayout;
+    private Runnable currentViewRefresher;
 
     private ViewManager() {
     }
@@ -74,33 +75,53 @@ public class ViewManager {
      */
 
     public void showCustomers() {
+        currentViewRefresher = this::showCustomers;
         showView(new ShowCustomersView().show());
     }
 
     public void showVehicles() {
+        currentViewRefresher = this::showVehicles;
         showView(new ShowVehicleView().show());
     }
 
     public void showBookings() {
+        currentViewRefresher = this::showBookings;
         showView(new ShowBookingsView().show());
     }
 
     public void showMechanics() {
+        currentViewRefresher = this::showMechanics;
         showView(new ShowMechanicsView().show());
     }
 
     public void showServices() {
+        currentViewRefresher = this::showServices;
         showView(new ShowServiceItemsView().show());
     }
 
     public void showWorkOrders() {
+        currentViewRefresher = this::showWorkOrders;
         showView(new ShowWorkOrdersView().show());
     }
 
-    public void showInvoices() { showView(new ShowInvoicesView().show()); }
+    public void showInvoices() {
+        currentViewRefresher = this::showInvoices;
+        showView(new ShowInvoicesView().show());
+    }
 
     public void showPayments() {
+        currentViewRefresher = this::showPayments;
         showView(new ShowPaymentsView().show());
+    }
+
+    public void refreshSideNav() {
+        rootLayout.setLeft(new SideNav().show());
+    }
+
+    public void refreshCurrentView() {
+        if (currentViewRefresher != null) {
+            currentViewRefresher.run();
+        }
     }
 
     public void showCreateBooking() {
@@ -121,9 +142,9 @@ public class ViewManager {
         showPopup(popup, "Create new Work Order", content, this::showWorkOrders);
     }
     public void showCreateVehiclePopup() {
-            Stage popup = new Stage();
-            Parent content = new CreateVehicleForm(popup).show();
-            showPopup(popup, "Create new vehicle", content, this::showVehicles);
+        Stage popup = new Stage();
+        Parent content = new CreateVehicleForm(popup).show();
+        showPopup(popup, "Create new vehicle", content, this::showVehicles);
     }
 
     public void showCreateCustomerPopup() {
@@ -133,7 +154,7 @@ public class ViewManager {
         showPopup(popup, "Skapa ny kund", content, this::showCustomers);
     }
 
-     public void showProcessPaymentPopup() {
+    public void showProcessPaymentPopup() {
         Stage popup = new Stage();
         Parent content = new ProcessPaymentForm(popup).show();
 
@@ -146,7 +167,7 @@ public class ViewManager {
 
         showPopup(popup, "Create invoice", content, this::showInvoices);
     }
-  
+
     public void exit() {
         primaryStage.close();
     }
