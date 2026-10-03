@@ -10,7 +10,6 @@ import com.wac.autocore.view.components.ProcessPaymentForm;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -39,6 +38,7 @@ public class ViewManager {
         rootLayout.setLeft(new SideNav().show());
 
         Scene scene = new Scene(rootLayout, 900, 600);
+        scene.getStylesheets().add("style/stylesheet.css");
 
         stage.setTitle("Wigell AutoCore");
         stage.setScene(scene);
@@ -56,6 +56,7 @@ public class ViewManager {
         popup.setTitle(title);
 
         Scene scene = new Scene(content, 400, 400);
+        scene.getStylesheets().add("style/stylesheet.css");
         popup.setScene(scene);
 
         popup.showAndWait();
