@@ -12,6 +12,11 @@ import javafx.scene.layout.VBox;
 import java.util.function.Consumer;
 
 public class VehicleCard extends VBox{
+    private void setStyle() {
+        this.getStyleClass().add("card");
+        this.setMaxWidth(Double.MAX_VALUE);
+    }
+
     /**
      * Only information about Vehicle
      * @param vehicle
@@ -79,11 +84,5 @@ public class VehicleCard extends VBox{
 
         HBox vehicleBox = new HBox(vehicleIcon, vehicleInfoBox);
         return vehicleBox;
-    }
-
-    private void setStyle() {
-        this.setStyle("-fx-border-color: blue");
-        this.getStyleClass().add("card");
-        this.setMaxWidth(Double.MAX_VALUE);
     }
 }

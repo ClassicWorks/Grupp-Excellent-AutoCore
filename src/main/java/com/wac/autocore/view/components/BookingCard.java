@@ -8,19 +8,55 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 
-public class BookingCard extends HBox {
+public class BookingCard extends VBox {
     public BookingCard(Booking booking, Vehicle vehicle, Mechanic mechanic){
         //date
-        Label date = new Label(booking.getDate().toString());
-        VBox dateBox = new VBox(date);
+        VBox dateBox = getDateBox(booking);
+        dateBox.getStyleClass().add("card-info-box");
 
         //Info about booked vehicle
-        ImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40,40);
+        VBox vehicleInfoBox = getVehicleInfoBox(vehicle);
+        vehicleInfoBox.getStyleClass().add("card-info-box");
+
+        IconImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40,40);
+        HBox vehicleBox = new HBox(vehicleIcon, vehicleInfoBox);
+
+        //Info about mechanic
+        Hyperlink mechanicLink = new MechanicHyperLink(mechanic);
+        mechanicLink.getStyleClass().add("card-info-box");
+
+        //Actionable buttons
+        Button createWorkOrderBtn = getCreateWorkOrderBtn(booking);
+        createWorkOrderBtn.getStyleClass().addAll("confirm-btn", "card-action-btn");
+
+        HBox buttonBox = new HBox(createWorkOrderBtn);
+        buttonBox.setAlignment(Pos.BASELINE_RIGHT);
+        buttonBox.getStyleClass().addAll("card-info-box");
+
+        VBox bookingCard = new VBox();
+        this.getStyleClass().add("card");
+
+        this.getChildren().add(dateBox);
+        this.getChildren().add(vehicleBox);
+        this.getChildren().add(mechanicLink);
+        this.getChildren().add(buttonBox);
+        this.getChildren().addAll(bookingCard);
+    }
+
+    private static Button getCreateWorkOrderBtn(Booking booking) {
+        Button createWorkOrderBtn = new Button("Create work order");
+
+        createWorkOrderBtn.setOnAction(e ->
+                ViewManager.getInstance().showCreateWorkOrderPopup(booking.getId())
+        );
+        return createWorkOrderBtn;
+    }
+
+    private static VBox getVehicleInfoBox(Vehicle vehicle) {
         Label regNumberLabel = new Label(vehicle.getRegistrationNumber());
         Label brandModelYearLabel = new Label(String.format(
                 "%s - %2s, %d",
@@ -28,29 +64,12 @@ public class BookingCard extends HBox {
                 vehicle.getModel(),
                 vehicle.getYear()));
         VBox vehicleInfoBox = new VBox(regNumberLabel, brandModelYearLabel);
+        return vehicleInfoBox;
+    }
 
-        HBox vehicleBox = new HBox(vehicleIcon, vehicleInfoBox);
-
-        //Info about mechanic
-        Hyperlink mechanicLink = new MechanicHyperLink(mechanic);
-
-        //Actionable buttons
-        Button createWorkOrderBtn = new Button("Create work order");
-        createWorkOrderBtn.getStyleClass().add("create-btn");
-
-        createWorkOrderBtn.setOnAction(e ->
-                ViewManager.getInstance().showCreateWorkOrderPopup(booking.getId())
-        );
-        HBox buttonBox = new HBox(createWorkOrderBtn);
-        buttonBox.setAlignment(Pos.BASELINE_RIGHT);
-
-        VBox bookingCard = new VBox();
-        this.getStyleClass().add("card");
-
-        bookingCard.getChildren().add(dateBox);
-        bookingCard.getChildren().add(vehicleBox);
-        bookingCard.getChildren().add(mechanicLink);
-        bookingCard.getChildren().add(buttonBox);
-        this.getChildren().addAll(bookingCard);
+    private static VBox getDateBox(Booking booking) {
+        Label date = new Label(booking.getDate().toString());
+        VBox dateBox = new VBox(date);
+        return dateBox;
     }
 }

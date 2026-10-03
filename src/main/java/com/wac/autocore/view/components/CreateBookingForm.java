@@ -19,12 +19,6 @@ import javafx.stage.Stage;
 import java.time.LocalDate;
 
 public class CreateBookingForm {
-    private static final String SELECTED_STYLE =
-            "-fx-background-color: lightblue; -fx-border-color: blue;";
-
-    private static final String UNSELECTED_STYLE =
-            "-fx-border-color: blue;";
-
     private final GarageSystem garageSystem;
     private final Stage popupStage;
 
@@ -49,18 +43,35 @@ public class CreateBookingForm {
     public Parent show() {
         VBox layout = new VBox();
 
-        layout.getChildren().add(createTitle());
+        Label title = createTitle();
+        title.getStyleClass().add("form-title");
+        layout.getChildren().add(title);
+
+        CustomerSelection customerSelection = new CustomerSelection(
+                garageSystem.getCustomers(),
+                this::showVehiclesOfCustomer);
+        customerSelection.getStyleClass().addAll("form-field-container");
+
         layout.getChildren().add(
-                new CustomerSelection(
-                        garageSystem.getCustomers(),
-                        this::showVehiclesOfCustomer)
+                customerSelection
         );
+
+        vehicleResults.getStyleClass().addAll("card-container", "compact");
         layout.getChildren().add(vehicleResults);
-        layout.getChildren().add(createBookingInformation());
-        layout.getChildren().add(createActionButtons());
+
+        Node bookingInformation = createBookingInformation();
+        bookingInformation.getStyleClass().addAll("form-field-container");
+        layout.getChildren().add(bookingInformation);
+
+        HBox actionButtons = createActionButtons();
+        actionButtons.getStyleClass().add("btn-container");
+        layout.getChildren().add(actionButtons);
+
+        layout.getStyleClass().add("form-container");
 
         ScrollPane scrollPane = new ScrollPane(layout);
         scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
         return scrollPane;
     }
 
@@ -138,15 +149,12 @@ public class CreateBookingForm {
 
         if (parent != null) {
             parent.getChildrenUnmodifiable().forEach(node -> {
-                if (node.getStyleClass().contains("vehicle-card")) {
-                    node.setStyle(UNSELECTED_STYLE);
-                    node.getStyleClass().remove("selected");
+                if (node.getStyleClass().contains("card")) {
+                    node.getStyleClass().remove("is-selected");
                 }
             });
         }
-
-        selectedCard.setStyle(SELECTED_STYLE);
-        selectedCard.getStyleClass().add("selected");
+        selectedCard.getStyleClass().add("is-selected");
     }
 
     // =========================================================
@@ -174,8 +182,6 @@ public class CreateBookingForm {
         return bookingInformation;
     }
 
-    //TODO only get available mechanics
-
     private ComboBox<Mechanic> createMechanicComboBox() {
         ObservableList<Mechanic> mechanics =
                 FXCollections.observableArrayList(garageSystem.getAvailableMechanics());
@@ -193,9 +199,11 @@ public class CreateBookingForm {
     private HBox createActionButtons() {
         Button cancelButton =
                 new Button("Cancel booking");
+        cancelButton.getStyleClass().addAll("cancel-btn");
 
         Button createButton =
                 new Button("Create booking");
+        createButton.getStyleClass().add("confirm-btn");
 
         createButton.disableProperty().bind(
                 selectedVehicle.isNull()

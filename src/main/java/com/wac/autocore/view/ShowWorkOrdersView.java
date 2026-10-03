@@ -137,12 +137,12 @@ public class ShowWorkOrdersView {
         title.getStyleClass().add("page-title");
 
         Button createWorkOrderBtn = new Button("See bookings");
+        createWorkOrderBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
 
         BorderPane header = new BorderPane();
         header.getStyleClass().add("content-header-container");
         header.setCenter(title);
         header.setRight(createWorkOrderBtn);
-        createWorkOrderBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
         return header;
     }
 }

@@ -1,7 +1,6 @@
 package com.wac.autocore.view;
 
 import com.wac.autocore.manager.ViewManager;
-import com.wac.autocore.view.components.IconImageView;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -21,7 +20,7 @@ public class SideNav {
     * Exit*/
 
 
-
+    private VBox navBox;
     /**
      * Creates the navigation menu, containing several buttons calling ViewManager to change view.
      *
@@ -60,18 +59,52 @@ public class SideNav {
         exitBtn.getStyleClass().addAll("menu-btn", "exit-btn");
 
 
-        customerBtn.setOnAction(e -> ViewManager.getInstance().showCustomers());
-        vehicleBtn.setOnAction(e -> ViewManager.getInstance().showVehicles());
-        bookingBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
-        mechanicsBtn.setOnAction(e -> ViewManager.getInstance().showMechanics());
-        serviceBtn.setOnAction(e -> ViewManager.getInstance().showServices());
-        workOrderBtn.setOnAction(e -> ViewManager.getInstance().showWorkOrders());
-        invoiceBtn.setOnAction(e -> ViewManager.getInstance().showInvoices());
-        paymentBtn.setOnAction(e -> ViewManager.getInstance().showPayments());
-        exitBtn.setOnAction(e -> ViewManager.getInstance().exit());
+        customerBtn.setOnAction(e -> {
+            ViewManager.getInstance().showCustomers();
+            setIsSelected(customerBtn);
+
+        });
+        vehicleBtn.setOnAction(e -> {
+            ViewManager.getInstance().showVehicles();
+            setIsSelected(vehicleBtn);
+
+        });
+        bookingBtn.setOnAction(e -> {
+            ViewManager.getInstance().showBookings();
+            setIsSelected(bookingBtn);
+
+        });
+        mechanicsBtn.setOnAction(e -> {
+            ViewManager.getInstance().showMechanics();
+            setIsSelected(mechanicsBtn);
+
+        });
+        serviceBtn.setOnAction(e -> {
+            ViewManager.getInstance().showServices();
+            setIsSelected(serviceBtn);
+
+        });
+        workOrderBtn.setOnAction(e -> {
+            ViewManager.getInstance().showWorkOrders();
+            setIsSelected(workOrderBtn);
+
+        });
+        invoiceBtn.setOnAction(e -> {
+            ViewManager.getInstance().showInvoices();
+            setIsSelected(invoiceBtn);
+
+        });
+        paymentBtn.setOnAction(e -> {
+            ViewManager.getInstance().showPayments();
+            setIsSelected(paymentBtn);
+
+        });
+        exitBtn.setOnAction(e -> {
+            ViewManager.getInstance().exit();
+        });
 
         //Place all buttons in navPane
-        VBox navBox = new VBox(
+        navBox = new VBox(
                 customerBtn,
                 vehicleBtn,
                 bookingBtn,
@@ -91,5 +124,15 @@ public class SideNav {
         navPane.setBottom(exitBox);
 
         return navPane;
+    }
+
+    private void setIsSelected(Button button) {
+        navBox.getChildrenUnmodifiable().forEach(node -> {
+            if (node.getStyleClass().contains("menu-btn")) {
+                node.getStyleClass().remove("is-selected");
+            }
+        });
+
+        button.getStyleClass().add("is-selected");
     }
 }

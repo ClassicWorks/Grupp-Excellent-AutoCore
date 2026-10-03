@@ -6,7 +6,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -25,26 +24,32 @@ public class CreateWorkOrderForm {
     }
 
     public Parent show(int bookingId) {
-        BorderPane root = new BorderPane();
+        VBox root = new VBox();
+        root.getStyleClass().add("form-container");
+
         Label heading = new Label("Create Work Order");
-        heading.getStyleClass().add("form-heading");
-        root.setTop(heading);
+        heading.getStyleClass().add("form-title");
 
         Button cancelBtn = new Button("Cancel");
+        cancelBtn.getStyleClass().add("cancel-btn");
         cancelBtn.setOnAction(e -> popupStage.close());
 
         //Check if required objects exist
         Optional<Booking> optionalBooking = garageSystem.getBooking(bookingId);
         if(!optionalBooking.isPresent()){
-            root.setCenter(new Label("Error:Booking not found!"));
-            root.setBottom(cancelBtn);
+            Label errorLabel = new Label("Error:Booking not found!");
+            errorLabel.getStyleClass().add("error-label");
+
+           root.getChildren().addAll(heading, errorLabel, cancelBtn);
             return root;
         }
         Booking booking = optionalBooking.get();
         Vehicle vehicle = booking.getVehicle();
         if(vehicle == null){
-            root.setCenter(new Label("Error: Vehicle not found!"));
-            root.setBottom(cancelBtn);
+            Label errorLabel = new Label("Error: Vehicle not found!");
+            errorLabel.getStyleClass().add("error-label");
+
+            root.getChildren().addAll(heading, errorLabel, cancelBtn);
             return root;
         }
 
@@ -53,24 +58,39 @@ public class CreateWorkOrderForm {
         VBox bookingCard = createBookingCard(booking, vehicle, mechanic);
 
         Label mechanicLabel = new Label("Choose mechanic");
+        mechanicLabel.getStyleClass().add("form-field-label");
 
         ComboBox<Mechanic> mechanicComboBox = createMechanicComboBox();
         if(mechanic != null){
             mechanicComboBox.setValue(mechanic);
         }
 
-        VBox serviceItemsBox = new VBox();
+        VBox mechanicBox = new VBox(mechanicLabel, mechanicComboBox);
+        mechanicBox.getStyleClass().add("form-field-container");
+
+        Label serviceItemLabel = new Label("Choose service items");
+        serviceItemLabel.getStyleClass().add("form-field-label");
+
+        VBox serviceItemsCheckBoxes = new VBox();
+        serviceItemsCheckBoxes.getStyleClass().add("check-box-container");
+
         List<CheckBox> serviceCheckBoxes = new ArrayList<>();
         for(ServiceItem service : garageSystem.getServiceItems()){
             CheckBox checkBox = new CheckBox(service.getName());
             checkBox.setUserData(service.getId());
             serviceCheckBoxes.add(checkBox);
-            serviceItemsBox.getChildren().add(checkBox);
+            serviceItemsCheckBoxes.getChildren().add(checkBox);
         }
 
-        serviceItemsBox.getStyleClass().add("check-box-container");
+        VBox serviceItemsBox = new VBox(serviceItemLabel, serviceItemsCheckBoxes);
+        serviceItemsBox.getStyleClass().add("form-field-container");
 
         Button submitBtn = new Button("Create work order");
+        submitBtn.getStyleClass().add("confirm-btn");
+
+        HBox actionableBtns = new HBox(submitBtn, cancelBtn);
+        actionableBtns.getStyleClass().add("btn-container");
+
         submitBtn.setOnAction(e -> {
                     Mechanic selectedMechanic = mechanicComboBox.getValue();
 
@@ -88,20 +108,21 @@ public class CreateWorkOrderForm {
                 }
         );
 
-        root.setCenter(new VBox(
+        root.getChildren().addAll(
+                heading,
                 bookingCard,
-                mechanicLabel,
-                mechanicComboBox,
-                serviceItemsBox)
+                mechanicBox,
+                serviceItemsBox,
+                actionableBtns
         );
-        root.setBottom(new HBox(
-                cancelBtn,
-                submitBtn)
-        );
-        return root;
+        ScrollPane scrollPane = new ScrollPane(root);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        return scrollPane;
     }
 
 
+    //TODO move to BookingCard
     private VBox createBookingCard(Booking booking, Vehicle vehicle, Mechanic mechanic){
         //date
         Label date = new Label(booking.getDate().toString());
@@ -121,8 +142,7 @@ public class CreateWorkOrderForm {
         Hyperlink mechanicLink = new MechanicHyperLink(mechanic);
 
         VBox bookingCard = new VBox();
-        bookingCard.setStyle("-fx-border-color: blue");
-        bookingCard.getStyleClass().addAll("booking-card", "card");
+        bookingCard.getStyleClass().addAll("card");
 
         bookingCard.getChildren().addAll(
                 dateBox,

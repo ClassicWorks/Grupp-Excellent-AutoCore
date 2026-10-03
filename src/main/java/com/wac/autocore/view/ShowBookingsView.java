@@ -7,7 +7,7 @@ import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.view.components.BookingCard;
 import com.wac.autocore.view.components.BookingDetails;
-import com.wac.autocore.view.components.kanban.KanbanGridUtil;
+import com.wac.autocore.view.components.kanban.KanbanGrid;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -22,9 +22,11 @@ public class ShowBookingsView {
 
     public Parent show(){
         VBox layout = new VBox();
-        layout.getChildren().add(getHeader());
+        Node header = getHeader();
+        header.getStyleClass().add("content-header-container");
+        layout.getChildren().add(header);
 
-        GridPane mainContent = KanbanGridUtil.getKanbanGrid(2);
+        KanbanGrid mainContent = new KanbanGrid(2);
 
         //Filtrerings nodes
         //TODO Just nu finns ingen logik för filtrering, är det något som ska implementeras? Vilka typer?
@@ -43,6 +45,7 @@ public class ShowBookingsView {
 
         //Show alla cards of bookings
         VBox bookingsBox = new VBox();
+        bookingsBox.getStyleClass().add("card-container");
 
         //Populate list
         for(Booking booking : garageSystem.getBookings()){
@@ -86,6 +89,16 @@ public class ShowBookingsView {
                     bookingDetails.setMaxHeight(Double.MAX_VALUE);
                     GridPane.setVgrow(bookingDetails, Priority.ALWAYS);
 
+                    //Remove is-selected styling on other cards
+                    Parent parent = bookingCard.getParent();
+
+                    if (parent != null) {
+                        parent.getChildrenUnmodifiable().forEach(node -> {
+                            if (node.getStyleClass().contains("card")) {
+                                node.getStyleClass().remove("is-selected");
+                            }
+                        });
+                    }
 
                     bookingCard.getStyleClass().add("is-selected");
                 });
@@ -97,12 +110,13 @@ public class ShowBookingsView {
             }
         }
 
-        VBox listBookingsBox = KanbanGridUtil.getScrollableColumnWithTitle("", bookingsBox, "");
+        ScrollPane listBookingsBox = new ScrollPane(bookingsBox);
+        listBookingsBox.setFitToWidth(true);
+        listBookingsBox.setFitToHeight(true);
 
         //Make nodes possible to fill entire view
         GridPane.setVgrow(listBookingsBox, Priority.ALWAYS);
         VBox.setVgrow(mainContent, Priority.ALWAYS);
-        VBox.setVgrow(listBookingsBox, Priority.ALWAYS);
 
         mainContent.add(listBookingsBox, 0, 0);
 
@@ -111,12 +125,14 @@ public class ShowBookingsView {
     }
 
     private Node getHeader(){
-        BorderPane headerPane = new BorderPane();
         Label title = new Label("Bookings");
         title.getStyleClass().setAll("page-title");
+
         Button createBookingBtn = new Button("Create new booking");
         createBookingBtn.getStyleClass().addAll("confirm-btn");
         createBookingBtn.setOnAction(e -> ViewManager.getInstance().showCreateBooking());
+
+        BorderPane headerPane = new BorderPane();
         headerPane.setCenter(title);
         headerPane.setRight(createBookingBtn);
         return headerPane;

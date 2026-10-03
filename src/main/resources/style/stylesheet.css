@@ -30,8 +30,8 @@
     -fx-status-in-progress-ink: #8C5A17;
     -fx-status-ready-background-color: #E7EEEF;
     -fx-status-ready-ink: #4F6B78;
-    -fx-status-handling-required-background-color: #F7E4DD;
-    -fx-status-handling-required-ink: #A6432E;
+    -fx-status-unhandled-background-color: #F7E4DD;
+    -fx-status-unhandled-ink: #A6432E;
 
     -fx-background-color: -fx-main-background;
 }
@@ -49,7 +49,6 @@ Label{
 }
 Text{
     -fx-fill: -fx-dark-ink;
-
 }
 
 .page-title{
@@ -163,6 +162,8 @@ Button{
 
 .menu-btn.is-selected{
     -fx-background-color: -fx-primary-color;
+    -fx-border-color: -fx-menu-btn-color;
+    -fx-border-width: 2px;
     -fx-text-fill: -fx-light-ink;
 }
 
@@ -183,6 +184,11 @@ Button{
 /*-----------------
     Containers
 -------------------*/
+
+.scroll-pane {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
 .side-bar {
     -fx-background-color: -fx-primary-color;
     -fx-border-color: -fx-primary-hover-color;
@@ -219,12 +225,14 @@ Button{
     -fx-border-color: -fx-frame-border-color;
 }
 
-.card-container.compressed {
+.card-container.compact {
     -fx-spacing: 2px;
+    -fx-padding: 6px;
 }
 
-.card-container.compressed .card{
+.card-container.compact .card{
     -fx-spacing: 3px;
+    -fx-padding: 3px;
 }
 
 .details-container {
@@ -295,12 +303,12 @@ Button{
 }
 
 .column-header.unhandled{
-    -fx-background-color: -fx-status-handling-required-background-color;
-    -fx-border-color: -fx-status-handling-required-ink;
+    -fx-background-color: -fx-status-unhandled-background-color;
+    -fx-border-color: -fx-status-unhandled-ink;
 }
 
 .column-header.unhandled Label{
-    -fx-text-fill: -fx-status-handling-required-ink;
+    -fx-text-fill: -fx-status-unhandled-ink;
 }
 
 /*------------------
