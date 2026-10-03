@@ -68,6 +68,8 @@ public class CreateWorkOrderForm {
             serviceItemsBox.getChildren().add(checkBox);
         }
 
+        serviceItemsBox.getStyleClass().add("check-box-container");
+
         Button submitBtn = new Button("Create work order");
         submitBtn.setOnAction(e -> {
                     Mechanic selectedMechanic = mechanicComboBox.getValue();

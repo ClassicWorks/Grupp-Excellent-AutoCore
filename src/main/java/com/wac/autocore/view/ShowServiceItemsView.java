@@ -2,7 +2,7 @@ package com.wac.autocore.view;
 
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.service.GarageSystem;
-import com.wac.autocore.view.components.KanbanGridUtil;
+import com.wac.autocore.view.components.kanban.KanbanGridUtil;
 import com.wac.autocore.view.components.ServiceItemCard;
 import com.wac.autocore.view.components.ServiceItemDetails;
 import javafx.scene.Node;
@@ -44,7 +44,7 @@ public class ShowServiceItemsView {
             serviceItemsBox.getChildren().add(card);
         }
 
-        VBox serviceItemsColumn = KanbanGridUtil.getScrollableColumnWithTitle("", serviceItemsBox);
+        VBox serviceItemsColumn = KanbanGridUtil.getScrollableColumnWithTitle("", serviceItemsBox, "");
 
         mainContent.add(serviceItemsColumn, 0, 0);
         mainContent.add(detailPanel, 1, 0);

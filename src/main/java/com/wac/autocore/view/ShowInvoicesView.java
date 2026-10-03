@@ -4,7 +4,7 @@ import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.view.components.InvoiceCard;
-import com.wac.autocore.view.components.KanbanGridUtil;
+import com.wac.autocore.view.components.kanban.KanbanGridUtil;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -31,10 +31,10 @@ public class ShowInvoicesView {
         GridPane kanbanGrid = KanbanGridUtil.getKanbanGrid(2);
 
         VBox unpaidView =
-                KanbanGridUtil.getScrollableColumnWithTitle("Unpaid", getUnpaidList());
+                KanbanGridUtil.getScrollableColumnWithTitle("Unpaid", getUnpaidList(), "unhandled");
 
         VBox paidView =
-                KanbanGridUtil.getScrollableColumnWithTitle("Paid", getPaidList());
+                KanbanGridUtil.getScrollableColumnWithTitle("Paid", getPaidList(), "completed");
 
         kanbanGrid.add(unpaidView, 0, 0);
         kanbanGrid.add(paidView, 1, 0);

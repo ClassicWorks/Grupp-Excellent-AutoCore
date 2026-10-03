@@ -210,6 +210,7 @@ Button{
     -fx-hgap: 20px;
     -fx-padding: 16px;
 }
+
 .card-container {
     -fx-spacing: 12px;
     -fx-padding: 12px;
@@ -255,28 +256,50 @@ Button{
 }
 
 .column-header {
+    -fx-alignment: center;
     -fx-background-color: -fx-default-color;
     -fx-padding: 12px 14px;
+    -fx-fill-width: true;
+    -fx-border-width: 1px 1px 0px 1px;
+    -fx-border-radius: 8px 8px 0px 0px;
+    -fx-background-radius: 8px 8px 0px 0px;
 }
 
 .column-header.ready,
-.column-header.waiting Label{
+.column-header.waiting{
     -fx-background-color: -fx-status-ready-background-color;
+    -fx-border-color: -fx-status-ready-ink;
+}
+
+.column-header.ready Label,
+.column-header.waiting Label{
     -fx-text-fill: -fx-status-ready-ink;
 }
 
-.column-header.in-progress Label{
+.column-header.in-progress{
     -fx-background-color: -fx-status-in-progress-background-color;
+    -fx-border-color: -fx-status-in-progress-ink;
+}
+
+.column-header.in-progress Label{
     -fx-text-fill: -fx-status-in-progress-ink;
 }
 
-.column-header.completed Label{
+.column-header.completed{
     -fx-background-color: -fx-status-completed-background-color;
+    -fx-border-color: -fx-status-completed-ink;
+}
+
+.column-header.completed Label{
     -fx-text-fill: -fx-status-completed-ink;
 }
 
-.column-header.unhandled Label{
+.column-header.unhandled{
     -fx-background-color: -fx-status-handling-required-background-color;
+    -fx-border-color: -fx-status-handling-required-ink;
+}
+
+.column-header.unhandled Label{
     -fx-text-fill: -fx-status-handling-required-ink;
 }
 

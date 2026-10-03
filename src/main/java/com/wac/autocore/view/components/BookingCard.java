@@ -45,8 +45,7 @@ public class BookingCard extends HBox {
         buttonBox.setAlignment(Pos.BASELINE_RIGHT);
 
         VBox bookingCard = new VBox();
-        bookingCard.setStyle("-fx-border-color: blue");
-        bookingCard.getStyleClass().add("vehicle-card");
+        this.getStyleClass().add("card");
 
         bookingCard.getChildren().add(dateBox);
         bookingCard.getChildren().add(vehicleBox);

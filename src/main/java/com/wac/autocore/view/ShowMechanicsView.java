@@ -2,7 +2,7 @@ package com.wac.autocore.view;
 
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.service.GarageSystem;
-import com.wac.autocore.view.components.KanbanGridUtil;
+import com.wac.autocore.view.components.kanban.KanbanGridUtil;
 import com.wac.autocore.view.components.MechanicCard;
 import com.wac.autocore.view.components.MechanicDetails;
 import javafx.scene.Node;
@@ -47,7 +47,7 @@ public class ShowMechanicsView {
             mechanicsBox.getChildren().add(card);
         }
 
-        VBox mechanicsColumn = KanbanGridUtil.getScrollableColumnWithTitle("", mechanicsBox);
+        VBox mechanicsColumn = KanbanGridUtil.getScrollableColumnWithTitle("", mechanicsBox, "");
 
         mainContent.add(mechanicsColumn, 0, 0);
         mainContent.add(detailPanel, 1, 0);

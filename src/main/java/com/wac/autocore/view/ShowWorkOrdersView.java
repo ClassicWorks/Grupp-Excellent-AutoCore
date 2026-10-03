@@ -3,7 +3,8 @@ package com.wac.autocore.view;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
-import com.wac.autocore.view.components.KanbanGridUtil;
+import com.wac.autocore.view.components.kanban.KanbanColumn;
+import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.view.components.WorkOrderCard;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -29,17 +30,29 @@ public class ShowWorkOrdersView {
         //Node filterView = getFilter();
 
         //Create grid with 3 columns
-        GridPane kanbanGrid = KanbanGridUtil.getKanbanGrid(3);
+        KanbanGrid kanbanGrid = new KanbanGrid(3);
 
         //Create columns
         VBox incomingOrdersView =
-                KanbanGridUtil.getScrollableColumnWithTitle("Incoming", getIncomingList());
+                new KanbanColumn(
+                        "Incoming",
+                        getIncomingList(),
+                        "ready"
+                );
 
         VBox inProgressOrdersView =
-                KanbanGridUtil.getScrollableColumnWithTitle("In progress", getInProgressList());
+                new KanbanColumn(
+                        "In progress",
+                        getInProgressList(),
+                        "in-progress"
+                );
 
         VBox completedOrdersView =
-                KanbanGridUtil.getScrollableColumnWithTitle("Completed", getCompletedList());
+                new KanbanColumn(
+                        "Completed",
+                        getCompletedList(),
+                        "completed"
+                );
 
         kanbanGrid.add(incomingOrdersView, 0, 0);
         kanbanGrid.add(inProgressOrdersView, 1, 0);
@@ -113,13 +126,20 @@ public class ShowWorkOrdersView {
 
             workOrderCards.getChildren().add(new WorkOrderCard(workOrder, booking, vehicle,mechanic, items));
         }
+        workOrderCards.getStyleClass().add("card-container");
+        VBox.setVgrow(workOrderCards, Priority.ALWAYS);
+        workOrderCards.setMaxHeight(Double.MAX_VALUE);
         return workOrderCards;
     }
 
     private BorderPane getHeader() {
-        BorderPane header = new BorderPane();
         Label title = new Label("Work Orders");
+        title.getStyleClass().add("page-title");
+
         Button createWorkOrderBtn = new Button("See bookings");
+
+        BorderPane header = new BorderPane();
+        header.getStyleClass().add("content-header-container");
         header.setCenter(title);
         header.setRight(createWorkOrderBtn);
         createWorkOrderBtn.setOnAction(e -> ViewManager.getInstance().showBookings());

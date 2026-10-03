@@ -10,6 +10,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         ViewManager.getInstance().init(stage);
+        ViewManager.getInstance().showWorkOrders();
     }
 
     public static void main(String[] args) {

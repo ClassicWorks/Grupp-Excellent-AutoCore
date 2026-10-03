@@ -4,7 +4,7 @@ import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
-import com.wac.autocore.view.components.KanbanGridUtil;
+import com.wac.autocore.view.components.kanban.KanbanGridUtil;
 import com.wac.autocore.view.components.VehicleCard;
 import com.wac.autocore.view.components.VehicleDetails;
 import javafx.scene.Node;
@@ -65,7 +65,7 @@ public class ShowVehicleView {
             vehiclesBox.getChildren().add(vehicleCard);
         }
 
-        VBox vehiclesScroll = KanbanGridUtil.getScrollableColumnWithTitle("", vehiclesBox);
+        VBox vehiclesScroll = KanbanGridUtil.getScrollableColumnWithTitle("", vehiclesBox, "");
         GridPane.setVgrow(vehiclesScroll, Priority.ALWAYS);
 
         mainContent.add(

@@ -37,7 +37,7 @@ public class ViewManager {
         rootLayout = new BorderPane();
         rootLayout.setLeft(new SideNav().show());
 
-        Scene scene = new Scene(rootLayout, 900, 600);
+        Scene scene = new Scene(rootLayout, 1300, 1000);
         scene.getStylesheets().add("style/stylesheet.css");
 
         stage.setTitle("Wigell AutoCore");

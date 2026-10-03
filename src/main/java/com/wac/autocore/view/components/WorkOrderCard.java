@@ -30,18 +30,23 @@ public class WorkOrderCard extends VBox {
         this.mechanic = mechanic;
 
         HBox statusInfo = getStatusInfo();
+        statusInfo.getStyleClass().add("card-info-box");
 
         HBox vehicleInfo = getVehicleInfo();
+        vehicleInfo.getStyleClass().add("card-info-box");
 
         //mechanic info
         Hyperlink mechanicLink = new MechanicHyperLink(mechanic);
+        mechanicLink.getStyleClass().add("link-label");
 
         Text description = new Text(booking.getDescription());
 
         VBox serviceItemBox = getServiceItemBox(workOrderItems);
+        serviceItemBox.getStyleClass().add("card-info-box");
 
         //Add OrderActionBtn to card
         HBox buttonBox = new HBox();
+        buttonBox.getStyleClass().add("btn-container");
         buttonBox.setAlignment(Pos.BASELINE_RIGHT);
         buttonBox.getChildren().add(createOrderActionBtn());
 
@@ -85,7 +90,6 @@ public class WorkOrderCard extends VBox {
         itemGrid.add(new Label(Integer.toString(totalTime)), 1, workOrderItems.size());
 
         VBox serviceItemBox = new VBox(serviceItemsLabel, itemGrid);
-        serviceItemBox.getStyleClass().add("card-info-box");
         return serviceItemBox;
     }
 
@@ -102,7 +106,6 @@ public class WorkOrderCard extends VBox {
 
         VBox vehicleText = new VBox(registrationNumber, brandModelYear);
         HBox vehicleInfo = new HBox(vehicleIcon, vehicleText);
-        vehicleInfo.getStyleClass().add("card-info-box");
         return vehicleInfo;
     }
 
@@ -119,7 +122,6 @@ public class WorkOrderCard extends VBox {
         Label statusLabel;
         switch (workOrder.getStatus().toUpperCase()) {
             case "CREATED":
-                setStyle(this.getStyle() + "-fx-border-color: gray;");
                 getStyleClass().add("created");
 
                 statusLabel = new Label("Incoming");
@@ -127,7 +129,6 @@ public class WorkOrderCard extends VBox {
                 break;
 
             case "IN_PROGRESS":
-                setStyle(this.getStyle() + "-fx-border-color: yellow;");
                 getStyleClass().add("in-progress");
 
                 statusLabel = new Label("In Progress");
@@ -135,7 +136,6 @@ public class WorkOrderCard extends VBox {
                 break;
 
             case "COMPLETED":
-                setStyle(this.getStyle() + "-fx-border-color: green;");
                 getStyleClass().add("completed");
 
                 statusLabel = new Label("Completed");
@@ -160,7 +160,7 @@ public class WorkOrderCard extends VBox {
                     garageSystem.startWorkOrder(workOrder.getId());
                     ViewManager.getInstance().showWorkOrders();
                 });
-                startWorkBtn.getStyleClass().add("start-work-btn");
+                startWorkBtn.getStyleClass().addAll("confirm-btn", "card-action-btn");
                 return startWorkBtn;
             case "IN_PROGRESS":
                 Button completeWorkBtn = new Button("Complete work");
@@ -168,7 +168,7 @@ public class WorkOrderCard extends VBox {
                     garageSystem.completeWorkOrder(workOrder.getId());
                     ViewManager.getInstance().showWorkOrders();
                 });
-                completeWorkBtn.getStyleClass().add("complete-work-btn");
+                completeWorkBtn.getStyleClass().addAll("confirm-btn", "card-action-btn");
                 return completeWorkBtn;
         }
         return new Label("No action required");

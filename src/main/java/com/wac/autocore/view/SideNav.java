@@ -57,7 +57,7 @@ public class SideNav {
         workOrderBtn.getStyleClass().addAll("menu-btn", "work-order");
         invoiceBtn.getStyleClass().addAll("menu-btn", "invoice");
         paymentBtn.getStyleClass().addAll("menu-btn", "payment");
-        exitBtn.getStyleClass().addAll("menu-btn", "destructive-btn");
+        exitBtn.getStyleClass().addAll("menu-btn", "exit-btn");
 
 
         customerBtn.setOnAction(e -> ViewManager.getInstance().showCustomers());
@@ -81,9 +81,14 @@ public class SideNav {
                 invoiceBtn,
                 paymentBtn);
 
+        VBox exitBox = new VBox(exitBtn);
+
+        navBox.getStyleClass().add("side-nav");
+        exitBox.getStyleClass().add("side-nav");
+
         navPane.setTop(logoBox);
         navPane.setCenter(navBox);
-        navPane.setBottom(exitBtn);
+        navPane.setBottom(exitBox);
 
         return navPane;
     }

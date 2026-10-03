@@ -67,8 +67,12 @@ public class BookingDetails extends BorderPane {
         HBox actionableButtons = new HBox(20,
                 createDeleteBtn(), createSaveBtn(), createWorkOrderBtn());
 
+
+        VBox detailsBox = new VBox(vehicleBox, mechanicBox, descriptionBox);
+        detailsBox.getStyleClass().add("details-container");
+
         this.setTop(topBox);
-        this.setCenter(new VBox(vehicleBox, mechanicBox, descriptionBox));
+        this.setCenter(detailsBox);
         this.setBottom(actionableButtons);
     }
 

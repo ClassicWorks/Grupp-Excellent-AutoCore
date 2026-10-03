@@ -5,7 +5,7 @@ import com.wac.autocore.model.Customer;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.view.components.CustomerCard;
 import com.wac.autocore.view.components.CustomerDetails;
-import com.wac.autocore.view.components.KanbanGridUtil;
+import com.wac.autocore.view.components.kanban.KanbanGridUtil;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -51,7 +51,7 @@ public class ShowCustomersView {
             customersBox.getChildren().add(customerCard);
         }
 
-        VBox customersScroll = KanbanGridUtil.getScrollableColumnWithTitle("", customersBox);
+        VBox customersScroll = KanbanGridUtil.getScrollableColumnWithTitle("", customersBox,"");
 
         mainContent.add(
                 customersScroll,
