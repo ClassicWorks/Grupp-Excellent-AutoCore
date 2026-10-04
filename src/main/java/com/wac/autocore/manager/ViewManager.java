@@ -174,6 +174,16 @@ public class ViewManager {
         showPopup(popup, LanguageManager.getString("invoice.form.title"), content, this::showInvoices);
     }
 
+    public void showInvoiceDetailsPopup(int invoiceId) {
+        Stage popup = new Stage();
+        Parent content = new InvoiceDetailsPopup(popup, invoiceId).show();
+
+        showPopup(popup,
+                String.format(LanguageManager.getString("invoice.id"), invoiceId),
+                content,
+                null);
+    }
+
     public void exit() {
         primaryStage.close();
     }
