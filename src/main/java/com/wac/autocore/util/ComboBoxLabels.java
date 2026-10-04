@@ -1,9 +1,6 @@
 package com.wac.autocore.util;
 
-import com.wac.autocore.model.Customer;
-import com.wac.autocore.model.Invoice;
-import com.wac.autocore.model.Mechanic;
-import com.wac.autocore.model.WorkOrder;
+import com.wac.autocore.model.*;
 import javafx.util.StringConverter;
 
 import java.util.function.Function;
@@ -86,5 +83,13 @@ public class ComboBoxLabels {
             label += " | " + String.format(LanguageManager.getString("invoice.workorder"), invoice.getWorkOrder().getId());
         }
         return label + " | " + invoice.getTotalAmount() + " SEK";
+    }
+
+    private static String serviceItemLabel(ServiceItem serviceItem) {
+        return String.format("%s | %.0f kr", serviceItem.getName(), serviceItem.getPrice());
+    }
+
+    public static StringConverter<ServiceItem> serviceItem() {
+        return converter(ComboBoxLabels::serviceItemLabel);
     }
 }
