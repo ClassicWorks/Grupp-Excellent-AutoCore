@@ -3,6 +3,7 @@ package com.wac.autocore.view.components;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.Payment;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -30,7 +31,7 @@ public class ProcessPaymentForm {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20));
 
-        Label title = new Label("Process payment");
+        Label title = new Label(LanguageManager.getString("payment.form.title"));
 
         List<Invoice> unpaidInvoices = garageSystem.getInvoices().stream()
                 .filter(invoice -> !invoice.isPaid())
@@ -38,17 +39,17 @@ public class ProcessPaymentForm {
 
         ObservableList<Invoice> invoiceItems = FXCollections.observableArrayList(unpaidInvoices);
         ComboBox<Invoice> invoiceComboBox = new ComboBox<>(invoiceItems);
-        invoiceComboBox.setPromptText("Choose invoice");
+        invoiceComboBox.setPromptText(LanguageManager.getString("payment.form.invoice.prompt"));
 
         ObservableList<String> paymentTypes = FXCollections.observableArrayList("CARD", "SWISH", "CASH");
         ComboBox<String> paymentTypeComboBox = new ComboBox<>(paymentTypes);
-        paymentTypeComboBox.setPromptText("Choose payment type");
+        paymentTypeComboBox.setPromptText(LanguageManager.getString("payment.form.type.prompt"));
 
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
 
-        Button processBtn = new Button("Process payment");
-        Button cancelBtn = new Button("Cancel");
+        Button processBtn = new Button(LanguageManager.getString("payment.form.submit"));
+        Button cancelBtn = new Button(LanguageManager.getString("payment.form.cancel"));
 
         processBtn.setOnAction(e -> {
             errorLabel.setText("");
@@ -57,19 +58,19 @@ public class ProcessPaymentForm {
             String selectedType = paymentTypeComboBox.getValue();
 
             if (selectedInvoice == null) {
-                errorLabel.setText("You must select an invoice.");
+                errorLabel.setText(LanguageManager.getString("payment.form.error.noInvoice"));
                 return;
             }
 
             if (selectedType == null) {
-                errorLabel.setText("You must select a payment type.");
+                errorLabel.setText(LanguageManager.getString("payment.form.error.noType"));
                 return;
             }
 
             Payment payment = garageSystem.processPayment(selectedInvoice.getId(), selectedType);
 
             if (payment == null || !payment.isSuccessful()) {
-                errorLabel.setText("Payment failed.");
+                errorLabel.setText(LanguageManager.getString("payment.form.error.failed"));
                 return;
             }
 

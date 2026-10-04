@@ -1,5 +1,6 @@
 package com.wac.autocore.manager;
 
+import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.*;
 import com.wac.autocore.view.components.CreateBookingForm;
 import com.wac.autocore.view.components.CreateInvoiceForm;
@@ -151,21 +152,21 @@ public class ViewManager {
         Stage popup = new Stage();
         Parent content = new CreateCustomer(popup, null).show();
 
-        showPopup(popup, "Skapa ny kund", content, this::showCustomers);
+        showPopup(popup, LanguageManager.getString("customer.form.title.create"), content, this::showCustomers);
     }
 
     public void showProcessPaymentPopup() {
         Stage popup = new Stage();
         Parent content = new ProcessPaymentForm(popup).show();
 
-        showPopup(popup, "Process payment", content, this::showPayments);
+        showPopup(popup, LanguageManager.getString("payment.form.title"), content, this::showPayments);
     }
 
     public void showCreateInvoicePopup() {
         Stage popup = new Stage();
         Parent content = new CreateInvoiceForm(popup).show();
 
-        showPopup(popup, "Create invoice", content, this::showInvoices);
+        showPopup(popup, LanguageManager.getString("invoice.form.title"), content, this::showInvoices);
     }
 
     public void exit() {

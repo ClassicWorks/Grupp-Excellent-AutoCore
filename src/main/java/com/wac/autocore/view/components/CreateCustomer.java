@@ -2,6 +2,7 @@ package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -28,19 +29,21 @@ public class CreateCustomer {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20));
 
-        Label title = new Label(editMode ? "Kundinformation" : "Skapa ny kund");
+        Label title = new Label(editMode
+                ? LanguageManager.getString("customer.form.title.edit")
+                : LanguageManager.getString("customer.form.title.create"));
 
-        Label nameLabel = new Label("Namn:");
+        Label nameLabel = new Label(LanguageManager.getString("customer.form.name"));
         TextField nameField = new TextField();
-        nameField.setPromptText("Namn Efternamn");
+        nameField.setPromptText(LanguageManager.getString("customer.form.name.prompt"));
 
-        Label phoneLabel = new Label("Telefon:");
+        Label phoneLabel = new Label(LanguageManager.getString("customer.form.phone"));
         TextField phoneField = new TextField();
-        phoneField.setPromptText("07x-xxx xx xx");
+        phoneField.setPromptText(LanguageManager.getString("customer.form.phone.prompt"));
 
-        Label emailLabel = new Label("Email:");
+        Label emailLabel = new Label(LanguageManager.getString("customer.form.email"));
         TextField emailField = new TextField();
-        emailField.setPromptText("namn@exampel.com");
+        emailField.setPromptText(LanguageManager.getString("customer.form.email.prompt"));
 
         if (editMode) {
             nameField.setText(customer.getName());
@@ -51,8 +54,10 @@ public class CreateCustomer {
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
 
-        Button submitBtn = new Button(editMode ? "Spara" : "Skapa kund");
-        Button cancelBtn = new Button("Avbryt");
+        Button submitBtn = new Button(editMode
+                ? LanguageManager.getString("customer.form.submit.edit")
+                : LanguageManager.getString("customer.form.submit.create"));
+        Button cancelBtn = new Button(LanguageManager.getString("customer.form.cancel"));
 
         submitBtn.setOnAction(e -> {
             errorLabel.setText("");
@@ -60,7 +65,7 @@ public class CreateCustomer {
             String nameValue = nameField.getText().trim();
 
             if (nameValue.isEmpty()) {
-                errorLabel.setText("Namn måste fyllas i.");
+                errorLabel.setText(LanguageManager.getString("customer.form.error.nameRequired"));
                 return;
             }
 
