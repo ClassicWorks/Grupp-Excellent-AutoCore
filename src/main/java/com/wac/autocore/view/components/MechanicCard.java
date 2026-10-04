@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Mechanic;
+import com.wac.autocore.util.LanguageManager;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
@@ -17,7 +18,9 @@ public class MechanicCard extends HBox {
 
         Label nameLabel = new Label(mechanic.getName());
         Label specializationlabel = new Label(mechanic.getSpecialization());
-        Label availabilityLabel = new Label(mechanic.isAvailable() ? "Available" : "Busy");
+        Label availabilityLabel = new Label(mechanic.isAvailable()
+                ? LanguageManager.getString("mechanic.status.available")
+                : LanguageManager.getString("mechanic.status.busy"));
 
         VBox mechanicInfo = new VBox(nameLabel, specializationlabel, availabilityLabel);
 

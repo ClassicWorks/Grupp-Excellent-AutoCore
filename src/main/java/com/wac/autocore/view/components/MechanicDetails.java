@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Mechanic;
+import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -20,23 +21,26 @@ public class MechanicDetails extends BorderPane {
     public MechanicDetails(Mechanic mechanic) {
         this.mechanic = mechanic;
 
-        Label idLabel = new Label(String.format("Mechanic ID: %d", mechanic.getId()));
+        Label idLabel = new Label(String.format(LanguageManager.getString("mechanic.id"), mechanic.getId()));
 
         nameField.setText(mechanic.getName());
         phoneField.setText(mechanic.getPhone());
         specializationField.setText(mechanic.getSpecialization());
 
         Label availabilityLabel = new Label(String.format(
-                "Status: %s", mechanic.isAvailable() ? "Available" : "Busy"));
+                LanguageManager.getString("mechanic.status"),
+                mechanic.isAvailable()
+                        ? LanguageManager.getString("mechanic.status.available")
+                        : LanguageManager.getString("mechanic.status.busy")));
 
         errorLabel.setStyle("-fx-text-fill: red;");
 
         VBox fields = new VBox(10,
-                new Label("Name"),
+                new Label(LanguageManager.getString("mechanic.name")),
                 nameField,
-                new Label("Phone"),
+                new Label(LanguageManager.getString("mechanic.phone")),
                 phoneField,
-                new Label("Specialization"),
+                new Label(LanguageManager.getString("mechanic.specialization")),
                 specializationField,
                 availabilityLabel,
                 errorLabel
@@ -50,7 +54,7 @@ public class MechanicDetails extends BorderPane {
     }
 
     private Button createSaveBtn() {
-        Button saveBtn = new Button("Save changes");
+        Button saveBtn = new Button(LanguageManager.getString("mechanic.save"));
 
         saveBtn.disableProperty().bind(nameField.textProperty().isEmpty());
 
@@ -58,7 +62,7 @@ public class MechanicDetails extends BorderPane {
             errorLabel.setText("");
 
             if (nameField.getText().trim().isEmpty()) {
-                errorLabel.setText("Name cannot be empty.");
+                errorLabel.setText(LanguageManager.getString("mechanic.error.nameEmpty"));
                 return;
             }
 
