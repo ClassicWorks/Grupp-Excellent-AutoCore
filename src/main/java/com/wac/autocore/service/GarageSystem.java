@@ -223,7 +223,7 @@ public class GarageSystem {
         return workOrderRepo.get(id);
     }
 
-    private Optional<WorkOrder> getWorkOrderWithItems(int workOrderId) {
+    public Optional<WorkOrder> getWorkOrderWithItems(int workOrderId) {
         return workOrderRepo.getWithItems(workOrderId);
     }
 
@@ -416,6 +416,65 @@ public class GarageSystem {
         System.out.println(savedWorkOrder);
 
         return savedWorkOrder;
+    }
+
+    public WorkOrder addServiceToWorkOrder(int workOrderId, int serviceItemId) {
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
+
+        if (!optionalWorkOrder.isPresent()) {
+            System.out.println("Work order with ID " + workOrderId + " does not exist.");
+            return null;
+        }
+        WorkOrder workOrder = optionalWorkOrder.get();
+
+        if (!workOrder.getStatus().equals("CREATED")) {
+            System.out.println("Services can only be changed before the work order is started.");
+            return null;
+        }
+
+        Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
+
+        if (!optionalServiceItem.isPresent()) {
+            System.out.println("Service item with ID " + serviceItemId + " does not exist.");
+            return null;
+        }
+        ServiceItem serviceItem = optionalServiceItem.get();
+
+        if (workOrder.hasService(serviceItemId)) {
+            System.out.println("Service is already on the work order.");
+            return null;
+        }
+
+        workOrder.addItem(serviceItem, serviceItem.getPrice());
+
+        return workOrderRepo.update(workOrder);
+    }
+
+    public WorkOrder removeItemFromWorkOrder(int workOrderId, int itemId) {
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
+
+        if (!optionalWorkOrder.isPresent()) {
+            System.out.println("Work order with ID " + workOrderId + " does not exist.");
+            return null;
+        }
+        WorkOrder workOrder = optionalWorkOrder.get();
+
+        if (!workOrder.getStatus().equals("CREATED")) {
+            System.out.println("Services can only be changed before the work order is started.");
+            return null;
+        }
+
+        if (workOrder.getItems().size() <= 1) {
+            System.out.println("A work order must have at least one service.");
+            return null;
+        }
+
+        if (!workOrder.removeItem(itemId)) {
+            System.out.println("Item with ID " + itemId + " is not on the work order.");
+            return null;
+        }
+
+        return workOrderRepo.update(workOrder);
     }
 
     public void startWorkOrder(int workOrderId) {
