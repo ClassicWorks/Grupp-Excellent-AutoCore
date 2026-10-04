@@ -29,33 +29,49 @@ public class CreateVehicleForm {
     }
 
     public Parent show() {
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(20));
+        VBox root = new VBox();
+        root.getStyleClass().add("form-container");
 
         Label title = new Label(LanguageManager.getString("vehicle.form.title"));
+        title.getStyleClass().add("form-title");
 
         TextField regField = new TextField();
         regField.setPromptText(LanguageManager.getString("vehicle.form.regNumber.prompt"));
+        VBox regBox = new VBox(regField);
+        regBox.getStyleClass().add("form-field-container");
 
         TextField brandField = new TextField();
         brandField.setPromptText(LanguageManager.getString("vehicle.form.brand.prompt"));
+        VBox brandBox = new VBox(brandField);
+        brandBox.getStyleClass().add("form-field-container");
 
         TextField modelField = new TextField();
         modelField.setPromptText(LanguageManager.getString("vehicle.form.model.prompt"));
+        VBox modelBox = new VBox(modelField);
+        modelBox.getStyleClass().add("form-field-container");
 
         TextField yearField = new TextField();
         yearField.setPromptText(LanguageManager.getString("vehicle.form.year.prompt"));
+        VBox yearBox = new VBox(yearField);
+        yearBox.getStyleClass().add("form-field-container");
 
-        ObservableList<Customer> customers = FXCollections.observableArrayList(Database.getCustomers());
+        ObservableList<Customer> customers =
+                FXCollections.observableArrayList(Database.getCustomers());
+
         ComboBox<Customer> customerComboBox = new ComboBox<>(customers);
         customerComboBox.setPromptText(LanguageManager.getString("vehicle.form.customer.prompt"));
         customerComboBox.setConverter(ComboBoxLabels.customer());
+        VBox customerBox = new VBox(customerComboBox);
+        customerBox.getStyleClass().add("form-field-container");
 
         Label errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: red;");
+        errorLabel.getStyleClass().add("error-label");
 
         Button createBtn = new Button(LanguageManager.getString("vehicle.form.submit"));
+        createBtn.getStyleClass().add("confirm-btn");
+
         Button cancelBtn = new Button(LanguageManager.getString("vehicle.form.cancel"));
+        cancelBtn.getStyleClass().add("cancel-btn");
 
         createBtn.setOnAction(e -> {
             errorLabel.setText("");
@@ -97,11 +113,18 @@ public class CreateVehicleForm {
 
         cancelBtn.setOnAction(e -> popupStage.close());
 
-        HBox buttonBox = new HBox(10, createBtn, cancelBtn);
+        HBox buttonBox = new HBox(createBtn, cancelBtn);
+        buttonBox.getStyleClass().add("btn-container");
 
         root.getChildren().addAll(
-                title, regField, brandField, modelField, yearField,
-                customerComboBox, buttonBox, errorLabel
+                title,
+                regBox,
+                brandBox,
+                modelBox,
+                yearBox,
+                customerBox,
+                buttonBox,
+                errorLabel
         );
 
         return root;

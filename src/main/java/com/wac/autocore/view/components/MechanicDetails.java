@@ -23,38 +23,64 @@ public class MechanicDetails extends BorderPane {
 
         Label idLabel = new Label(String.format(LanguageManager.getString("mechanic.id"), mechanic.getId()));
 
+        Label nameLabel = new Label(LanguageManager.getString("mechanic.name"));
+        nameLabel.getStyleClass().add("form-field-label");
+
         nameField.setText(mechanic.getName());
+
+        VBox nameBox = new VBox(nameLabel, nameField);
+        nameBox.getStyleClass().add("form-field-container");
+
+        Label phoneLabel = new Label(LanguageManager.getString("mechanic.phone"));
+        phoneLabel.getStyleClass().add("form-field-label");
+
         phoneField.setText(mechanic.getPhone());
+
+        VBox phoneBox = new VBox(phoneLabel, phoneField);
+        phoneBox.getStyleClass().add("form-field-container");
+
+        Label specializationLabel = new Label(LanguageManager.getString("mechanic.specialization"));
+        specializationLabel.getStyleClass().add("form-field-label");
+
         specializationField.setText(mechanic.getSpecialization());
+        VBox specializationBox = new VBox(specializationLabel, specializationField);
+        specializationBox.getStyleClass().add("form-field-container");
 
         Label availabilityLabel = new Label(String.format(
                 LanguageManager.getString("mechanic.status"),
                 mechanic.isAvailable()
                         ? LanguageManager.getString("mechanic.status.available")
                         : LanguageManager.getString("mechanic.status.busy")));
+        availabilityLabel.getStyleClass().add("status-label");
+        //TODO add styling and logic for status-label
 
         errorLabel.setStyle("-fx-text-fill: red;");
 
-        VBox fields = new VBox(10,
-                new Label(LanguageManager.getString("mechanic.name")),
-                nameField,
-                new Label(LanguageManager.getString("mechanic.phone")),
-                phoneField,
-                new Label(LanguageManager.getString("mechanic.specialization")),
-                specializationField,
+        errorLabel.getStyleClass().add("error-label");
+
+
+        VBox fields = new VBox(
+                nameBox,
+                phoneBox,
+                specializationBox,
                 availabilityLabel,
                 errorLabel
         );
 
-        HBox actionableButtons = new HBox(20, createSaveBtn());
 
-        this.setTop(idLabel);
-        this.setCenter(fields);
-        this.setBottom(actionableButtons);
+        HBox actionableButtons = new HBox(createSaveBtn());
+        actionableButtons.getStyleClass().add("btn-container");
+
+        setTop(idLabel);
+        setCenter(fields);
+        setBottom(actionableButtons);
+
+        getStyleClass().add("details-container");
     }
 
     private Button createSaveBtn() {
         Button saveBtn = new Button(LanguageManager.getString("mechanic.save"));
+        saveBtn.getStyleClass().addAll("confirm-btn");
 
         saveBtn.disableProperty().bind(nameField.textProperty().isEmpty());
 

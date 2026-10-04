@@ -29,29 +29,45 @@ public class ProcessPaymentForm {
     }
 
     public Parent show() {
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(20));
+        VBox root = new VBox();
+        root.getStyleClass().add("form-container");
 
         Label title = new Label(LanguageManager.getString("payment.form.title"));
+        title.getStyleClass().add("form-title");
 
         List<Invoice> unpaidInvoices = garageSystem.getInvoices().stream()
                 .filter(invoice -> !invoice.isPaid())
                 .collect(Collectors.toList());
 
         ObservableList<Invoice> invoiceItems = FXCollections.observableArrayList(unpaidInvoices);
+
         ComboBox<Invoice> invoiceComboBox = new ComboBox<>(invoiceItems);
         invoiceComboBox.setPromptText(LanguageManager.getString("payment.form.invoice.prompt"));
         invoiceComboBox.setConverter(ComboBoxLabels.invoice());
 
+        VBox invoiceBox = new VBox(invoiceComboBox);
+        invoiceBox.getStyleClass().add("form-field-container");
+
+
         ObservableList<String> paymentTypes = FXCollections.observableArrayList("CARD", "SWISH", "CASH");
+
         ComboBox<String> paymentTypeComboBox = new ComboBox<>(paymentTypes);
         paymentTypeComboBox.setPromptText(LanguageManager.getString("payment.form.type.prompt"));
 
+        VBox paymentTypeBox = new VBox(paymentTypeComboBox);
+        paymentTypeBox.getStyleClass().add("form-field-container");
+
+
         Label errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: red;");
+        errorLabel.getStyleClass().add("error-label");
+
 
         Button processBtn = new Button(LanguageManager.getString("payment.form.submit"));
+        processBtn.getStyleClass().add("confirm-btn");
+
         Button cancelBtn = new Button(LanguageManager.getString("payment.form.cancel"));
+        cancelBtn.getStyleClass().add("cancel-btn");
+
 
         processBtn.setOnAction(e -> {
             errorLabel.setText("");
@@ -81,9 +97,18 @@ public class ProcessPaymentForm {
 
         cancelBtn.setOnAction(e -> popupStage.close());
 
-        HBox buttonBox = new HBox(10, processBtn, cancelBtn);
 
-        root.getChildren().addAll(title, invoiceComboBox, paymentTypeComboBox, buttonBox, errorLabel);
+        HBox buttonBox = new HBox(processBtn, cancelBtn);
+        buttonBox.getStyleClass().add("btn-container");
+
+
+        root.getChildren().addAll(
+                title,
+                invoiceBox,
+                paymentTypeBox,
+                buttonBox,
+                errorLabel
+        );
 
         return root;
     }

@@ -3,6 +3,7 @@ package com.wac.autocore.view.components;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -25,28 +26,60 @@ public class ServiceItemDetails extends BorderPane {
         this.onSaved = onSaved;
 
         Label nameLabel = new Label(serviceItem.getName());
-        nameLabel.getStyleClass().add("details-heading");
+        nameLabel.getStyleClass().add("details-title");
+        //TODO add styling and implement details-title
+
+        Label descriptionFieldLabel = new Label("Description");
+        descriptionFieldLabel.getStyleClass().add("form-field-label");
 
         Label descriptionLabel = new Label(serviceItem.getDescription());
         descriptionLabel.setWrapText(true);
 
+        VBox descriptionBox = new VBox(
+                descriptionFieldLabel,
+                descriptionLabel
+        );
+        descriptionBox.getStyleClass().add("form-field-container");
+
+
+        Label timeFieldLabel = new Label(LanguageManager.getString("service.estimatedTime"));
+        timeFieldLabel.getStyleClass().add("form-field-label");
+
         Label timeLabel = new Label(String.format(LanguageManager.getString("service.minutes"), serviceItem.getEstimatedMinutes()));
+
+        VBox timeBox = new VBox(
+                timeFieldLabel,
+                timeLabel
+        );
+        timeBox.getStyleClass().add("form-field-container");
+
+
+        Label priceFieldLabel = new Label(LanguageManager.getString("service.price"));
+        priceFieldLabel.getStyleClass().add("form-field-label");
 
         priceField.setText(String.valueOf(serviceItem.getPrice()));
 
-        VBox fields = new VBox(10,
-                new Label(LanguageManager.getString("service.description")),
-                descriptionLabel,
-                new Label(LanguageManager.getString("service.estimatedTime")),
-                timeLabel,
-                new Label(LanguageManager.getString("service.price")),
-                priceField,
+        VBox priceBox = new VBox(
+                priceFieldLabel,
+                priceField
+        );
+        priceBox.getStyleClass().add("form-field-container");
+
+
+        errorLabel.getStyleClass().add("error-label");
+
+        VBox fields = new VBox(
+                descriptionBox,
+                timeBox,
+                priceBox,
                 errorLabel
         );
+        fields.getStyleClass().add("details-container");
 
-        errorLabel.setStyle("-fx-text-fill: red;");
 
-        HBox actionableButtons = new HBox(20, createSaveBtn());
+        HBox actionableButtons = new HBox(createSaveBtn());
+        actionableButtons.getStyleClass().add("btn-container");
+
 
         this.setTop(nameLabel);
         this.setCenter(fields);
@@ -55,12 +88,12 @@ public class ServiceItemDetails extends BorderPane {
 
     private Button createSaveBtn() {
         Button saveBtn = new Button(LanguageManager.getString("service.save"));
+        saveBtn.getStyleClass().add("confirm-btn");
 
         saveBtn.disableProperty().bind(priceField.textProperty().isEmpty());
 
         saveBtn.setOnAction(e -> {
             errorLabel.setText("");
-            errorLabel.setStyle("-fx-text-fill: red;");
 
             String input = priceField.getText().trim().replace(',', '.');
 

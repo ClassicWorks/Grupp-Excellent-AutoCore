@@ -1,0 +1,383 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=Space+Grotesk:wght@300..700&display=swap');
+
+/*------------
+  Variables
+--------------*/
+.root {
+    -fx-main-background: #F3F1E7;
+    -fx-surface-background-color: #FDFCF7;
+    -fx-surface-selected-background-color: #dcdbd7;
+    -fx-frame-border-color: #C7C0A5;
+
+    -fx-menu-btn-color: #b4bfaa;
+
+    -fx-primary-color: #3F5D3A;
+    -fx-primary-hover-color: #2F4A2C;
+
+    -fx-dark-ink:#2B2A22;
+    -fx-muted-ink: #6E6B5C;
+    -fx-light-ink: #e6e6e6;
+    -fx-error-ink: #A6432E;
+
+    -fx-destructive-color: #A6432E;
+    -fx-destructive-hover-color: #873624;
+    -fx-default-color: #e8e7e0;
+    -fx-default-hover-color: #b8b8b8;
+
+    -fx-status-completed-background-color: #E7EEDF;
+    -fx-status-completed-ink: #3F5D3A;
+    -fx-status-in-progress-background-color: #F7EDDC;
+    -fx-status-in-progress-ink: #8C5A17;
+    -fx-status-ready-background-color: #E7EEEF;
+    -fx-status-ready-ink: #4F6B78;
+    -fx-status-unhandled-background-color: #F7E4DD;
+    -fx-status-unhandled-ink: #A6432E;
+
+    -fx-background-color: -fx-main-background;
+}
+/*------------
+     Text
+--------------*/
+
+Label, Text, HyperLink{
+    -fx-font-family: "IBM Plex Sans", sans-serif;
+    -fx-font-size: 14px;
+
+}
+Label{
+    -fx-text-fill:-fx-dark-ink;
+}
+Text{
+    -fx-fill: -fx-dark-ink;
+}
+
+.page-title{
+    -fx-font-family: "Space Grotesk", sans-serif;
+    -fx-font-size: 28px;
+    -fx-font-weight: 700;
+}
+
+.column-title{
+    -fx-font-family: "IBM Plex Sans", sans-serif;
+    -fx-font-weight: 600;
+    -fx-font-size: 20px;
+}
+
+.card-title{
+    -fx-font-family: "IBM Plex Sans", sans-serif;
+    -fx-font-weight: 600;
+}
+
+HyperLink{
+
+}
+
+.form-title{
+    -fx-font-family: "Space Grotesk", sans-serif;
+    -fx-font-weight: 600;
+    -fx-font-size: 20px;
+}
+
+.form-field-label{
+    -fx-font-family: "IBM Plex Mono", monospace;
+    -fx-font-weight: 500;
+    color: -fx-muted-ink;
+}
+
+.error-label{
+    -fx-font-weight: 500;
+    -fx-text-fill: -fx-error-ink;
+}
+
+.error-label.smaller,
+.form-field-label.smaller,
+.link-label.smaller{
+    -fx-font-size: 10px;
+}
+
+/*-------------
+     Buttons
+---------------*/
+/*Add this class to indicate that element can be clicked*/
+.clickable{
+    -fx-cursor: hand;
+}
+
+Button{
+    -fx-font-family: "IBM Plex Sans", sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+
+    -fx-background-color: -fx-default-color;
+
+    -fx-border-color: -fx-default-hover-color;
+    -fx-border-width: 1;
+
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-padding: 7px 15px;
+
+    -fx-cursor: hand;
+    -fx-background-insets: 0;
+}
+
+.confirm-btn{
+    -fx-background-color: -fx-primary-color;
+    -fx-text-fill: -fx-light-ink;
+    -fx-border-width: 0;
+}
+
+.confirm-btn:hover {
+    -fx-background-color: -fx-primary-hover-color;
+}
+
+.destroy-btn{
+    -fx-background-color: -fx-destructive-color;
+    -fx-text-fill: -fx-light-ink;
+    -fx-border-width: 0;
+}
+
+.destroy-btn:hover{
+    -fx-background-color: -fx-destructive-hover-color;
+}
+
+.cancel-btn{
+    -fx-font-weight: 400;
+}
+
+.cancel-btn:hover {
+}
+
+
+.menu-btn{
+    -fx-background-color: -fx-menu-btn-color;
+    -fx-border-width: 0;
+
+    -fx-background-radius: 6px;
+    -fx-padding: 15px 14px;
+    -fx-pref-width: 200px;
+
+    -fx-font-size: 16px;
+}
+
+.menu-btn:hover{
+    -fx-background-color: -fx-primary-hover-color;
+    -fx-text-fill: -fx-light-ink;
+}
+
+.menu-btn.is-selected{
+    -fx-background-color: -fx-primary-color;
+    -fx-border-color: -fx-menu-btn-color;
+    -fx-border-width: 2px;
+    -fx-text-fill: -fx-light-ink;
+}
+
+.exit-btn{
+    -fx-background-color: -fx-destructive-color;
+    -fx-text-fill: -fx-light-ink;
+}
+
+.exit-btn:hover{
+    -fx-background-color: -fx-destructive-hover-color;
+}
+
+.card-action-btn{
+    -fx-padding: 4px 10px;
+    -fx-font-weight: 500;
+}
+
+/*-----------------
+    Containers
+-------------------*/
+
+.scroll-pane {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.side-bar {
+    -fx-background-color: -fx-primary-color;
+    -fx-border-color: -fx-primary-hover-color;
+    -fx-border-width: 0 2px 0 0;
+}
+
+.side-nav {
+    -fx-padding: 16px 12px;
+    -fx-alignment: top-center;
+    -fx-spacing: 12px;
+}
+
+.logo-container {
+    -fx-padding: 8px 12px;
+    -fx-alignment: center;
+    -fx-background-color: -fx-main-background;
+    -fx-background-radius: 0px 0px 12px 12px;
+}
+
+.content-header-container {
+    -fx-padding: 16px 24px;
+}
+
+.grid{
+    -fx-hgap: 20px;
+    -fx-padding: 16px;
+}
+
+.card-container {
+    -fx-spacing: 12px;
+    -fx-padding: 12px;
+    -fx-background-color: -fx-main-background;
+    -fx-border-width: 1;
+    -fx-border-color: -fx-frame-border-color;
+}
+
+.card-container.compact {
+    -fx-spacing: 2px;
+    -fx-padding: 6px;
+}
+
+.card-container.compact .card,
+card.compact{
+    -fx-spacing: 3px;
+    -fx-padding: 3px;
+}
+
+.details-container {
+    -fx-background-color: -fx-surface-background-color;
+    -fx-padding: 10px;
+    -fx-border-color: -fx-frame-border-color;
+    -fx-border-width: 1px;
+    -fx-spacing: 16px;
+}
+
+.form-container {
+    -fx-background-color: -fx-surface-background-color;
+    -fx-padding: 20px;
+    -fx-spacing: 16px;
+    -fx-background-radius: 10px;
+}
+
+.btn-container {
+    -fx-padding: 12px;
+    -fx-spacing: 10px;
+}
+
+.form-field-container {
+    -fx-spacing: 3px;
+}
+
+.check-box-container {
+    -fx-spacing: 10px;
+}
+
+.column-header {
+    -fx-alignment: center;
+    -fx-background-color: -fx-default-color;
+    -fx-padding: 12px 14px;
+    -fx-fill-width: true;
+    -fx-border-width: 1px 1px 0px 1px;
+    -fx-border-radius: 8px 8px 0px 0px;
+    -fx-background-radius: 8px 8px 0px 0px;
+}
+
+.column-header.ready,
+.column-header.waiting{
+    -fx-background-color: -fx-status-ready-background-color;
+    -fx-border-color: -fx-status-ready-ink;
+}
+
+.column-header.ready Label,
+.column-header.waiting Label{
+    -fx-text-fill: -fx-status-ready-ink;
+}
+
+.column-header.in-progress{
+    -fx-background-color: -fx-status-in-progress-background-color;
+    -fx-border-color: -fx-status-in-progress-ink;
+}
+
+.column-header.in-progress Label{
+    -fx-text-fill: -fx-status-in-progress-ink;
+}
+
+.column-header.completed{
+    -fx-background-color: -fx-status-completed-background-color;
+    -fx-border-color: -fx-status-completed-ink;
+}
+
+.column-header.completed Label{
+    -fx-text-fill: -fx-status-completed-ink;
+}
+
+.column-header.unhandled{
+    -fx-background-color: -fx-status-unhandled-background-color;
+    -fx-border-color: -fx-status-unhandled-ink;
+}
+
+.column-header.unhandled Label{
+    -fx-text-fill: -fx-status-unhandled-ink;
+}
+
+.row-even{
+    -fx-background-color: -fx-surface-background-color;
+}
+.row-odd{
+    -fx-background-color: -fx-surface-selected-background-color;
+}
+
+/*------------------
+       Cards
+------------------*/
+.card {
+    -fx-background-color: -fx-surface-background-color;
+    -fx-background-radius: 8px;
+    -fx-border-color: -fx-frame-border-color;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 14px;
+    -fx-spacing: 6px;
+}
+
+.card.clickable:hover{
+    -fx-background-color: -fx-surface-selected-background-color;
+}
+
+.card.is-selected {
+    -fx-border-color: -fx-primary-color;
+    -fx-border-width: 2px;
+    -fx-background-color: -fx-surface-selected-background-color;
+}
+
+.card-info-box {
+    -fx-spacing: 3px;
+}
+
+/*--------------------
+      Form fields
+----------------------*/
+TextField,
+PasswordField,
+TextArea,
+ComboBox,
+DatePicker {
+    -fx-background-color: -fx-surface-background-color;
+    -fx-text-fill: -fx-dark-ink;
+    -fx-prompt-text-fill: -fx-muted-ink;
+    -fx-border-width: 1px;
+    -fx-border-color: -fx-frame-border-color;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+TextField:focused,
+PasswordField:focused,
+TextArea:focused,
+ComboBox:focused,
+DatePicker:focused {
+    -fx-border-color: -fx-primary-color;
+    -fx-border-width: 2px;
+}
+
+CheckBox {
+    -fx-text-fill: -fx-dark-ink;
+}

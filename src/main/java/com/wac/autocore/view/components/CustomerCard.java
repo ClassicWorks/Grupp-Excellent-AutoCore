@@ -6,7 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class CustomerCard extends HBox {
+public class CustomerCard extends VBox {
 
     public CustomerCard(Customer customer) {
         IconImageView customerIcon = new IconImageView("/imgs/user-solid.png", 40, 40);
@@ -23,11 +23,7 @@ public class CustomerCard extends HBox {
 
         HBox customerBox = new HBox(customerIcon, customerInfoBox);
 
-        VBox customerCard = new VBox();
-        customerCard.setStyle("-fx-border-color: blue");
-        customerCard.getStyleClass().add("customer-card");
-        customerCard.getChildren().add(customerBox);
-
-        this.getChildren().addAll(customerCard);
+        this.getStyleClass().add("card");
+        this.getChildren().add(customerBox);
     }
 }

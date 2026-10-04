@@ -5,10 +5,11 @@ import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.BookingCard;
 import com.wac.autocore.view.components.BookingDetails;
-import com.wac.autocore.view.components.KanbanGridUtil;
+import com.wac.autocore.view.components.kanban.KanbanGrid;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -23,9 +24,11 @@ public class ShowBookingsView {
 
     public Parent show(){
         VBox layout = new VBox();
-        layout.getChildren().add(getHeader());
+        Node header = getHeader();
+        header.getStyleClass().add("content-header-container");
+        layout.getChildren().add(header);
 
-        GridPane mainContent = KanbanGridUtil.getKanbanGrid(2);
+        KanbanGrid mainContent = new KanbanGrid(2);
 
         //Filtrerings nodes
         //TODO Just nu finns ingen logik för filtrering, är det något som ska implementeras? Vilka typer?
@@ -44,6 +47,7 @@ public class ShowBookingsView {
 
         //Show alla cards of bookings
         VBox bookingsBox = new VBox();
+        bookingsBox.getStyleClass().add("card-container");
 
         //Populate list
         for(Booking booking : garageSystem.getBookings()){
@@ -65,27 +69,30 @@ public class ShowBookingsView {
                         booking,
                         vehicle,
                         mechanic);
+                bookingCard.getStyleClass().add("clickable");
 
                 bookingCard.setOnMouseClicked(e -> {
+                    //If anything is in right column, remove content
+                    mainContent.getChildren().removeIf(node ->
+                            GridPane.getColumnIndex(node) != null
+                    && GridPane.getColumnIndex(node) == 1);
+                    //Add bookingDetails
                     BookingDetails bookingDetails = new BookingDetails(
                             booking,
                             garageSystem.getAvailableMechanics(),
                             this::saveBooking,
                             this::deleteBooking
                     );
-                    bookingDetails.setMaxHeight(Double.MAX_VALUE);
-
-                    //If anything is in right column, remove content
-                    mainContent.getChildren().removeIf(node ->
-                            GridPane.getColumnIndex(node) != null
-                                    && GridPane.getColumnIndex(node) == 1);
 
                     mainContent.add(
                             bookingDetails,
                             1,0
                     );
 
+                    bookingDetails.setMaxHeight(Double.MAX_VALUE);
                     GridPane.setVgrow(bookingDetails, Priority.ALWAYS);
+
+                    StylingUtil.setSelected(bookingCard, "card");
                 });
                 bookingsBox.getChildren().add(bookingCard);
             } catch (Exception e){
@@ -95,12 +102,13 @@ public class ShowBookingsView {
             }
         }
 
-        VBox listBookingsBox = KanbanGridUtil.getScrollableColumnWithTopNode(new HBox(), bookingsBox);
+        ScrollPane listBookingsBox = new ScrollPane(bookingsBox);
+        listBookingsBox.setFitToWidth(true);
+        listBookingsBox.setFitToHeight(true);
 
         //Make nodes possible to fill entire view
         GridPane.setVgrow(listBookingsBox, Priority.ALWAYS);
         VBox.setVgrow(mainContent, Priority.ALWAYS);
-        VBox.setVgrow(listBookingsBox, Priority.ALWAYS);
 
         mainContent.add(listBookingsBox, 0, 0);
 
@@ -109,12 +117,14 @@ public class ShowBookingsView {
     }
 
     private Node getHeader(){
-        BorderPane headerPane = new BorderPane();
         Label title = new Label(LanguageManager.getString("bookings.title"));
         title.getStyleClass().setAll("page-title");
+
         Button createBookingBtn = new Button(LanguageManager.getString("bookings.create"));
-        createBookingBtn.getStyleClass().addAll("create-btn");
+        createBookingBtn.getStyleClass().addAll("confirm-btn");
         createBookingBtn.setOnAction(e -> ViewManager.getInstance().showCreateBooking());
+
+        BorderPane headerPane = new BorderPane();
         headerPane.setCenter(title);
         headerPane.setRight(createBookingBtn);
         return headerPane;

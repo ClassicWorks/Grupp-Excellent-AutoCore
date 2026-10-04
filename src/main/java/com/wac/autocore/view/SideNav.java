@@ -2,6 +2,7 @@ package com.wac.autocore.view;
 
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.IconImageView;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -22,7 +23,7 @@ public class SideNav {
      * Exit*/
 
 
-
+    private VBox navBox;
     /**
      * Creates the navigation menu, containing several buttons calling ViewManager to change view.
      *
@@ -59,19 +60,54 @@ public class SideNav {
         workOrderBtn.getStyleClass().addAll("menu-btn", "work-order");
         invoiceBtn.getStyleClass().addAll("menu-btn", "invoice");
         paymentBtn.getStyleClass().addAll("menu-btn", "payment");
-        exitBtn.getStyleClass().addAll("menu-btn", "destructive-btn");
+        exitBtn.getStyleClass().addAll("menu-btn", "exit-btn");
         languageBtn.getStyleClass().addAll("menu-btn", "language");
 
 
-        customerBtn.setOnAction(e -> ViewManager.getInstance().showCustomers());
-        vehicleBtn.setOnAction(e -> ViewManager.getInstance().showVehicles());
-        bookingBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
-        mechanicsBtn.setOnAction(e -> ViewManager.getInstance().showMechanics());
-        serviceBtn.setOnAction(e -> ViewManager.getInstance().showServices());
-        workOrderBtn.setOnAction(e -> ViewManager.getInstance().showWorkOrders());
-        invoiceBtn.setOnAction(e -> ViewManager.getInstance().showInvoices());
-        paymentBtn.setOnAction(e -> ViewManager.getInstance().showPayments());
-        exitBtn.setOnAction(e -> ViewManager.getInstance().exit());
+        customerBtn.setOnAction(e -> {
+            ViewManager.getInstance().showCustomers();
+            StylingUtil.setSelected(customerBtn, "menu-btn");
+
+        });
+        vehicleBtn.setOnAction(e -> {
+            ViewManager.getInstance().showVehicles();
+            StylingUtil.setSelected(vehicleBtn, "menu-btn");
+
+        });
+        bookingBtn.setOnAction(e -> {
+            ViewManager.getInstance().showBookings();
+            StylingUtil.setSelected(bookingBtn, "menu-btn");
+
+        });
+        mechanicsBtn.setOnAction(e -> {
+            ViewManager.getInstance().showMechanics();
+            StylingUtil.setSelected(mechanicsBtn, "menu-btn");
+
+        });
+        serviceBtn.setOnAction(e -> {
+            ViewManager.getInstance().showServices();
+            StylingUtil.setSelected(serviceBtn, "menu-btn");
+
+        });
+        workOrderBtn.setOnAction(e -> {
+            ViewManager.getInstance().showWorkOrders();
+            StylingUtil.setSelected(workOrderBtn, "menu-btn");
+
+        });
+        invoiceBtn.setOnAction(e -> {
+            ViewManager.getInstance().showInvoices();
+            StylingUtil.setSelected(invoiceBtn, "menu-btn");
+
+        });
+        paymentBtn.setOnAction(e -> {
+            ViewManager.getInstance().showPayments();
+            StylingUtil.setSelected(paymentBtn, "menu-btn");
+
+        });
+        exitBtn.setOnAction(e -> {
+            ViewManager.getInstance().exit();
+        });
+
         languageBtn.setOnAction(e -> {
             LanguageManager.toggleLanguage();
             ViewManager.getInstance().refreshSideNav();
@@ -79,7 +115,7 @@ public class SideNav {
         });
 
         //Place all buttons in navPane
-        VBox navBox = new VBox(
+        navBox = new VBox(
                 customerBtn,
                 vehicleBtn,
                 bookingBtn,
@@ -90,9 +126,14 @@ public class SideNav {
                 paymentBtn,
                 languageBtn);
 
+        VBox exitBox = new VBox(exitBtn);
+
+        navBox.getStyleClass().add("side-nav");
+        exitBox.getStyleClass().add("side-nav");
+
         navPane.setTop(logoBox);
         navPane.setCenter(navBox);
-        navPane.setBottom(exitBtn);
+        navPane.setBottom(exitBox);
 
         return navPane;
     }

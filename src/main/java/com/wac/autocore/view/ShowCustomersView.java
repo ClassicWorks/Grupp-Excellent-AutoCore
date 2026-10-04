@@ -4,13 +4,16 @@ import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.CustomerCard;
 import com.wac.autocore.view.components.CustomerDetails;
-import com.wac.autocore.view.components.KanbanGridUtil;
+import com.wac.autocore.view.components.kanban.KanbanGrid;
+import com.wac.autocore.view.components.kanban.KanbanGridUtil;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -25,14 +28,18 @@ public class ShowCustomersView {
 
     public Parent show() {
         BorderPane layout = new BorderPane();
-        layout.setTop(getHeader());
+        Node header = getHeader();
+        header.getStyleClass().add("content-header-container");
+        layout.setTop(header);
 
-        GridPane mainContent = KanbanGridUtil.getKanbanGrid(2);
+        GridPane mainContent = new KanbanGrid(2);
 
         VBox customersBox = new VBox();
+        customersBox.getStyleClass().add("card-container");
 
         for (Customer customer : garageSystem.getCustomers()) {
             CustomerCard customerCard = new CustomerCard(customer);
+            customerCard.getStyleClass().add("clickable");
             customerCard.setOnMouseClicked(e -> {
 
                 CustomerDetails customerDetails = new CustomerDetails(customer);
@@ -47,12 +54,19 @@ public class ShowCustomersView {
                         1, 0
                 );
 
+                StylingUtil.setSelected(customerCard, "card");
+
                 GridPane.setVgrow(customerDetails, Priority.ALWAYS);
             });
             customersBox.getChildren().add(customerCard);
         }
 
-        VBox customersScroll = KanbanGridUtil.getScrollableColumnWithTitle("", customersBox);
+        ScrollPane customersScroll = new ScrollPane(customersBox);
+        customersScroll.setFitToWidth(true);
+        customersScroll.setFitToHeight(true);
+
+        GridPane.setVgrow(customersScroll, Priority.ALWAYS);
+        VBox.setVgrow(mainContent, Priority.ALWAYS);
 
         mainContent.add(
                 customersScroll,
@@ -67,7 +81,7 @@ public class ShowCustomersView {
         Label title = new Label(LanguageManager.getString("customers.title"));
         title.getStyleClass().setAll("page-title");
         Button createCustomerBtn = new Button(LanguageManager.getString("customers.create"));
-        createCustomerBtn.getStyleClass().addAll("create-btn");
+        createCustomerBtn.getStyleClass().addAll("confirm-btn");
         createCustomerBtn.setOnAction(e -> ViewManager.getInstance().showCreateCustomerPopup());
         headerPane.setCenter(title);
         headerPane.setRight(createCustomerBtn);

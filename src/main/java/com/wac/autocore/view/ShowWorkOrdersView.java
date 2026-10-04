@@ -3,8 +3,9 @@ package com.wac.autocore.view;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.view.components.kanban.KanbanColumn;
+import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.util.LanguageManager;
-import com.wac.autocore.view.components.KanbanGridUtil;
 import com.wac.autocore.view.components.WorkOrderCard;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -25,22 +26,35 @@ public class ShowWorkOrdersView {
     public Parent show() {
         BorderPane root = new BorderPane();
         Node header = getHeader();
+        header.getStyleClass().add("content-header-container");
 
         //Could be added later
         //Node filterView = getFilter();
 
         //Create grid with 3 columns
-        GridPane kanbanGrid = KanbanGridUtil.getKanbanGrid(3);
+        KanbanGrid kanbanGrid = new KanbanGrid(3);
 
         //Create columns
         VBox incomingOrdersView =
-                KanbanGridUtil.getScrollableColumnWithTitle(LanguageManager.getString("workorders.column.incoming"), getIncomingList());
+                new KanbanColumn(
+                        LanguageManager.getString("workorders.column.incoming"),
+                        getIncomingList(),
+                        "ready"
+                );
 
         VBox inProgressOrdersView =
-                KanbanGridUtil.getScrollableColumnWithTitle(LanguageManager.getString("workorders.column.inProgress"), getInProgressList());
+                new KanbanColumn(
+                        LanguageManager.getString("workorders.column.inProgress"),
+                        getInProgressList(),
+                        "in-progress"
+                );
 
         VBox completedOrdersView =
-                KanbanGridUtil.getScrollableColumnWithTitle(LanguageManager.getString("workorders.column.completed"), getCompletedList());
+                new KanbanColumn(
+                        LanguageManager.getString("workorders.column.completed"),
+                        getCompletedList(),
+                        "completed"
+                );
 
         kanbanGrid.add(incomingOrdersView, 0, 0);
         kanbanGrid.add(inProgressOrdersView, 1, 0);
@@ -114,16 +128,22 @@ public class ShowWorkOrdersView {
 
             workOrderCards.getChildren().add(new WorkOrderCard(workOrder, booking, vehicle,mechanic, items));
         }
+        workOrderCards.getStyleClass().add("card-container");
+        VBox.setVgrow(workOrderCards, Priority.ALWAYS);
+        workOrderCards.setMaxHeight(Double.MAX_VALUE);
         return workOrderCards;
     }
 
     private BorderPane getHeader() {
-        BorderPane header = new BorderPane();
         Label title = new Label(LanguageManager.getString("workorders.title"));
+        title.getStyleClass().add("page-title");
+
         Button createWorkOrderBtn = new Button(LanguageManager.getString("workorders.seeBookings"));
+        createWorkOrderBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
+
+        BorderPane header = new BorderPane();
         header.setCenter(title);
         header.setRight(createWorkOrderBtn);
-        createWorkOrderBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
         return header;
     }
 }

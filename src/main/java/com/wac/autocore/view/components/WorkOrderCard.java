@@ -43,6 +43,7 @@ public class WorkOrderCard extends VBox {
 
         //Add OrderActionBtn to card
         HBox buttonBox = new HBox();
+        buttonBox.getStyleClass().add("btn-container");
         buttonBox.setAlignment(Pos.BASELINE_RIGHT);
         buttonBox.getChildren().add(createOrderActionBtn());
 
@@ -115,7 +116,9 @@ public class WorkOrderCard extends VBox {
         Label idsLabel = new Label(String.format(LanguageManager.getString("workorder.ids"),
                 workOrder.getId(), booking.getId()) + " ");
         Label statusLabel = createStatusLabel();
+
         statusInfo = new HBox(idsLabel, statusLabel);
+        statusInfo.getStyleClass().add("card-info-box");
         return statusInfo;
     }
 
@@ -123,7 +126,6 @@ public class WorkOrderCard extends VBox {
         Label statusLabel;
         switch (workOrder.getStatus().toUpperCase()) {
             case "CREATED":
-                setStyle(this.getStyle() + "-fx-border-color: gray;");
                 getStyleClass().add("created");
 
                 statusLabel = new Label(LanguageManager.getString("workorder.status.incoming"));
@@ -131,7 +133,6 @@ public class WorkOrderCard extends VBox {
                 break;
 
             case "IN_PROGRESS":
-                setStyle(this.getStyle() + "-fx-border-color: yellow;");
                 getStyleClass().add("in-progress");
 
                 statusLabel = new Label(LanguageManager.getString("workorder.status.inProgress"));
@@ -139,7 +140,6 @@ public class WorkOrderCard extends VBox {
                 break;
 
             case "COMPLETED":
-                setStyle(this.getStyle() + "-fx-border-color: green;");
                 getStyleClass().add("completed");
 
                 statusLabel = new Label(LanguageManager.getString("workorder.status.completed"));
@@ -163,13 +163,14 @@ public class WorkOrderCard extends VBox {
                 editServiceBtn.setOnAction(e ->
                         ViewManager.getInstance().showEditWorkOrderItemsPopUp(workOrder.getId())
                 );
+                editServiceBtn.getStyleClass().addAll("confirm-btn", "card-action-btn");
 
                 Button startWorkBtn = new Button(LanguageManager.getString("workorder.start"));
                 startWorkBtn.setOnAction(e -> {
                     garageSystem.startWorkOrder(workOrder.getId());
                     ViewManager.getInstance().showWorkOrders();
                 });
-                startWorkBtn.getStyleClass().add("start-work-btn");
+                startWorkBtn.getStyleClass().addAll("confirm-btn", "card-action-btn");
 
                 return new HBox(10, editServiceBtn, startWorkBtn);
             case "IN_PROGRESS":
@@ -178,7 +179,7 @@ public class WorkOrderCard extends VBox {
                     garageSystem.completeWorkOrder(workOrder.getId());
                     ViewManager.getInstance().showWorkOrders();
                 });
-                completeWorkBtn.getStyleClass().add("complete-work-btn");
+                completeWorkBtn.getStyleClass().addAll("confirm-btn", "card-action-btn");
                 return completeWorkBtn;
         }
         return new Label(LanguageManager.getString("workorder.noAction"));

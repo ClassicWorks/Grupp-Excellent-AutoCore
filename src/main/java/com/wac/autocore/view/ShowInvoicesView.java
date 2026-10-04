@@ -5,7 +5,9 @@ import com.wac.autocore.model.Invoice;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.InvoiceCard;
-import com.wac.autocore.view.components.KanbanGridUtil;
+import com.wac.autocore.view.components.kanban.KanbanColumn;
+import com.wac.autocore.view.components.kanban.KanbanGrid;
+import com.wac.autocore.view.components.kanban.KanbanGridUtil;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -28,14 +30,15 @@ public class ShowInvoicesView {
     public Parent show() {
         BorderPane root = new BorderPane();
         Node header = getHeader();
+        header.getStyleClass().addAll("content-header-container");
 
-        GridPane kanbanGrid = KanbanGridUtil.getKanbanGrid(2);
+        GridPane kanbanGrid = new KanbanGrid(2);
 
         VBox unpaidView =
-                KanbanGridUtil.getScrollableColumnWithTitle(LanguageManager.getString("invoices.unpaid"), getUnpaidList());
+                new KanbanColumn(LanguageManager.getString("invoices.unpaid"), getUnpaidList(), "unhandled");
 
         VBox paidView =
-                KanbanGridUtil.getScrollableColumnWithTitle(LanguageManager.getString("invoices.paid"), getPaidList());
+                new KanbanColumn(LanguageManager.getString("invoices.paid"), getPaidList(), "completed");
 
         kanbanGrid.add(unpaidView, 0, 0);
         kanbanGrid.add(paidView, 1, 0);
@@ -77,13 +80,18 @@ public class ShowInvoicesView {
                     ViewManager.getInstance().showInvoiceDetailsPopup(i.getId())
             ));
         }
+        invoiceCards.getStyleClass().addAll("card-container");
         return invoiceCards;
     }
 
     private BorderPane getHeader() {
         BorderPane header = new BorderPane();
         Label title = new Label(LanguageManager.getString("invoices.title"));
+        title.getStyleClass().addAll("page-title");
+
         Button createInvoiceBtn = new Button(LanguageManager.getString("invoices.create"));
+        createInvoiceBtn.getStyleClass().addAll("confirm-btn");
+
         header.setCenter(title);
         header.setRight(createInvoiceBtn);
         createInvoiceBtn.setOnAction(e -> ViewManager.getInstance().showCreateInvoicePopup());
