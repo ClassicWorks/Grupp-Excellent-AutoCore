@@ -3,6 +3,7 @@ package com.wac.autocore.view;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.KanbanGridUtil;
 import com.wac.autocore.view.components.WorkOrderCard;
 import javafx.scene.Node;
@@ -33,13 +34,13 @@ public class ShowWorkOrdersView {
 
         //Create columns
         VBox incomingOrdersView =
-                KanbanGridUtil.getScrollableColumnWithTitle("Incoming", getIncomingList());
+                KanbanGridUtil.getScrollableColumnWithTitle(LanguageManager.getString("workorders.column.incoming"), getIncomingList());
 
         VBox inProgressOrdersView =
-                KanbanGridUtil.getScrollableColumnWithTitle("In progress", getInProgressList());
+                KanbanGridUtil.getScrollableColumnWithTitle(LanguageManager.getString("workorders.column.inProgress"), getInProgressList());
 
         VBox completedOrdersView =
-                KanbanGridUtil.getScrollableColumnWithTitle("Completed", getCompletedList());
+                KanbanGridUtil.getScrollableColumnWithTitle(LanguageManager.getString("workorders.column.completed"), getCompletedList());
 
         kanbanGrid.add(incomingOrdersView, 0, 0);
         kanbanGrid.add(inProgressOrdersView, 1, 0);
@@ -61,7 +62,7 @@ public class ShowWorkOrdersView {
                 .filter(wo -> wo.getStatus().equalsIgnoreCase("COMPLETED"))
                 .collect(Collectors.toList());
         if (completedWorkOrders.isEmpty()) {
-            return new Label("No completed and unpaid work orders found");
+            return new Label(LanguageManager.getString("workorders.empty.completed"));
         }
 
         return getWorkOrderCardsFromList(completedWorkOrders);
@@ -72,7 +73,7 @@ public class ShowWorkOrdersView {
                 .filter(wo -> wo.getStatus().equalsIgnoreCase("IN_PROGRESS"))
                 .collect(Collectors.toList());
         if (completedWorkOrders.isEmpty()) {
-            return new Label("No in progress work orders found");
+            return new Label(LanguageManager.getString("workorders.empty.inProgress"));
         }
 
         return getWorkOrderCardsFromList(completedWorkOrders);
@@ -83,7 +84,7 @@ public class ShowWorkOrdersView {
                 .filter(wo -> wo.getStatus().equalsIgnoreCase("CREATED"))
                 .collect(Collectors.toList());
         if (completedWorkOrders.isEmpty()) {
-            return new Label("No incoming work orders found");
+            return new Label(LanguageManager.getString("workorders.empty.incoming"));
         }
 
         return getWorkOrderCardsFromList(completedWorkOrders);
@@ -95,17 +96,17 @@ public class ShowWorkOrdersView {
             //Check if necessary objects exists
             Mechanic mechanic = workOrder.getMechanic();
             if(mechanic == null){
-                workOrderCards.getChildren().add(new Label("Mechanic not found"));
+                workOrderCards.getChildren().add(new Label(LanguageManager.getString("workorders.error.mechanicNotFound")));
                 continue;
             }
             Booking booking = workOrder.getBooking();
             if(booking == null){
-                workOrderCards.getChildren().add(new Label("Booking not found"));
+                workOrderCards.getChildren().add(new Label(LanguageManager.getString("workorders.error.bookingNotFound")));
                 continue;
             }
             Vehicle vehicle = booking.getVehicle();
             if(vehicle == null){
-                workOrderCards.getChildren().add(new Label("Vehicle not found"));
+                workOrderCards.getChildren().add(new Label(LanguageManager.getString("workorders.error.vehicleNotFound")));
                 continue;
             }
 
@@ -118,8 +119,8 @@ public class ShowWorkOrdersView {
 
     private BorderPane getHeader() {
         BorderPane header = new BorderPane();
-        Label title = new Label("Work Orders");
-        Button createWorkOrderBtn = new Button("See bookings");
+        Label title = new Label(LanguageManager.getString("workorders.title"));
+        Button createWorkOrderBtn = new Button(LanguageManager.getString("workorders.seeBookings"));
         header.setCenter(title);
         header.setRight(createWorkOrderBtn);
         createWorkOrderBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
