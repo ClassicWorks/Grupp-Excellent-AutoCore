@@ -3,6 +3,7 @@ package com.wac.autocore.view.components;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.WorkOrder;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -48,6 +49,7 @@ public class CreateInvoiceForm {
 
         ComboBox<WorkOrder> workOrderComboBox = new ComboBox<>(workOrderItems);
         workOrderComboBox.setPromptText(LanguageManager.getString("invoice.form.workorder.prompt"));
+        workOrderComboBox.setConverter(ComboBoxLabels.workOrder());
 
         VBox workOrderBox = new VBox(workOrderComboBox);
         workOrderBox.getStyleClass().add("form-field-container");

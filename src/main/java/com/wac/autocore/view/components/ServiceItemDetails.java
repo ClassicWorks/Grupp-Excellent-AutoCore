@@ -1,6 +1,9 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.ServiceItem;
+import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -15,9 +18,12 @@ public class ServiceItemDetails extends BorderPane {
 
     private final TextField priceField = new TextField();
     private final Label errorLabel = new Label();
+    private final GarageSystem garageSystem = new GarageSystem();
+    private final Runnable onSaved;
 
-    public ServiceItemDetails(ServiceItem serviceItem) {
+    public ServiceItemDetails(ServiceItem serviceItem, Runnable onSaved) {
         this.serviceItem = serviceItem;
+        this.onSaved = onSaved;
 
         Label nameLabel = new Label(serviceItem.getName());
         nameLabel.getStyleClass().add("details-title");
@@ -36,12 +42,10 @@ public class ServiceItemDetails extends BorderPane {
         descriptionBox.getStyleClass().add("form-field-container");
 
 
-        Label timeFieldLabel = new Label("Estimated time");
+        Label timeFieldLabel = new Label(LanguageManager.getString("service.estimatedTime"));
         timeFieldLabel.getStyleClass().add("form-field-label");
 
-        Label timeLabel = new Label(
-                String.format("%d min", serviceItem.getEstimatedMinutes())
-        );
+        Label timeLabel = new Label(String.format(LanguageManager.getString("service.minutes"), serviceItem.getEstimatedMinutes()));
 
         VBox timeBox = new VBox(
                 timeFieldLabel,
@@ -50,7 +54,7 @@ public class ServiceItemDetails extends BorderPane {
         timeBox.getStyleClass().add("form-field-container");
 
 
-        Label priceFieldLabel = new Label("Price (kr)");
+        Label priceFieldLabel = new Label(LanguageManager.getString("service.price"));
         priceFieldLabel.getStyleClass().add("form-field-label");
 
         priceField.setText(String.valueOf(serviceItem.getPrice()));
@@ -83,7 +87,7 @@ public class ServiceItemDetails extends BorderPane {
     }
 
     private Button createSaveBtn() {
-        Button saveBtn = new Button("Save changes");
+        Button saveBtn = new Button(LanguageManager.getString("service.save"));
         saveBtn.getStyleClass().add("confirm-btn");
 
         saveBtn.disableProperty().bind(priceField.textProperty().isEmpty());
@@ -97,18 +101,24 @@ public class ServiceItemDetails extends BorderPane {
             try {
                 newPrice = Double.parseDouble(input);
             } catch (NumberFormatException ex) {
-                errorLabel.setText("Price must be a number.");
+                errorLabel.setText(LanguageManager.getString("service.error.priceNumber"));
                 return;
             }
 
             if (newPrice < 0) {
-                errorLabel.setText("Price cannot be negative.");
+                errorLabel.setText(LanguageManager.getString("service.error.priceNegative"));
                 return;
             }
 
-            //TODO Call garageSystem when an update method for price exists
-            System.out.printf("Should call garageSystem.updateServiceItemPrice(%d, %s)%n",
-                    serviceItem.getId(), newPrice);
+            ServiceItem updated = garageSystem.updateServiceItemPrice(serviceItem.getId(), newPrice);
+            if (updated == null) {
+                errorLabel.setText(LanguageManager.getString("service.error.saveFailed"));
+                return;
+            }
+
+            errorLabel.setStyle("-fx-text-fill: green;");
+            errorLabel.setText(LanguageManager.getString("service.saved"));
+            onSaved.run();
         });
 
         return saveBtn;

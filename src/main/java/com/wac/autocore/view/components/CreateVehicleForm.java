@@ -4,6 +4,8 @@ import com.wac.autocore.data.Database;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.ComboBoxLabels;
+import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -30,26 +32,26 @@ public class CreateVehicleForm {
         VBox root = new VBox();
         root.getStyleClass().add("form-container");
 
-        Label title = new Label("Create new vehicle");
+        Label title = new Label(LanguageManager.getString("vehicle.form.title"));
         title.getStyleClass().add("form-title");
 
         TextField regField = new TextField();
-        regField.setPromptText("Registration number");
+        regField.setPromptText(LanguageManager.getString("vehicle.form.regNumber.prompt"));
         VBox regBox = new VBox(regField);
         regBox.getStyleClass().add("form-field-container");
 
         TextField brandField = new TextField();
-        brandField.setPromptText("Brand");
+        brandField.setPromptText(LanguageManager.getString("vehicle.form.brand.prompt"));
         VBox brandBox = new VBox(brandField);
         brandBox.getStyleClass().add("form-field-container");
 
         TextField modelField = new TextField();
-        modelField.setPromptText("Model");
+        modelField.setPromptText(LanguageManager.getString("vehicle.form.model.prompt"));
         VBox modelBox = new VBox(modelField);
         modelBox.getStyleClass().add("form-field-container");
 
         TextField yearField = new TextField();
-        yearField.setPromptText("Year");
+        yearField.setPromptText(LanguageManager.getString("vehicle.form.year.prompt"));
         VBox yearBox = new VBox(yearField);
         yearBox.getStyleClass().add("form-field-container");
 
@@ -57,17 +59,18 @@ public class CreateVehicleForm {
                 FXCollections.observableArrayList(Database.getCustomers());
 
         ComboBox<Customer> customerComboBox = new ComboBox<>(customers);
-        customerComboBox.setPromptText("Choose customer");
+        customerComboBox.setPromptText(LanguageManager.getString("vehicle.form.customer.prompt"));
+        customerComboBox.setConverter(ComboBoxLabels.customer());
         VBox customerBox = new VBox(customerComboBox);
         customerBox.getStyleClass().add("form-field-container");
 
         Label errorLabel = new Label();
         errorLabel.getStyleClass().add("error-label");
 
-        Button createBtn = new Button("Create vehicle");
+        Button createBtn = new Button(LanguageManager.getString("vehicle.form.submit"));
         createBtn.getStyleClass().add("confirm-btn");
 
-        Button cancelBtn = new Button("Cancel");
+        Button cancelBtn = new Button(LanguageManager.getString("vehicle.form.cancel"));
         cancelBtn.getStyleClass().add("cancel-btn");
 
         createBtn.setOnAction(e -> {
@@ -76,7 +79,7 @@ public class CreateVehicleForm {
             Customer selectedCustomer = customerComboBox.getValue();
 
             if (selectedCustomer == null) {
-                errorLabel.setText("You must select a customer.");
+                errorLabel.setText(LanguageManager.getString("vehicle.form.error.noCustomer"));
                 return;
             }
 
@@ -88,7 +91,7 @@ public class CreateVehicleForm {
             try {
                 year = Integer.parseInt(yearField.getText());
             } catch(NumberFormatException ex) {
-                errorLabel.setText("Year must be a valid number.");
+                errorLabel.setText(LanguageManager.getString("vehicle.form.error.yearInvalid"));
                 return;
             }
 
@@ -101,7 +104,7 @@ public class CreateVehicleForm {
             );
 
             if (vehicle == null) {
-                errorLabel.setText("Could not create vehicle.");
+                errorLabel.setText(LanguageManager.getString("vehicle.form.error.failed"));
                 return;
             }
 

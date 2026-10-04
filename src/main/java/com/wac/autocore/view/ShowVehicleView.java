@@ -7,6 +7,8 @@ import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.view.components.kanban.KanbanGridUtil;
+import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.view.components.KanbanGridUtil;
 import com.wac.autocore.view.components.VehicleCard;
 import com.wac.autocore.view.components.VehicleDetails;
 import javafx.scene.Node;
@@ -85,10 +87,9 @@ public class ShowVehicleView {
 
     private Node getHeader(){
         BorderPane headerPane = new BorderPane();
-        Label title = new Label("Vehicles");
+        Label title = new Label(LanguageManager.getString("vehicles.title"));
         title.getStyleClass().setAll("page-title");
-
-        Button createBookingBtn = new Button("Create new vehicle");
+        Button createBookingBtn = new Button(LanguageManager.getString("vehicles.create"));
         createBookingBtn.getStyleClass().addAll("confirm-btn");
         createBookingBtn.setOnAction(e -> ViewManager.getInstance().showCreateVehiclePopup());
 

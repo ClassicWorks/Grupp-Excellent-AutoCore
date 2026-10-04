@@ -3,6 +3,7 @@ package com.wac.autocore.view.components;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.Payment;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -42,6 +43,7 @@ public class ProcessPaymentForm {
 
         ComboBox<Invoice> invoiceComboBox = new ComboBox<>(invoiceItems);
         invoiceComboBox.setPromptText(LanguageManager.getString("payment.form.invoice.prompt"));
+        invoiceComboBox.setConverter(ComboBoxLabels.invoice());
 
         VBox invoiceBox = new VBox(invoiceComboBox);
         invoiceBox.getStyleClass().add("form-field-container");

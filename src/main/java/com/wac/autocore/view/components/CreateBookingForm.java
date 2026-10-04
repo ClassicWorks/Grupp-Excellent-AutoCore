@@ -5,6 +5,8 @@ import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.StylingUtil;
+import com.wac.autocore.util.ComboBoxLabels;
+import com.wac.autocore.util.LanguageManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -83,7 +85,7 @@ public class CreateBookingForm {
 
         if (vehicle == null) {
             //TODO dialog window with error message
-            Label errorLabel = new Label("No vehicle found.");
+            Label errorLabel = new Label(LanguageManager.getString("booking.error.noVehicle"));
             errorLabel.getStyleClass().add("error-label");
             return new ScrollPane(errorLabel);
         }
@@ -92,7 +94,7 @@ public class CreateBookingForm {
 
         if (customer == null) {
             //TODO dialog window with error message
-            Label errorLabel = new Label("No connected customer found.");
+            Label errorLabel = new Label(LanguageManager.getString("booking.error.noCustomer")));
             errorLabel.getStyleClass().add("error-label");
             return new ScrollPane(errorLabel);
         }
@@ -123,7 +125,7 @@ public class CreateBookingForm {
     }
 
     private Label createTitle() {
-        Label title = new Label("Create booking");
+        Label title = new Label(LanguageManager.getString("booking.form.title"));
         title.getStyleClass().add("form-title");
         return title;
     }
@@ -177,7 +179,7 @@ public class CreateBookingForm {
     // =========================================================
 
     private VBox getMechanicBox() {
-        Label mechanicLabel = new Label("Choose mechanic (optionally)");
+        Label mechanicLabel = new Label(LanguageManager.getString("booking.form.mechanicOptional");
         mechanicLabel.getStyleClass().add("form-field-label");
 
         mechanicComboBox = createMechanicComboBox();
@@ -188,7 +190,7 @@ public class CreateBookingForm {
     }
 
     private VBox getDescriptionBox() {
-        Label descriptionLabel = new Label("Describe the problem");
+        Label descriptionLabel = new Label((LanguageManager.getString("booking.form.description")));
         descriptionLabel.getStyleClass().add("form-field-label");
 
         descriptionField.setPrefRowCount(3);
@@ -203,7 +205,8 @@ public class CreateBookingForm {
 
         ComboBox<Mechanic> comboBox = new ComboBox<>(mechanics);
 
-        comboBox.setPromptText("Choose mechanic");
+        comboBox.setPromptText(LanguageManager.getString("booking.chooseMechanic"));
+        comboBox.setConverter(ComboBoxLabels.mechanic());
 
         return comboBox;
     }
@@ -213,11 +216,11 @@ public class CreateBookingForm {
     // =========================================================
     private HBox createActionButtons() {
         Button cancelButton =
-                new Button("Cancel booking");
+                new Button(LanguageManager.getString("booking.form.cancel"));
         cancelButton.getStyleClass().addAll("cancel-btn");
 
         Button createButton =
-                new Button("Create booking");
+                new Button(LanguageManager.getString("booking.form.submit"));
         createButton.getStyleClass().add("confirm-btn");
 
         HBox btnBox = new HBox(

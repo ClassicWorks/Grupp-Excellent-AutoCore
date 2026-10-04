@@ -2,6 +2,9 @@ package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.ComboBoxLabels;
+import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Parent;
@@ -27,26 +30,28 @@ public class CreateWorkOrderForm {
         VBox root = new VBox();
         root.getStyleClass().add("form-container");
 
-        Label heading = new Label("Create Work Order");
+
+        Label heading = new Label(LanguageManager.getString("workorder.form.title"));
         heading.getStyleClass().add("form-title");
 
-        Button cancelBtn = new Button("Cancel");
+        Button cancelBtn = new Button(LanguageManager.getString("workorder.form.cancel"));
         cancelBtn.getStyleClass().add("cancel-btn");
         cancelBtn.setOnAction(e -> popupStage.close());
 
         //Check if required objects exist
         Optional<Booking> optionalBooking = garageSystem.getBooking(bookingId);
         if(!optionalBooking.isPresent()){
-            Label errorLabel = new Label("Error:Booking not found!");
+            Label errorLabel = new Label(LanguageManager.getString("workorder.form.error.bookingNotFound"));
             errorLabel.getStyleClass().add("error-label");
 
            root.getChildren().addAll(heading, errorLabel, cancelBtn);
             return root;
         }
+
         Booking booking = optionalBooking.get();
         Vehicle vehicle = booking.getVehicle();
         if(vehicle == null){
-            Label errorLabel = new Label("Error: Vehicle not found!");
+            Label errorLabel = new Label(LanguageManager.getString("workorder.form.error.vehicleNotFound"));
             errorLabel.getStyleClass().add("error-label");
 
             root.getChildren().addAll(heading, errorLabel, cancelBtn);
@@ -57,7 +62,7 @@ public class CreateWorkOrderForm {
 
         VBox bookingCard = createBookingCard(booking, vehicle, mechanic);
 
-        Label mechanicLabel = new Label("Choose mechanic");
+        Label mechanicLabel = new Label(LanguageManager.getString("booking.chooseMechanic"));
         mechanicLabel.getStyleClass().add("form-field-label");
 
         ComboBox<Mechanic> mechanicComboBox = createMechanicComboBox();
@@ -85,7 +90,7 @@ public class CreateWorkOrderForm {
         VBox serviceItemsBox = new VBox(serviceItemLabel, serviceItemsCheckBoxes);
         serviceItemsBox.getStyleClass().add("form-field-container");
 
-        Button submitBtn = new Button("Create work order");
+        Button submitBtn = new Button(LanguageManager.getString("booking.createWorkOrder"));
         submitBtn.getStyleClass().add("confirm-btn");
 
         HBox actionableBtns = new HBox(submitBtn, cancelBtn);
@@ -161,7 +166,8 @@ public class CreateWorkOrderForm {
         ComboBox<Mechanic> comboBox =
                 new ComboBox<>(mechanics);
 
-        comboBox.setPromptText("Choose mechanic");
+        comboBox.setPromptText(LanguageManager.getString("booking.chooseMechanic"));
+        comboBox.setConverter(ComboBoxLabels.mechanic());
 
         return comboBox;
     }

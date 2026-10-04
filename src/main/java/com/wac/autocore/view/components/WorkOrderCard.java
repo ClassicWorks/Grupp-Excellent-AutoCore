@@ -3,6 +3,7 @@ package com.wac.autocore.view.components;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -57,9 +58,9 @@ public class WorkOrderCard extends VBox {
     }
 
     private VBox getServiceItemBox(List<WorkOrderItem> workOrderItems) {
-        Label serviceItemsLabel = new Label("Service items");
+        Label serviceItemsLabel = new Label(LanguageManager.getString("workorder.serviceItems"));
         if(workOrderItems.isEmpty()){
-            Label error = new Label("Service items not found");
+            Label error = new Label(LanguageManager.getString("workorder.serviceItems.empty"));
             return new VBox(serviceItemsLabel, error);
         }
         GridPane itemGrid = new GridPane();
@@ -69,7 +70,7 @@ public class WorkOrderCard extends VBox {
             ServiceItem serviceItem = item.getServiceItem();
             if(serviceItem == null) {
                 System.out.println("service item not found: id %d");
-                Label error = new Label(String.format("Service item not found: workOrderItems id %d", item.getId()));
+                Label error = new Label(String.format(LanguageManager.getString("workorder.serviceItems.itemMissing"), item.getId()));
                 itemGrid.add(error, 0, i);
             }else {
                 Label itemName = new Label(item.getServiceItem().getName());
@@ -85,10 +86,14 @@ public class WorkOrderCard extends VBox {
             }
         }
 
-        itemGrid.add(new Label("Total time"), 0, workOrderItems.size());
+        itemGrid.add(new Label(LanguageManager.getString("workorder.totalTime")), 0, workOrderItems.size());
         itemGrid.add(new Label(Integer.toString(totalTime)), 1, workOrderItems.size());
 
+        itemGrid.add(new Label(LanguageManager.getString("workorder.totalPrice")), 0, workOrderItems.size() + 1);
+        itemGrid.add((new Label(String.format("%.0f kr", workOrder.getTotalPrice()))), 1, workOrderItems.size() + 1);
+
         VBox serviceItemBox = new VBox(serviceItemsLabel, itemGrid);
+        serviceItemBox.getStyleClass().add("card-info-box");
         return serviceItemBox;
     }
 
@@ -105,13 +110,14 @@ public class WorkOrderCard extends VBox {
 
         VBox vehicleText = new VBox(registrationNumber, brandModelYear);
         HBox vehicleInfo = new HBox(vehicleIcon, vehicleText);
+        vehicleInfo.getStyleClass().add("card-info-box");
         return vehicleInfo;
     }
 
     private HBox getStatusInfo() {
         HBox statusInfo;
-        Label idsLabel = new Label(String.format("Work Order ID: %d, Booking ID: %d ",
-                workOrder.getId(), booking.getId()));
+        Label idsLabel = new Label(String.format(LanguageManager.getString("workorder.ids"),
+                workOrder.getId(), booking.getId()) + " ");
         Label statusLabel = createStatusLabel();
         statusInfo = new HBox(idsLabel, statusLabel);
         return statusInfo;
@@ -123,26 +129,26 @@ public class WorkOrderCard extends VBox {
             case "CREATED":
                 getStyleClass().add("created");
 
-                statusLabel = new Label("Incoming");
+                statusLabel = new Label(LanguageManager.getString("workorder.status.incoming"));
                 statusLabel.getStyleClass().add("incoming");
                 break;
 
             case "IN_PROGRESS":
                 getStyleClass().add("in-progress");
 
-                statusLabel = new Label("In Progress");
+                statusLabel = new Label(LanguageManager.getString("workorder.status.inProgress"));
                 statusLabel.getStyleClass().add("in-progress");
                 break;
 
             case "COMPLETED":
                 getStyleClass().add("completed");
 
-                statusLabel = new Label("Completed");
+                statusLabel = new Label(LanguageManager.getString("workorder.status.completed"));
                 statusLabel.getStyleClass().add("completed");
                 break;
 
             default:
-                statusLabel = new Label("Unknown");
+                statusLabel = new Label(LanguageManager.getString("workorder.status.unknown"));
                 break;
         }
 
@@ -154,15 +160,21 @@ public class WorkOrderCard extends VBox {
     private Node createOrderActionBtn(){
         switch(workOrder.getStatus().toUpperCase()){
             case "CREATED":
-                Button startWorkBtn = new Button("Start work");
+                Button editServiceBtn = new Button(LanguageManager.getString("workorder.editServices"));
+                editServiceBtn.setOnAction(e ->
+                        ViewManager.getInstance().showEditWorkOrderItemsPopUp(workOrder.getId())
+                );
+
+                Button startWorkBtn = new Button(LanguageManager.getString("workorder.start"));
                 startWorkBtn.setOnAction(e -> {
                     garageSystem.startWorkOrder(workOrder.getId());
                     ViewManager.getInstance().showWorkOrders();
                 });
                 startWorkBtn.getStyleClass().addAll("confirm-btn", "card-action-btn");
-                return startWorkBtn;
+
+                return new HBox(10, editServiceBtn, startWorkBtn);
             case "IN_PROGRESS":
-                Button completeWorkBtn = new Button("Complete work");
+                Button completeWorkBtn = new Button(LanguageManager.getString("workorder.complete"));
                 completeWorkBtn.setOnAction(e -> {
                     garageSystem.completeWorkOrder(workOrder.getId());
                     ViewManager.getInstance().showWorkOrders();
@@ -170,6 +182,6 @@ public class WorkOrderCard extends VBox {
                 completeWorkBtn.getStyleClass().addAll("confirm-btn", "card-action-btn");
                 return completeWorkBtn;
         }
-        return new Label("No action required");
+        return new Label(LanguageManager.getString("workorder.noAction"));
     }
 }

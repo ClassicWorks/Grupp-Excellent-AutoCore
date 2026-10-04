@@ -4,6 +4,7 @@ import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
+import com.wac.autocore.util.LanguageManager;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
@@ -31,7 +32,6 @@ public class BookingCard extends VBox {
 
         //Actionable buttons
         Button createWorkOrderBtn = getCreateWorkOrderBtn(booking);
-        createWorkOrderBtn.getStyleClass().addAll("confirm-btn", "card-action-btn");
 
         HBox buttonBox = new HBox(createWorkOrderBtn);
         buttonBox.setAlignment(Pos.BASELINE_RIGHT);
@@ -48,7 +48,8 @@ public class BookingCard extends VBox {
     }
 
     private static Button getCreateWorkOrderBtn(Booking booking) {
-        Button createWorkOrderBtn = new Button("Create work order");
+        Button createWorkOrderBtn = new Button(LanguageManager.getString("booking.createWorkOrder"));
+        createWorkOrderBtn.getStyleClass().addAll("confirm-btn", "card-action-btn");
 
         createWorkOrderBtn.setOnAction(e ->
                 ViewManager.getInstance().showCreateWorkOrderPopup(booking.getId())

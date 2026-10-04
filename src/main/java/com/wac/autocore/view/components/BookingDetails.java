@@ -5,6 +5,8 @@ import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
+import com.wac.autocore.util.ComboBoxLabels;
+import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
@@ -39,15 +41,15 @@ public class BookingDetails extends BorderPane {
         this.description = booking.getDescription();
 
         HBox topBox = new HBox(10,
-                new Label(String.format("Date: %s", booking.getDate().toString())),
-                new Label(String.format("ID: %d",booking.getId()))
+                new Label(String.format(LanguageManager.getString("booking.date"), booking.getDate().toString())),
+                new Label(String.format(LanguageManager.getString("booking.id"), booking.getId()))
         );
 
         this.vehicle = booking.getVehicle();
         //If there is no vehicle, the booking is faulty
         if(vehicle == null){
             this.setTop(topBox);
-            this.setCenter(new Label("No vehicle connected to booking"));
+            this.setCenter(new Label(LanguageManager.getString("booking.error.noVehicleConnected")));
             //TODO button to remove faulty booking
             return;
         }
@@ -93,12 +95,12 @@ public class BookingDetails extends BorderPane {
         BorderPane actionableButtons = new BorderPane(null, null, confirmingButtons, null, destructiveButtons);
 
         VBox detailsBox = new VBox(vehicleBox, mechanicBox, descriptionBox);
+        detailsBox.getStyleClass().add("details-container");
 
         this.setTop(topBox);
         this.setCenter(detailsBox);
         this.setBottom(actionableButtons);
 
-        this.getStyleClass().add("details-container");
     }
 
     private ComboBox<Mechanic> createMechanicComboBox() {
@@ -108,7 +110,8 @@ public class BookingDetails extends BorderPane {
         ComboBox<Mechanic> comboBox =
                 new ComboBox<>(mechanics);
 
-        comboBox.setPromptText("Choose mechanic");
+        comboBox.setPromptText(LanguageManager.getString("booking.chooseMechanic"));
+        comboBox.setConverter(ComboBoxLabels.mechanic());
 
         if(currentMechanic != null){
             comboBox.setValue(currentMechanic);
@@ -118,7 +121,7 @@ public class BookingDetails extends BorderPane {
     }
 
     private Button createWorkOrderBtn() {
-        Button bookVehicleBtn = new Button("Create Workorder");
+        Button bookVehicleBtn = new Button(LanguageManager.getString("booking.createWorkOrder"));
         bookVehicleBtn.setOnAction(e ->
                 ViewManager.getInstance().showCreateWorkOrderPopup(booking.getId())
         );
@@ -126,7 +129,7 @@ public class BookingDetails extends BorderPane {
     }
 
     private Button createSaveBtn() {
-        Button saveBtn = new Button("Save changes");
+        Button saveBtn = new Button(LanguageManager.getString("booking.save"));
 
         //TODO check if everything is added
         //TODO savefunction
@@ -143,7 +146,7 @@ public class BookingDetails extends BorderPane {
     }
 
     private Button createDeleteBtn() {
-        Button deleteBtn = new Button("Delete");
+        Button deleteBtn = new Button(LanguageManager.getString("booking.delete"));
 
         deleteBtn.setOnAction(e ->
                 onDelete.accept(booking)

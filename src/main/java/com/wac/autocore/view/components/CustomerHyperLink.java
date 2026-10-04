@@ -2,6 +2,7 @@ package com.wac.autocore.view.components;
 
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
+import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.image.ImageView;
 
@@ -18,7 +19,7 @@ public class CustomerHyperLink extends Hyperlink {
         this.setGraphic(imageView);
 
         if (customer == null){
-            setText("No customer assigned");
+            setText(LanguageManager.getString("customer.none.assigned"));
             setDisable(true);
         } else {
             setText(customer.getName());
@@ -28,7 +29,7 @@ public class CustomerHyperLink extends Hyperlink {
     }
 
     public CustomerHyperLink(){
-        setText("No customer assigned");
+        setText(LanguageManager.getString("customer.none.assigned"));
         setDisable(true);
     }
 
@@ -36,7 +37,7 @@ public class CustomerHyperLink extends Hyperlink {
         this.customer = customer;
 
         if (customer == null) {
-            setText("No customer connected");
+            setText(LanguageManager.getString("customer.none.connected"));
             setDisable(true);
             return;
         }

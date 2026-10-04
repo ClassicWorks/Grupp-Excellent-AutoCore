@@ -3,7 +3,7 @@ package com.wac.autocore.view;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
-import com.wac.autocore.view.components.kanban.KanbanGridUtil;
+import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.ServiceItemCard;
 import com.wac.autocore.view.components.ServiceItemDetails;
 import javafx.scene.Node;
@@ -35,22 +35,7 @@ public class ShowServiceItemsView {
         VBox detailPanel = new VBox();
 
         VBox serviceItemsBox = new VBox();
-        serviceItemsBox.getStyleClass().add("card-container");
-        List<ServiceItem> serviceItems = garageSystem.getServiceItems();
-
-        if (serviceItems.isEmpty()) {
-            Label errorLabel = new Label("No services found.");
-            errorLabel.getStyleClass().add("error-label");
-            serviceItemsBox.getChildren().add(errorLabel);
-        }
-
-        for (ServiceItem serviceItem : serviceItems) {
-            ServiceItemCard card = new ServiceItemCard(serviceItem, s ->
-                    detailPanel.getChildren().setAll(new ServiceItemDetails(s))
-            );
-            card.getStyleClass().add("clickable");
-            serviceItemsBox.getChildren().add(card);
-        }
+        fillServiceItems(serviceItemsBox, detailPanel);
 
         ScrollPane serviceItemsColumn = new ScrollPane(serviceItemsBox);
         serviceItemsColumn.setFitToWidth(true);
@@ -67,9 +52,29 @@ public class ShowServiceItemsView {
         return layout;
     }
 
+    private void fillServiceItems(VBox serviceItemsBox, VBox detailPanel) {
+        serviceItemsBox.getStyleClass().add("card-container");
+        List<ServiceItem> serviceItems = garageSystem.getServiceItems();
+
+        if (serviceItems.isEmpty()) {
+            Label errorLabel = new Label(LanguageManager.getString("services.empty"));
+            errorLabel.getStyleClass().add("error-label");
+            serviceItemsBox.getChildren().add(errorLabel);
+        }
+
+        for (ServiceItem serviceItem : serviceItems) {
+            ServiceItemCard card = new ServiceItemCard(serviceItem, s ->
+                    detailPanel.getChildren().setAll(
+                            new ServiceItemDetails(s, () -> fillServiceItems(serviceItemsBox, detailPanel)))
+            );
+            card.getStyleClass().add("clickable");
+            serviceItemsBox.getChildren().add(card);
+        }
+    }
+
     private Node getHeader() {
         BorderPane headerPane = new BorderPane();
-        Label title = new Label("Services");
+        Label title = new Label(LanguageManager.getString("services.title"));
         title.getStyleClass().setAll("page-title");
 
         headerPane.setCenter(title);

@@ -2,6 +2,8 @@ package com.wac.autocore.view;
 
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.view.components.KanbanGridUtil;
 import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.view.components.kanban.KanbanGridUtil;
@@ -44,7 +46,7 @@ public class ShowMechanicsView {
         List<Mechanic> mechanics = garageSystem.getMechanics();
 
         if (mechanics.isEmpty()) {
-            Label errorLabel = new Label("No mechanics found.");
+            Label errorLabel = new Label(LanguageManager.getString("mechanics.empty"));
             errorLabel.getStyleClass().add("error-label");
             mechanicsBox.getChildren().add(errorLabel);
         }
@@ -75,10 +77,10 @@ public class ShowMechanicsView {
 
     private Node getHeader() {
         BorderPane headerPane = new BorderPane();
-        Label title = new Label("Mechanics");
+        Label title = new Label(LanguageManager.getString("mechanics.title"));
         title.getStyleClass().setAll("page-title");
 
-        Button createMechanicBtn = new Button("Create new mechanic");
+        Button createMechanicBtn = new Button(LanguageManager.getString("mechanics.create"));
         createMechanicBtn.getStyleClass().addAll("confirm-btn");
 
         createMechanicBtn.setOnAction(e ->

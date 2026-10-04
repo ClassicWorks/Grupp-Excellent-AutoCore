@@ -76,7 +76,9 @@ public class ShowInvoicesView {
     private VBox getInvoiceCardsFromList(List<Invoice> invoices) {
         VBox invoiceCards = new VBox();
         for (Invoice invoice : invoices) {
-            invoiceCards.getChildren().add(new InvoiceCard(invoice));
+            invoiceCards.getChildren().add(new InvoiceCard(invoice, i ->
+                    ViewManager.getInstance().showInvoiceDetailsPopup(i.getId())
+            ));
         }
         invoiceCards.getStyleClass().addAll("card-container");
         return invoiceCards;

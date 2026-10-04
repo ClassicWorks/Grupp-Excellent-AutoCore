@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Mechanic;
+import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -20,11 +21,9 @@ public class MechanicDetails extends BorderPane {
     public MechanicDetails(Mechanic mechanic) {
         this.mechanic = mechanic;
 
-        Label idLabel = new Label(
-                String.format("Mechanic ID: %d", mechanic.getId())
-        );
+        Label idLabel = new Label(String.format(LanguageManager.getString("mechanic.id"), mechanic.getId()));
 
-        Label nameLabel = new Label("Name");
+        Label nameLabel = new Label(LanguageManager.getString("mechanic.name"));
         nameLabel.getStyleClass().add("form-field-label");
 
         nameField.setText(mechanic.getName());
@@ -32,7 +31,7 @@ public class MechanicDetails extends BorderPane {
         VBox nameBox = new VBox(nameLabel, nameField);
         nameBox.getStyleClass().add("form-field-container");
 
-        Label phoneLabel = new Label("Phone");
+        Label phoneLabel = new Label(LanguageManager.getString("mechanic.phone"));
         phoneLabel.getStyleClass().add("form-field-label");
 
         phoneField.setText(mechanic.getPhone());
@@ -40,23 +39,22 @@ public class MechanicDetails extends BorderPane {
         VBox phoneBox = new VBox(phoneLabel, phoneField);
         phoneBox.getStyleClass().add("form-field-container");
 
-        Label specializationLabel = new Label("Specialization");
+        Label specializationLabel = new Label(LanguageManager.getString("mechanic.specialization"));
         specializationLabel.getStyleClass().add("form-field-label");
 
         specializationField.setText(mechanic.getSpecialization());
-
         VBox specializationBox = new VBox(specializationLabel, specializationField);
         specializationBox.getStyleClass().add("form-field-container");
 
-
-        Label availabilityLabel = new Label(
-                String.format(
-                        "Status: %s",
-                        mechanic.isAvailable() ? "Available" : "Busy"
-                )
-        );
+        Label availabilityLabel = new Label(String.format(
+                LanguageManager.getString("mechanic.status"),
+                mechanic.isAvailable()
+                        ? LanguageManager.getString("mechanic.status.available")
+                        : LanguageManager.getString("mechanic.status.busy")));
         availabilityLabel.getStyleClass().add("status-label");
         //TODO add styling and logic for status-label
+
+        errorLabel.setStyle("-fx-text-fill: red;");
 
         errorLabel.getStyleClass().add("error-label");
 
@@ -81,7 +79,7 @@ public class MechanicDetails extends BorderPane {
     }
 
     private Button createSaveBtn() {
-        Button saveBtn = new Button("Save changes");
+        Button saveBtn = new Button(LanguageManager.getString("mechanic.save"));
         saveBtn.getStyleClass().addAll("confirm-btn");
 
         saveBtn.disableProperty().bind(nameField.textProperty().isEmpty());
@@ -90,7 +88,7 @@ public class MechanicDetails extends BorderPane {
             errorLabel.setText("");
 
             if (nameField.getText().trim().isEmpty()) {
-                errorLabel.setText("Name cannot be empty.");
+                errorLabel.setText(LanguageManager.getString("mechanic.error.nameEmpty"));
                 return;
             }
 
