@@ -4,6 +4,7 @@ import com.wac.autocore.data.Database;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -30,29 +31,29 @@ public class CreateVehicleForm {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20));
 
-        Label title = new Label("Create new vehicle");
+        Label title = new Label(LanguageManager.getString("vehicle.form.title"));
 
         TextField regField = new TextField();
-        regField.setPromptText("Registration number");
+        regField.setPromptText(LanguageManager.getString("vehicle.form.regNumber.prompt"));
 
         TextField brandField = new TextField();
-        brandField.setPromptText("Brand");
+        brandField.setPromptText(LanguageManager.getString("vehicle.form.brand.prompt"));
 
         TextField modelField = new TextField();
-        modelField.setPromptText("Model");
+        modelField.setPromptText(LanguageManager.getString("vehicle.form.model.prompt"));
 
         TextField yearField = new TextField();
-        yearField.setPromptText("Year");
+        yearField.setPromptText(LanguageManager.getString("vehicle.form.year.prompt"));
 
         ObservableList<Customer> customers = FXCollections.observableArrayList(Database.getCustomers());
         ComboBox<Customer> customerComboBox = new ComboBox<>(customers);
-        customerComboBox.setPromptText("Choose customer");
+        customerComboBox.setPromptText(LanguageManager.getString("vehicle.form.customer.prompt"));
 
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
 
-        Button createBtn = new Button("Create vehicle");
-        Button cancelBtn = new Button("Cancel");
+        Button createBtn = new Button(LanguageManager.getString("vehicle.form.submit"));
+        Button cancelBtn = new Button(LanguageManager.getString("vehicle.form.cancel"));
 
         createBtn.setOnAction(e -> {
             errorLabel.setText("");
@@ -60,7 +61,7 @@ public class CreateVehicleForm {
             Customer selectedCustomer = customerComboBox.getValue();
 
             if (selectedCustomer == null) {
-                errorLabel.setText("You must select a customer.");
+                errorLabel.setText(LanguageManager.getString("vehicle.form.error.noCustomer"));
                 return;
             }
 
@@ -72,7 +73,7 @@ public class CreateVehicleForm {
             try {
                 year = Integer.parseInt(yearField.getText());
             } catch(NumberFormatException ex) {
-                errorLabel.setText("Year must be a valid number.");
+                errorLabel.setText(LanguageManager.getString("vehicle.form.error.yearInvalid"));
                 return;
             }
 
@@ -85,7 +86,7 @@ public class CreateVehicleForm {
             );
 
             if (vehicle == null) {
-                errorLabel.setText("Could not create vehicle.");
+                errorLabel.setText(LanguageManager.getString("vehicle.form.error.failed"));
                 return;
             }
 
