@@ -2,6 +2,7 @@ package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Parent;
@@ -26,24 +27,24 @@ public class CreateWorkOrderForm {
 
     public Parent show(int bookingId) {
         BorderPane root = new BorderPane();
-        Label heading = new Label("Create Work Order");
+        Label heading = new Label(LanguageManager.getString("workorder.form.title"));
         heading.getStyleClass().add("form-heading");
         root.setTop(heading);
 
-        Button cancelBtn = new Button("Cancel");
+        Button cancelBtn = new Button(LanguageManager.getString("workorder.form.cancel"));
         cancelBtn.setOnAction(e -> popupStage.close());
 
         //Check if required objects exist
         Optional<Booking> optionalBooking = garageSystem.getBooking(bookingId);
         if(!optionalBooking.isPresent()){
-            root.setCenter(new Label("Error:Booking not found!"));
+            root.setCenter(new Label(LanguageManager.getString("workorder.form.error.bookingNotFound")));
             root.setBottom(cancelBtn);
             return root;
         }
         Booking booking = optionalBooking.get();
         Vehicle vehicle = booking.getVehicle();
         if(vehicle == null){
-            root.setCenter(new Label("Error: Vehicle not found!"));
+            root.setCenter(new Label(LanguageManager.getString("workorder.form.error.vehicleNotFound")));
             root.setBottom(cancelBtn);
             return root;
         }
@@ -52,7 +53,7 @@ public class CreateWorkOrderForm {
 
         VBox bookingCard = createBookingCard(booking, vehicle, mechanic);
 
-        Label mechanicLabel = new Label("Choose mechanic");
+        Label mechanicLabel = new Label(LanguageManager.getString("booking.chooseMechanic"));
 
         ComboBox<Mechanic> mechanicComboBox = createMechanicComboBox();
         if(mechanic != null){
@@ -68,7 +69,7 @@ public class CreateWorkOrderForm {
             serviceItemsBox.getChildren().add(checkBox);
         }
 
-        Button submitBtn = new Button("Create work order");
+        Button submitBtn = new Button(LanguageManager.getString("booking.createWorkOrder"));
         submitBtn.setOnAction(e -> {
                     Mechanic selectedMechanic = mechanicComboBox.getValue();
 
@@ -140,7 +141,7 @@ public class CreateWorkOrderForm {
         ComboBox<Mechanic> comboBox =
                 new ComboBox<>(mechanics);
 
-        comboBox.setPromptText("Choose mechanic");
+        comboBox.setPromptText(LanguageManager.getString("booking.chooseMechanic"));
 
         return comboBox;
     }

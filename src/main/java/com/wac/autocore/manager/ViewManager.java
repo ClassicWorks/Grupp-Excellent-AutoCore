@@ -140,7 +140,7 @@ public class ViewManager {
         Stage popup = new Stage();
         Parent content = new CreateWorkOrderForm(popup).show(bookingId);
 
-        showPopup(popup, "Create new Work Order", content, this::showWorkOrders);
+        showPopup(popup, LanguageManager.getString("workorder.form.title"), content, this::showWorkOrders);
     }
     public void showCreateVehiclePopup() {
         Stage popup = new Stage();
