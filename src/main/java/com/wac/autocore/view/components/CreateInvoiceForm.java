@@ -3,6 +3,7 @@ package com.wac.autocore.view.components;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.WorkOrder;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -46,6 +47,7 @@ public class CreateInvoiceForm {
         ObservableList<WorkOrder> workOrderItems = FXCollections.observableArrayList(availableWorkOrders);
         ComboBox<WorkOrder> workOrderComboBox = new ComboBox<>(workOrderItems);
         workOrderComboBox.setPromptText(LanguageManager.getString("invoice.form.workorder.prompt"));
+        workOrderComboBox.setConverter(ComboBoxLabels.workOrder());
 
         TextField discountCodeField = new TextField();
         discountCodeField.setPromptText(LanguageManager.getString("invoice.form.discount.prompt"));

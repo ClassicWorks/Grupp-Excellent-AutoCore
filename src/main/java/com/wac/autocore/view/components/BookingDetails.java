@@ -5,6 +5,7 @@ import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
+import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -81,6 +82,7 @@ public class BookingDetails extends BorderPane {
                 new ComboBox<>(mechanics);
 
         comboBox.setPromptText(LanguageManager.getString("booking.chooseMechanic"));
+        comboBox.setConverter(ComboBoxLabels.mechanic());
 
         if(currentMechanic != null){
             comboBox.setValue(currentMechanic);

@@ -2,6 +2,7 @@ package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -142,6 +143,7 @@ public class CreateWorkOrderForm {
                 new ComboBox<>(mechanics);
 
         comboBox.setPromptText(LanguageManager.getString("booking.chooseMechanic"));
+        comboBox.setConverter(ComboBoxLabels.mechanic());
 
         return comboBox;
     }
