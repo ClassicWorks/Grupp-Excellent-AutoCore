@@ -156,13 +156,19 @@ public class WorkOrderCard extends VBox {
     private Node createOrderActionBtn(){
         switch(workOrder.getStatus().toUpperCase()){
             case "CREATED":
+                Button editServiceBtn = new Button(LanguageManager.getString("workorder.editServices"));
+                editServiceBtn.setOnAction(e ->
+                        ViewManager.getInstance().showEditWorkOrderItemsPopUp(workOrder.getId())
+                );
+
                 Button startWorkBtn = new Button(LanguageManager.getString("workorder.start"));
                 startWorkBtn.setOnAction(e -> {
                     garageSystem.startWorkOrder(workOrder.getId());
                     ViewManager.getInstance().showWorkOrders();
                 });
                 startWorkBtn.getStyleClass().add("start-work-btn");
-                return startWorkBtn;
+
+                return new HBox(10, editServiceBtn, startWorkBtn);
             case "IN_PROGRESS":
                 Button completeWorkBtn = new Button(LanguageManager.getString("workorder.complete"));
                 completeWorkBtn.setOnAction(e -> {
