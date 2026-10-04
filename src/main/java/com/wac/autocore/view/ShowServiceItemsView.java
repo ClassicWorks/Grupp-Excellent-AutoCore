@@ -32,18 +32,7 @@ public class ShowServiceItemsView {
         VBox detailPanel = new VBox();
 
         VBox serviceItemsBox = new VBox();
-        List<ServiceItem> serviceItems = garageSystem.getServiceItems();
-
-        if (serviceItems.isEmpty()) {
-            serviceItemsBox.getChildren().add(new Label(LanguageManager.getString("services.empty")));
-        }
-
-        for (ServiceItem serviceItem : serviceItems) {
-            ServiceItemCard card = new ServiceItemCard(serviceItem, s ->
-                    detailPanel.getChildren().setAll(new ServiceItemDetails(s))
-            );
-            serviceItemsBox.getChildren().add(card);
-        }
+        fillServiceItems(serviceItemsBox, detailPanel);
 
         VBox serviceItemsColumn = KanbanGridUtil.getScrollableColumnWithTitle("", serviceItemsBox);
 
@@ -55,6 +44,24 @@ public class ShowServiceItemsView {
 
         layout.setCenter(mainContent);
         return layout;
+    }
+
+    private void fillServiceItems(VBox serviceItemsBox, VBox detailPanel) {
+        serviceItemsBox.getChildren().clear();
+
+        List<ServiceItem> serviceItems = garageSystem.getServiceItems();
+
+        if (serviceItems.isEmpty()) {
+            serviceItemsBox.getChildren().add(new Label(LanguageManager.getString("services.empty")));
+        }
+
+        for (ServiceItem serviceItem : serviceItems) {
+            ServiceItemCard card = new ServiceItemCard(serviceItem, s ->
+                    detailPanel.getChildren().setAll(
+                            new ServiceItemDetails(s, () -> fillServiceItems(serviceItemsBox, detailPanel)))
+            );
+            serviceItemsBox.getChildren().add(card);
+        }
     }
 
     private Node getHeader() {

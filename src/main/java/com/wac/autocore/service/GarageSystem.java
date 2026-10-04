@@ -147,6 +147,29 @@ public class GarageSystem {
         return serviceItemRepo.get(id);
     }
 
+    public ServiceItem updateServiceItemPrice(int serviceItemId, double newPrice) {
+        if (newPrice < 0) {
+            System.out.println("Price cannot be negative.");
+            return null;
+        }
+
+        Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
+
+        if (!optionalServiceItem.isPresent()) {
+            System.out.println("Service item with ID " + serviceItemId + " does not exist.");
+            return null;
+        }
+
+        ServiceItem serviceItem = optionalServiceItem.get();
+
+        serviceItem.setPrice(newPrice);
+        ServiceItem savedServiceItem = serviceItemRepo.update(serviceItem);
+
+        System.out.println("Price for " + savedServiceItem.getName() + " updated to " + newPrice + " SEK.");
+
+        return savedServiceItem;
+    }
+
     public void showMechanics() {
         System.out.println();
         System.out.println("=== MECHANICS ===");
