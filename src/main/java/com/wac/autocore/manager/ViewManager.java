@@ -2,12 +2,7 @@ package com.wac.autocore.manager;
 
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.*;
-import com.wac.autocore.view.components.CreateBookingForm;
-import com.wac.autocore.view.components.CreateInvoiceForm;
-import com.wac.autocore.view.components.CreateVehicleForm;
-import com.wac.autocore.view.components.CreateWorkOrderForm;
-import com.wac.autocore.view.components.CreateCustomer;
-import com.wac.autocore.view.components.ProcessPaymentForm;
+import com.wac.autocore.view.components.*;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -141,6 +136,16 @@ public class ViewManager {
         Parent content = new CreateWorkOrderForm(popup).show(bookingId);
 
         showPopup(popup, LanguageManager.getString("workorder.form.title"), content, this::showWorkOrders);
+    }
+
+    public void showEditWorkOrderItemsPopUp(int workOrderId) {
+        Stage popup = new Stage();
+        Parent content = new EditWorkOrderItemsForm(popup, workOrderId).show();
+
+        showPopup(popup,
+                String.format(LanguageManager.getString("workorder.edit.title"), workOrderId),
+                content,
+                this::showWorkOrders);
     }
     public void showCreateVehiclePopup() {
         Stage popup = new Stage();

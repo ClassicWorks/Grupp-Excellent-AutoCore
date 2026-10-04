@@ -20,7 +20,7 @@ public class WorkOrder {
     @JoinColumn(name = "mechanic_id")
     private Mechanic mechanic;
 
-    @OneToMany(mappedBy = "workOrder", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "workOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkOrderItem> items = new ArrayList<>();
 
     @Column(name = "status", nullable = false, length = 15)
@@ -69,6 +69,15 @@ public class WorkOrder {
 
     public void addItem(ServiceItem serviceItem, double priceAtOrder) {
         items.add(new WorkOrderItem(this, serviceItem, priceAtOrder));
+    }
+
+    public boolean removeItem(int itemId) {
+        return items.removeIf(item -> item.getId() == itemId);
+    }
+
+    public boolean hasService(int serviceItemId) {
+        return items.stream()
+                .anyMatch(item -> item.getServiceItem().getId() == serviceItemId);
     }
 
     public List<WorkOrderItem> getItems() {
