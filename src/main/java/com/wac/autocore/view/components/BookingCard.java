@@ -4,6 +4,7 @@ import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
+import com.wac.autocore.util.LanguageManager;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
@@ -35,7 +36,7 @@ public class BookingCard extends HBox {
         Hyperlink mechanicLink = new MechanicHyperLink(mechanic);
 
         //Actionable buttons
-        Button createWorkOrderBtn = new Button("Create work order");
+        Button createWorkOrderBtn = new Button(LanguageManager.getString("booking.createWorkOrder"));
         createWorkOrderBtn.getStyleClass().add("create-btn");
 
         createWorkOrderBtn.setOnAction(e ->

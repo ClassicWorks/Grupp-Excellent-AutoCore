@@ -128,13 +128,13 @@ public class ViewManager {
     public void showCreateBooking() {
         Stage popup = new Stage();
         Parent content = new CreateBookingForm(popup).show();
-        showPopup(popup, "Create new Booking", content, this::showBookings);
+        showPopup(popup, LanguageManager.getString("bookings.create"), content, this::showBookings);
     }
 
     public void showCreateBooking(int vehicleId) {
         Stage popup = new Stage();
         Parent content = new CreateBookingForm(popup).show(vehicleId);
-        showPopup(popup, "Create new Booking", content, null);
+        showPopup(popup, LanguageManager.getString("bookings.create"), content, null);
     }
     public void showCreateWorkOrderPopup(int bookingId) {
         Stage popup = new Stage();
