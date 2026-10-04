@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Customer;
+import com.wac.autocore.util.LanguageManager;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -25,7 +26,7 @@ public class CustomerSelection extends VBox {
     }
 
     private Node createCustomerSelection() {
-        Label label = new Label("Choose customer");
+        Label label = new Label(LanguageManager.getString("customer.select.choose"));
         TextField searchField = new TextField();
 
         selectedCustomer.getStyleClass().add("selected-customer");
@@ -76,9 +77,9 @@ public class CustomerSelection extends VBox {
         row.getStyleClass().add("customer-row");
 
         row.setOnMouseClicked(e -> {
-            selectedCustomer.setText(String.format("Selected customer: ID: %d - %s",
-                        customer.getId(),
-                        customer.getName())
+            selectedCustomer.setText(String.format(LanguageManager.getString("customer.select.selected"),
+                    customer.getId(),
+                    customer.getName())
             );
             onCustomerSelected.accept(customer);
         });

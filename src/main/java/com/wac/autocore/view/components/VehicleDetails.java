@@ -4,6 +4,7 @@ import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
@@ -34,7 +35,7 @@ public class VehicleDetails extends BorderPane {
         this.vehicle = vehicle;
         this.vehicleOwner = vehicleOwner;
 
-        Label vehicleOwnerLabel = new Label("Owner");
+        Label vehicleOwnerLabel = new Label(LanguageManager.getString("vehicle.owner"));
 
         VBox mainContent = new VBox(
                 createVehicleEditForm(),
@@ -66,7 +67,7 @@ public class VehicleDetails extends BorderPane {
                 "/imgs/pen-to-square-solid.png", 20, 20
         );
 
-        Button editCustomerBtn = new Button("Edit customer", editIcon);
+        Button editCustomerBtn = new Button(LanguageManager.getString("vehicle.editCustomer"), editIcon);
         editCustomerBtn.setOnAction(e -> showCustomerSelection());
 
         customerSection.getChildren().setAll(customerIcon, customerText, editCustomerBtn);
@@ -78,16 +79,16 @@ public class VehicleDetails extends BorderPane {
             );
 
             customerInfo.setText(String.format(
-                    "mail: %s phone: %s",
+                    LanguageManager.getString("vehicle.customerInfo"),
                     vehicleOwner.getEmail(),
                     vehicleOwner.getPhone()
             ));
 
             if(vehicleOwner.getId() != vehicle.getCustomer().getId()){
-                isChangedNotification.setText("Vehicle needs to be saved to set new vehicle owner");
+                isChangedNotification.setText(LanguageManager.getString("vehicle.ownerChangedNotice"));
             }
         } else {
-            customerName.setText("No customer connected");
+            customerName.setText(LanguageManager.getString("customer.none.connected"));
             customerName.setOnAction(null);
             customerInfo.setText("");
         }
@@ -99,12 +100,12 @@ public class VehicleDetails extends BorderPane {
                 customer -> vehicleOwner = customer
         );
 
-        Button changeCustomerBtn = new Button("Set customer");
+        Button changeCustomerBtn = new Button(LanguageManager.getString("vehicle.setCustomer"));
 
         customerSection.getChildren().setAll(
                 new VBox(
-                    customerSelection,
-                    changeCustomerBtn)
+                        customerSelection,
+                        changeCustomerBtn)
         );
 
         changeCustomerBtn.setOnAction(e -> createCustomerSection());
@@ -113,7 +114,7 @@ public class VehicleDetails extends BorderPane {
     private HBox createVehicleEditForm() {
         IconImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40, 40);
 
-        vehicleIdLabel.setText(String.format("Fordons ID: %d", vehicle.getId()));
+        vehicleIdLabel.setText(String.format(LanguageManager.getString("vehicle.id"), vehicle.getId()));
 
         registrationNumber.setText(vehicle.getRegistrationNumber());
 
@@ -123,13 +124,13 @@ public class VehicleDetails extends BorderPane {
 
         VBox vehicleFields = new VBox(10,
                 vehicleIdLabel,
-                new Label("Registration number"),
+                new Label(LanguageManager.getString("vehicle.regNumber")),
                 registrationNumber,
-                new Label("Brand"),
+                new Label(LanguageManager.getString("vehicle.brand")),
                 brandField,
-                new Label("Model"),
+                new Label(LanguageManager.getString("vehicle.model")),
                 modelField,
-                new Label("Year"),
+                new Label(LanguageManager.getString("vehicle.year")),
                 yearField
         );
         HBox vehicleBox = new HBox(vehicleIcon, vehicleFields);
@@ -138,7 +139,7 @@ public class VehicleDetails extends BorderPane {
     }
 
     private Button createBookVehicleBtn() {
-        Button bookVehicleBtn = new Button("Book vehicle");
+        Button bookVehicleBtn = new Button(LanguageManager.getString("vehicle.book"));
         bookVehicleBtn.setOnAction(e ->
                 ViewManager.getInstance().showCreateBooking(vehicle.getId())
         );
@@ -146,18 +147,18 @@ public class VehicleDetails extends BorderPane {
     }
 
     private Button createSaveBtn() {
-        Button saveBtn = new Button("Save changes");
+        Button saveBtn = new Button(LanguageManager.getString("vehicle.save"));
 
         saveBtn.disableProperty().bind(
-        registrationNumber.textProperty().isEmpty()
-                .or(modelField.textProperty().isEmpty())
-                .or(yearField.textProperty().isEmpty())
-                );
+                registrationNumber.textProperty().isEmpty()
+                        .or(modelField.textProperty().isEmpty())
+                        .or(yearField.textProperty().isEmpty())
+        );
 
         //TODO savefunction
         saveBtn.setOnAction(e -> {
             if(!isInteger(yearField.getText())){
-                errorLabel.setText("Year must be a number");
+                errorLabel.setText(LanguageManager.getString("vehicle.error.yearNumber"));
                 return;
             }
             //TODO check fields
@@ -186,7 +187,7 @@ public class VehicleDetails extends BorderPane {
     }
 
     private Button createDeleteBtn() {
-        Button deleteBtn = new Button("Delete");
+        Button deleteBtn = new Button(LanguageManager.getString("vehicle.delete"));
 
         deleteBtn.setOnAction(e ->
                 System.out.printf("Should call ViewManager.getInstance.confirmDelete(vehicle, garagesystem.deleteVehicle(%d)",

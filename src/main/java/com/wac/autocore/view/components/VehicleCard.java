@@ -2,6 +2,7 @@ package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
+import com.wac.autocore.util.LanguageManager;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -56,7 +57,7 @@ public class VehicleCard extends VBox{
     }
 
     private static HBox actionableButtons(Consumer<Vehicle> onCreateBooking, Vehicle vehicle) {
-        Button bookingBtn = new Button("Create booking");
+        Button bookingBtn = new Button(LanguageManager.getString("vehicle.createBooking"));
         bookingBtn.getStyleClass().addAll("confirm-btn");
 
         bookingBtn.setOnAction(e -> onCreateBooking.accept(vehicle));
