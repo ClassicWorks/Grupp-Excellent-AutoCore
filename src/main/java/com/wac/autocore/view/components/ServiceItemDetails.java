@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.ServiceItem;
+import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -16,9 +17,12 @@ public class ServiceItemDetails extends BorderPane {
 
     private final TextField priceField = new TextField();
     private final Label errorLabel = new Label();
+    private final GarageSystem garageSystem = new GarageSystem();
+    private final Runnable onSaved;
 
-    public ServiceItemDetails(ServiceItem serviceItem) {
+    public ServiceItemDetails(ServiceItem serviceItem, Runnable onSaved) {
         this.serviceItem = serviceItem;
+        this.onSaved = onSaved;
 
         Label nameLabel = new Label(serviceItem.getName());
         nameLabel.getStyleClass().add("details-heading");
@@ -56,6 +60,7 @@ public class ServiceItemDetails extends BorderPane {
 
         saveBtn.setOnAction(e -> {
             errorLabel.setText("");
+            errorLabel.setStyle("-fx-text-fill: red;");
 
             String input = priceField.getText().trim().replace(',', '.');
 
@@ -72,9 +77,15 @@ public class ServiceItemDetails extends BorderPane {
                 return;
             }
 
-            //TODO Call garageSystem when an update method for price exists
-            System.out.printf("Should call garageSystem.updateServiceItemPrice(%d, %s)%n",
-                    serviceItem.getId(), newPrice);
+            ServiceItem updated = garageSystem.updateServiceItemPrice(serviceItem.getId(), newPrice);
+            if (updated == null) {
+                errorLabel.setText(LanguageManager.getString("service.error.saveFailed"));
+                return;
+            }
+
+            errorLabel.setStyle("-fx-text-fill: green;");
+            errorLabel.setText(LanguageManager.getString("service.saved"));
+            onSaved.run();
         });
 
         return saveBtn;
