@@ -2,6 +2,7 @@ package com.wac.autocore.view.components;
 
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Mechanic;
+import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.image.ImageView;
 
@@ -12,7 +13,7 @@ public class MechanicHyperLink extends Hyperlink {
         this.mechanic = mechanic;
 
         if (mechanic == null){
-            setText("No mechanic assigned");
+            setText(LanguageManager.getString("mechanic.none.assigned"));
             setDisable(true);
         }else {
             setText(mechanic.getName());
@@ -32,7 +33,7 @@ public class MechanicHyperLink extends Hyperlink {
         this.setGraphic(imageView);
 
         if (mechanic == null){
-            setText("No mechanic assigned");
+            setText(LanguageManager.getString("mechanic.none.assigned"));
             setDisable(true);
         }else {
             setText(mechanic.getName());
@@ -42,7 +43,7 @@ public class MechanicHyperLink extends Hyperlink {
         }
     }
     public MechanicHyperLink(){
-        setText("No mechanic assigned");
+        setText(LanguageManager.getString("mechanic.none.assigned"));
         setDisable(true);
     }
 }
