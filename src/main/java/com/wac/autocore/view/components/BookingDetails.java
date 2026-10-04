@@ -64,7 +64,7 @@ public class BookingDetails extends BorderPane {
 
         //Mechanics form
         mechanicComboBox = createMechanicComboBox();
-        Label mechanicLabel = new Label("Mechanic");
+        Label mechanicLabel = new Label(LanguageManager.getString("booking.mechanic"));
         mechanicLabel.getStyleClass().add("form-field-label");
 
         VBox mechanicBox = new VBox(mechanicLabel, mechanicComboBox);
@@ -72,7 +72,7 @@ public class BookingDetails extends BorderPane {
 
         //Description form
         descriptionField = new TextArea(description);
-        Label descriptionLabel = new Label("Description of problem");
+        Label descriptionLabel = new Label(LanguageManager.getString("booking.form.description"));
         descriptionLabel.getStyleClass().add("form-field-label");
 
         VBox descriptionBox = new VBox(descriptionLabel, descriptionField);

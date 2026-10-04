@@ -94,7 +94,7 @@ public class CreateBookingForm {
 
         if (customer == null) {
             //TODO dialog window with error message
-            Label errorLabel = new Label(LanguageManager.getString("booking.error.noCustomer")));
+            Label errorLabel = new Label(LanguageManager.getString("booking.error.noCustomer"));
             errorLabel.getStyleClass().add("error-label");
             return new ScrollPane(errorLabel);
         }
@@ -179,7 +179,7 @@ public class CreateBookingForm {
     // =========================================================
 
     private VBox getMechanicBox() {
-        Label mechanicLabel = new Label(LanguageManager.getString("booking.form.mechanicOptional");
+        Label mechanicLabel = new Label(LanguageManager.getString("booking.form.mechanicOptional"));
         mechanicLabel.getStyleClass().add("form-field-label");
 
         mechanicComboBox = createMechanicComboBox();

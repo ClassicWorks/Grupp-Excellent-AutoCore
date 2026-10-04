@@ -31,10 +31,8 @@ public class WorkOrderCard extends VBox {
         this.mechanic = mechanic;
 
         HBox statusInfo = getStatusInfo();
-        statusInfo.getStyleClass().add("card-info-box");
 
         HBox vehicleInfo = getVehicleInfo();
-        vehicleInfo.getStyleClass().add("card-info-box");
 
         //mechanic info
         Hyperlink mechanicLink = new MechanicHyperLink(mechanic);
@@ -42,7 +40,6 @@ public class WorkOrderCard extends VBox {
         Text description = new Text(booking.getDescription());
 
         VBox serviceItemBox = getServiceItemBox(workOrderItems);
-        serviceItemBox.getStyleClass().add("card-info-box");
 
         //Add OrderActionBtn to card
         HBox buttonBox = new HBox();
@@ -119,7 +116,9 @@ public class WorkOrderCard extends VBox {
         Label idsLabel = new Label(String.format(LanguageManager.getString("workorder.ids"),
                 workOrder.getId(), booking.getId()) + " ");
         Label statusLabel = createStatusLabel();
+
         statusInfo = new HBox(idsLabel, statusLabel);
+        statusInfo.getStyleClass().add("card-info-box");
         return statusInfo;
     }
 
@@ -164,6 +163,7 @@ public class WorkOrderCard extends VBox {
                 editServiceBtn.setOnAction(e ->
                         ViewManager.getInstance().showEditWorkOrderItemsPopUp(workOrder.getId())
                 );
+                editServiceBtn.getStyleClass().addAll("confirm-btn", "card-action-btn");
 
                 Button startWorkBtn = new Button(LanguageManager.getString("workorder.start"));
                 startWorkBtn.setOnAction(e -> {

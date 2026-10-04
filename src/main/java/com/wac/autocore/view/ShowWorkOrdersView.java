@@ -138,7 +138,7 @@ public class ShowWorkOrdersView {
         Label title = new Label(LanguageManager.getString("workorders.title"));
         title.getStyleClass().add("page-title");
 
-        Button createWorkOrderBtn = new Button(LanguageManager.getString("workorders.seeBookings");
+        Button createWorkOrderBtn = new Button(LanguageManager.getString("workorders.seeBookings"));
         createWorkOrderBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
 
         BorderPane header = new BorderPane();
