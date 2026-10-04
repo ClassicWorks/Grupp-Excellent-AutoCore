@@ -18,7 +18,8 @@ public class InvoiceCard extends HBox {
         Label idLabel = new Label(String.format(LanguageManager.getString("invoice.id"), invoice.getId()));
         Label workOrderLabel = new Label(String.format(LanguageManager.getString("invoice.workorder"), invoice.getWorkOrder().getId()));
         Label dateLabel = new Label(invoice.getInvoiceDate().toString());
-        Label totalLabel = new Label(invoice.getTotalAmount() + " SEK");
+        Label totalLabel = new Label(String.format(
+                LanguageManager.getString("invoice.details.amountFormat"), invoice.getTotalAmount()));
         Label statusLabel = new Label(invoice.isPaid()
                 ? LanguageManager.getString("invoice.status.paid")
                 : LanguageManager.getString("invoice.status.unpaid"));
