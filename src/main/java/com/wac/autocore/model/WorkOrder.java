@@ -84,6 +84,14 @@ public class WorkOrder {
         return items;
     }
 
+    public double getTotalPrice() {
+        double total = 0;
+        for (WorkOrderItem item : items) {
+            total += item.getPriceAtOrder();
+        }
+        return total;
+    }
+
     @Override
     public String toString() {
         return id +

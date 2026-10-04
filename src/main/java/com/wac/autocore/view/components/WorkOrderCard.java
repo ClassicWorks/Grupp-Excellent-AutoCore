@@ -85,6 +85,9 @@ public class WorkOrderCard extends VBox {
         itemGrid.add(new Label(LanguageManager.getString("workorder.totalTime")), 0, workOrderItems.size());
         itemGrid.add(new Label(Integer.toString(totalTime)), 1, workOrderItems.size());
 
+        itemGrid.add(new Label(LanguageManager.getString("workorder.totalPrice")), 0, workOrderItems.size() + 1);
+        itemGrid.add((new Label(String.format("%.0f kr", workOrder.getTotalPrice()))), 1, workOrderItems.size() + 1);
+
         VBox serviceItemBox = new VBox(serviceItemsLabel, itemGrid);
         serviceItemBox.getStyleClass().add("card-info-box");
         return serviceItemBox;
