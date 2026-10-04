@@ -2,6 +2,7 @@ package com.wac.autocore.view;
 
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.KanbanGridUtil;
 import com.wac.autocore.view.components.ServiceItemCard;
 import com.wac.autocore.view.components.ServiceItemDetails;
@@ -34,7 +35,7 @@ public class ShowServiceItemsView {
         List<ServiceItem> serviceItems = garageSystem.getServiceItems();
 
         if (serviceItems.isEmpty()) {
-            serviceItemsBox.getChildren().add(new Label("No services found."));
+            serviceItemsBox.getChildren().add(new Label(LanguageManager.getString("services.empty")));
         }
 
         for (ServiceItem serviceItem : serviceItems) {
@@ -58,7 +59,7 @@ public class ShowServiceItemsView {
 
     private Node getHeader() {
         BorderPane headerPane = new BorderPane();
-        Label title = new Label("Services");
+        Label title = new Label(LanguageManager.getString("services.title"));
         title.getStyleClass().setAll("page-title");
 
         headerPane.setCenter(title);

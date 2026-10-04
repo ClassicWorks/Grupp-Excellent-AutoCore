@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.ServiceItem;
+import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -25,16 +26,16 @@ public class ServiceItemDetails extends BorderPane {
         Label descriptionLabel = new Label(serviceItem.getDescription());
         descriptionLabel.setWrapText(true);
 
-        Label timeLabel = new Label(String.format("%d min", serviceItem.getEstimatedMinutes()));
+        Label timeLabel = new Label(String.format(LanguageManager.getString("service.minutes"), serviceItem.getEstimatedMinutes()));
 
         priceField.setText(String.valueOf(serviceItem.getPrice()));
 
         VBox fields = new VBox(10,
-                new Label("Description"),
+                new Label(LanguageManager.getString("service.description")),
                 descriptionLabel,
-                new Label("Estimated time"),
+                new Label(LanguageManager.getString("service.estimatedTime")),
                 timeLabel,
-                new Label("Price (kr)"),
+                new Label(LanguageManager.getString("service.price")),
                 priceField,
                 errorLabel
         );
@@ -49,7 +50,7 @@ public class ServiceItemDetails extends BorderPane {
     }
 
     private Button createSaveBtn() {
-        Button saveBtn = new Button("Save changes");
+        Button saveBtn = new Button(LanguageManager.getString("service.save"));
 
         saveBtn.disableProperty().bind(priceField.textProperty().isEmpty());
 
@@ -62,12 +63,12 @@ public class ServiceItemDetails extends BorderPane {
             try {
                 newPrice = Double.parseDouble(input);
             } catch (NumberFormatException ex) {
-                errorLabel.setText("Price must be a number.");
+                errorLabel.setText(LanguageManager.getString("service.error.priceNumber"));
                 return;
             }
 
             if (newPrice < 0) {
-                errorLabel.setText("Price cannot be negative.");
+                errorLabel.setText(LanguageManager.getString("service.error.priceNegative"));
                 return;
             }
 
