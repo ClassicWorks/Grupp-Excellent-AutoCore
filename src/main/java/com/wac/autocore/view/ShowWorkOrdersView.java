@@ -25,6 +25,7 @@ public class ShowWorkOrdersView {
     public Parent show() {
         BorderPane root = new BorderPane();
         Node header = getHeader();
+        header.getStyleClass().add("content-header-container");
 
         //Could be added later
         //Node filterView = getFilter();
@@ -140,7 +141,6 @@ public class ShowWorkOrdersView {
         createWorkOrderBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
 
         BorderPane header = new BorderPane();
-        header.getStyleClass().add("content-header-container");
         header.setCenter(title);
         header.setRight(createWorkOrderBtn);
         return header;

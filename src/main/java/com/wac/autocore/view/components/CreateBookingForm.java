@@ -4,6 +4,7 @@ import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.StylingUtil;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -42,30 +43,28 @@ public class CreateBookingForm {
      */
     public Parent show() {
         VBox layout = new VBox();
-
         Label title = createTitle();
-        title.getStyleClass().add("form-title");
-        layout.getChildren().add(title);
 
         CustomerSelection customerSelection = new CustomerSelection(
                 garageSystem.getCustomers(),
                 this::showVehiclesOfCustomer);
         customerSelection.getStyleClass().addAll("form-field-container");
 
-        layout.getChildren().add(
-                customerSelection
-        );
-
         vehicleResults.getStyleClass().addAll("card-container", "compact");
-        layout.getChildren().add(vehicleResults);
-
-        Node bookingInformation = createBookingInformation();
-        bookingInformation.getStyleClass().addAll("form-field-container");
-        layout.getChildren().add(bookingInformation);
 
         HBox actionButtons = createActionButtons();
         actionButtons.getStyleClass().add("btn-container");
-        layout.getChildren().add(actionButtons);
+
+        layout.getChildren().add(
+                customerSelection
+        );
+        layout.getChildren().addAll(
+                createTitle(),
+                vehicleResults,
+                getDescriptionBox(),
+                getMechanicBox(),
+                actionButtons
+        );
 
         layout.getStyleClass().add("form-container");
 
@@ -84,38 +83,54 @@ public class CreateBookingForm {
 
         if (vehicle == null) {
             //TODO dialog window with error message
-            return new ScrollPane(new Label("No vehicle found."));
+            Label errorLabel = new Label("No vehicle found.");
+            errorLabel.getStyleClass().add("error-label");
+            return new ScrollPane(errorLabel);
         }
 
         Customer customer = vehicle.getCustomer();
-        /*Customer customer = garageSystem
-                .getCustomer(vehicle.getCustomerId())
-                .orElse(null);*/
 
         if (customer == null) {
             //TODO dialog window with error message
-            return new ScrollPane(new Label("No connected customer found."));
+            Label errorLabel = new Label("No connected customer found.");
+            errorLabel.getStyleClass().add("error-label");
+            return new ScrollPane(errorLabel);
         }
+
+        VehicleCard vehicleCard = new VehicleCard(vehicle, customer);
+        vehicleCard.getStyleClass().add("compact");
+
+        HBox actionButtons = createActionButtons();
 
         VBox layout = new VBox();
 
-        layout.getChildren().add(createTitle());
-        layout.getChildren().add(createCustomerInfo(customer));
-        layout.getChildren().add(new VehicleCard(vehicle));
-        layout.getChildren().add(createBookingInformation());
-        layout.getChildren().add(createActionButtons());
+        layout.getChildren().addAll(
+                createTitle(),
+                vehicleCard,
+                getDescriptionBox(),
+                getMechanicBox(),
+                actionButtons
+        );
 
         selectedVehicle.set(vehicle);
 
+        layout.getStyleClass().add("form-container");
+
         ScrollPane scrollPane = new ScrollPane(layout);
         scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
         return scrollPane;
     }
 
     private Label createTitle() {
-        return new Label("Create booking");
+        Label title = new Label("Create booking");
+        title.getStyleClass().add("form-title");
+        return title;
     }
 
+    // =========================================================
+    // VEHICLE SELECTION
+    // =========================================================
     private void showVehiclesOfCustomer(Customer customer) {
         vehicleResults.getChildren().clear();
         selectedVehicle.set(null);
@@ -128,15 +143,15 @@ public class CreateBookingForm {
                 );
     }
 
-    // =========================================================
-    // VEHICLE SELECTION
-    // =========================================================
     private Node createSelectableVehicleCard(Vehicle vehicle) {
         Node vehicleCard = new VehicleCard(vehicle);
 
-        vehicleCard.setOnMouseClicked(
-                e -> selectVehicle(vehicleCard, vehicle)
-        );
+        vehicleCard.setOnMouseClicked(e -> {
+            selectVehicle(vehicleCard, vehicle);
+            StylingUtil.setSelected(vehicleCard, "card");
+        });
+
+        vehicleCard.getStyleClass().add("clickable");
 
         return vehicleCard;
     }
@@ -160,26 +175,26 @@ public class CreateBookingForm {
     // =========================================================
     // BOOKING INFORMATION
     // =========================================================
-    private Node createBookingInformation() {
-        Label descriptionLabel =
-                new Label("Describe the problem");
 
-        Label mechanicLabel =
-                new Label("Choose mechanic (optionally)");
-
-        descriptionField.setPrefRowCount(3);
+    private VBox getMechanicBox() {
+        Label mechanicLabel = new Label("Choose mechanic (optionally)");
+        mechanicLabel.getStyleClass().add("form-field-label");
 
         mechanicComboBox = createMechanicComboBox();
 
-        bookingInformation.getChildren().clear();
-        bookingInformation.getChildren().addAll(
-                descriptionLabel,
-                descriptionField,
-                mechanicLabel,
-                mechanicComboBox
-        );
+        VBox mechanicBox = new VBox(mechanicLabel, mechanicComboBox);
+        mechanicBox.getStyleClass().add("form-field-container");
+        return mechanicBox;
+    }
 
-        return bookingInformation;
+    private VBox getDescriptionBox() {
+        Label descriptionLabel = new Label("Describe the problem");
+        descriptionLabel.getStyleClass().add("form-field-label");
+
+        descriptionField.setPrefRowCount(3);
+        VBox descriptionBox = new VBox(descriptionLabel, descriptionField);
+        descriptionBox.getStyleClass().add("form-field-container");
+        return descriptionBox;
     }
 
     private ComboBox<Mechanic> createMechanicComboBox() {
@@ -205,6 +220,12 @@ public class CreateBookingForm {
                 new Button("Create booking");
         createButton.getStyleClass().add("confirm-btn");
 
+        HBox btnBox = new HBox(
+                cancelButton,
+                createButton
+        );
+        btnBox.getStyleClass().add("btn-container");
+
         createButton.disableProperty().bind(
                 selectedVehicle.isNull()
                         .or(descriptionField.textProperty().isEmpty())
@@ -218,10 +239,7 @@ public class CreateBookingForm {
                 e -> popupStage.close()
         );
 
-        return new HBox(
-                cancelButton,
-                createButton
-        );
+        return btnBox;
     }
 
 
@@ -247,21 +265,4 @@ public class CreateBookingForm {
 
         popupStage.close();
     }
-
-    // =========================================================
-    // ALREADY SELECTED VEHICLE
-    // =========================================================
-    private Node createCustomerInfo(Customer customer) {
-        ImageView customerIcon =
-                new IconImageView("/imgs/user-solid.png", 20, 20);
-
-        Label customerName =
-                new Label(customer.getName());
-
-        return new HBox(
-                customerIcon,
-                customerName
-        );
-    }
-
 }

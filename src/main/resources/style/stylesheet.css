@@ -25,7 +25,7 @@
     -fx-default-hover-color: #b8b8b8;
 
     -fx-status-completed-background-color: #E7EEDF;
-    -fx-status-completed-ink: -fx-primary-color;
+    -fx-status-completed-ink: #3F5D3A;
     -fx-status-in-progress-background-color: #F7EDDC;
     -fx-status-in-progress-ink: #8C5A17;
     -fx-status-ready-background-color: #E7EEEF;
@@ -98,6 +98,11 @@ HyperLink{
 /*-------------
      Buttons
 ---------------*/
+/*Add this class to indicate that element can be clicked*/
+.clickable{
+    -fx-cursor: hand;
+}
+
 Button{
     -fx-font-family: "IBM Plex Sans", sans-serif;
     -fx-font-size: 13px;
@@ -189,6 +194,7 @@ Button{
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
 }
+
 .side-bar {
     -fx-background-color: -fx-primary-color;
     -fx-border-color: -fx-primary-hover-color;
@@ -230,7 +236,8 @@ Button{
     -fx-padding: 6px;
 }
 
-.card-container.compact .card{
+.card-container.compact .card,
+card.compact{
     -fx-spacing: 3px;
     -fx-padding: 3px;
 }
@@ -311,6 +318,13 @@ Button{
     -fx-text-fill: -fx-status-unhandled-ink;
 }
 
+.row-even{
+    -fx-background-color: -fx-surface-background-color;
+}
+.row-odd{
+    -fx-background-color: -fx-surface-selected-background-color;
+}
+
 /*------------------
        Cards
 ------------------*/
@@ -322,6 +336,10 @@ Button{
     -fx-border-width: 1px;
     -fx-padding: 14px;
     -fx-spacing: 6px;
+}
+
+.card.clickable:hover{
+    -fx-background-color: -fx-surface-selected-background-color;
 }
 
 .card.is-selected {

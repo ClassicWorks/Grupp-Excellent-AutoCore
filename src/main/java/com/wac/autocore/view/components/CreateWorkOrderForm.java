@@ -152,7 +152,6 @@ public class CreateWorkOrderForm {
         return bookingCard;
     }
 
-    //TODO change to only show unbooked mechanics
     private ComboBox<Mechanic> createMechanicComboBox() {
         ObservableList<Mechanic> mechanics =
                 FXCollections.observableArrayList();

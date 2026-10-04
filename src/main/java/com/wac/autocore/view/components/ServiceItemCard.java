@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.ServiceItem;
+import com.wac.autocore.util.StylingUtil;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.Cursor;
@@ -17,14 +18,11 @@ public class ServiceItemCard extends VBox {
                 serviceItem.getEstimatedMinutes()));
 
         this.getChildren().addAll(nameLabel, priceAndTimeLabel);
-        this.setSpacing(5);
-        this.getStyleClass().addAll("service-item-card", "card");
+        this.getStyleClass().addAll("card");
 
-        //Remove later when CSS-sheet exists.
-        this.setStyle("-fx-border-color: blue;");
-
-        this.setCursor(Cursor.HAND);
-
-        this.setOnMouseClicked(e -> onCardClick.accept(serviceItem));
+        this.setOnMouseClicked(e -> {
+            StylingUtil.setSelected(this, "card");
+            onCardClick.accept(serviceItem);
+        });
     }
 }

@@ -37,7 +37,6 @@ public class WorkOrderCard extends VBox {
 
         //mechanic info
         Hyperlink mechanicLink = new MechanicHyperLink(mechanic);
-        mechanicLink.getStyleClass().add("link-label");
 
         Text description = new Text(booking.getDescription());
 

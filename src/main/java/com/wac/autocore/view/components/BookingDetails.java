@@ -92,12 +92,13 @@ public class BookingDetails extends BorderPane {
 
         BorderPane actionableButtons = new BorderPane(null, null, confirmingButtons, null, destructiveButtons);
 
-        VBox detailsBox = new VBox(vehicleBox, mechanicBox, descriptionBox, actionableButtons);
-        detailsBox.getStyleClass().add("details-container");
+        VBox detailsBox = new VBox(vehicleBox, mechanicBox, descriptionBox);
 
         this.setTop(topBox);
         this.setCenter(detailsBox);
-        //this.setBottom(actionableButtons);
+        this.setBottom(actionableButtons);
+
+        this.getStyleClass().add("details-container");
     }
 
     private ComboBox<Mechanic> createMechanicComboBox() {

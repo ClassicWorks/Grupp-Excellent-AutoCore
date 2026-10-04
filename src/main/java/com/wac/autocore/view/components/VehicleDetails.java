@@ -26,7 +26,8 @@ public class VehicleDetails extends BorderPane {
     private TextField yearField = new TextField();
     private Hyperlink customerName = new Hyperlink();
     private Label customerInfo = new Label();
-    private HBox customerSection = new HBox();
+    private HBox customerEditableBox = new HBox();
+    private VBox customerSection = new VBox();
     private Label errorLabel = new Label();
 
 
@@ -34,42 +35,53 @@ public class VehicleDetails extends BorderPane {
         this.vehicle = vehicle;
         this.vehicleOwner = vehicleOwner;
 
-        Label vehicleOwnerLabel = new Label("Owner");
+        getCustomerSection();
+        customerSection.getStyleClass().add("form-field-container");
 
         VBox mainContent = new VBox(
                 createVehicleEditForm(),
-                vehicleOwnerLabel,
                 customerSection,
                 errorLabel
         );
+        mainContent.getStyleClass().add("details-container");
 
-        createCustomerSection();
-
-        HBox actionableButtons = new HBox(20,
-                createDeleteBtn(),
+        HBox confirmingButtons = new HBox(
                 createSaveBtn(),
-                createBookVehicleBtn());
+                createBookVehicleBtn()
+        );
+        confirmingButtons.getStyleClass().add("btn-container");
+
+        HBox destructiveButtons = new HBox(createDeleteBtn());
+        destructiveButtons.getStyleClass().add("btn-container");
+
+        BorderPane actionableButtons = new BorderPane(null, null, confirmingButtons, null, destructiveButtons);
 
         this.setCenter(mainContent);
         this.setBottom(actionableButtons);
     }
 
-    private void createCustomerSection() {
+    private void getCustomerSection() {
         IconImageView customerIcon = new IconImageView(
                 "/imgs/user-solid.png", 20, 20
         );
 
-        Label isChangedNotification = new Label();
-        VBox customerText = new VBox(customerName, customerInfo, isChangedNotification);
+        Label customerLabel = new Label("Owner");
+        customerLabel.getStyleClass().add("form-field-label");
+
+        Label notificationLabel = new Label();
+        notificationLabel.getStyleClass().add("error-label");
+        VBox customerText = new VBox(customerName, customerInfo, notificationLabel);
 
         IconImageView editIcon = new IconImageView(
                 "/imgs/pen-to-square-solid.png", 20, 20
         );
 
         Button editCustomerBtn = new Button("Edit customer", editIcon);
+        editCustomerBtn.getStyleClass().add("confirm-btn");
         editCustomerBtn.setOnAction(e -> showCustomerSelection());
 
-        customerSection.getChildren().setAll(customerIcon, customerText, editCustomerBtn);
+        customerEditableBox.getChildren().setAll(customerIcon, customerText, editCustomerBtn);
+
 
         if (vehicleOwner != null) {
             customerName.setText(vehicleOwner.getName());
@@ -84,13 +96,17 @@ public class VehicleDetails extends BorderPane {
             ));
 
             if(vehicleOwner.getId() != vehicle.getCustomer().getId()){
-                isChangedNotification.setText("Vehicle needs to be saved to set new vehicle owner");
+                notificationLabel.setText("Vehicle needs to be saved to set new vehicle owner");
             }
         } else {
             customerName.setText("No customer connected");
             customerName.setOnAction(null);
+            notificationLabel.setText("Customer needs to be set");
             customerInfo.setText("");
         }
+
+        customerSection.getChildren().setAll(customerLabel, customerEditableBox);
+
     }
 
     private void showCustomerSelection(){
@@ -100,45 +116,84 @@ public class VehicleDetails extends BorderPane {
         );
 
         Button changeCustomerBtn = new Button("Set customer");
+        changeCustomerBtn.getStyleClass().add("confirm-btn");
 
-        customerSection.getChildren().setAll(
+        customerEditableBox.getChildren().setAll(
                 new VBox(
                     customerSelection,
                     changeCustomerBtn)
         );
 
-        changeCustomerBtn.setOnAction(e -> createCustomerSection());
+        changeCustomerBtn.setOnAction(e -> getCustomerSection());
     }
 
     private HBox createVehicleEditForm() {
-        IconImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40, 40);
+        IconImageView vehicleIcon =
+                new IconImageView("/imgs/car-solid.png", 40, 40);
 
         vehicleIdLabel.setText(String.format("Fordons ID: %d", vehicle.getId()));
+        vehicleIdLabel.getStyleClass().add("details-id");
 
         registrationNumber.setText(vehicle.getRegistrationNumber());
-
         brandField.setText(vehicle.getBrand());
         modelField.setText(vehicle.getModel());
         yearField.setText(Integer.toString(vehicle.getYear()));
 
-        VBox vehicleFields = new VBox(10,
+        Label registrationLabel = new Label("Registration number");
+        registrationLabel.getStyleClass().add("form-field-label");
+
+        VBox registrationBox =
+                new VBox(registrationLabel, registrationNumber);
+        registrationBox.getStyleClass().add("form-field-container");
+
+
+        Label brandLabel = new Label("Brand");
+        brandLabel.getStyleClass().add("form-field-label");
+
+        VBox brandBox =
+                new VBox(brandLabel, brandField);
+        brandBox.getStyleClass().add("form-field-container");
+
+
+        Label modelLabel = new Label("Model");
+        modelLabel.getStyleClass().add("form-field-label");
+
+        VBox modelBox =
+                new VBox(modelLabel, modelField);
+        modelBox.getStyleClass().add("form-field-container");
+
+
+        Label yearLabel = new Label("Year");
+        yearLabel.getStyleClass().add("form-field-label");
+
+        VBox yearBox =
+                new VBox(yearLabel, yearField);
+        yearBox.getStyleClass().add("form-field-container");
+
+
+        VBox vehicleFields = new VBox(
                 vehicleIdLabel,
-                new Label("Registration number"),
-                registrationNumber,
-                new Label("Brand"),
-                brandField,
-                new Label("Model"),
-                modelField,
-                new Label("Year"),
-                yearField
+                registrationBox,
+                brandBox,
+                modelBox,
+                yearBox
         );
-        HBox vehicleBox = new HBox(vehicleIcon, vehicleFields);
+        vehicleFields.getStyleClass().add("form-container");
+
+
+        HBox vehicleBox = new HBox(
+                vehicleIcon,
+                vehicleFields
+        );
+
         vehicleBox.setAlignment(Pos.CENTER_LEFT);
+
         return vehicleBox;
     }
 
     private Button createBookVehicleBtn() {
         Button bookVehicleBtn = new Button("Book vehicle");
+        bookVehicleBtn.getStyleClass().add("confirm-btn");
         bookVehicleBtn.setOnAction(e ->
                 ViewManager.getInstance().showCreateBooking(vehicle.getId())
         );
@@ -147,6 +202,7 @@ public class VehicleDetails extends BorderPane {
 
     private Button createSaveBtn() {
         Button saveBtn = new Button("Save changes");
+        saveBtn.getStyleClass().add("confirm-btn");
 
         saveBtn.disableProperty().bind(
         registrationNumber.textProperty().isEmpty()
@@ -176,6 +232,16 @@ public class VehicleDetails extends BorderPane {
         return saveBtn;
     }
 
+    private Button createDeleteBtn() {
+        Button deleteBtn = new Button("Delete");
+        deleteBtn.getStyleClass().add("destroy-btn");
+        deleteBtn.setOnAction(e ->
+                System.out.printf("Should call ViewManager.getInstance.confirmDelete(vehicle, garagesystem.deleteVehicle(%d)",
+                        vehicle.getId())
+        );
+        return deleteBtn;
+    }
+
     private boolean isInteger(String value) {
         try {
             Integer.parseInt(value);
@@ -183,15 +249,5 @@ public class VehicleDetails extends BorderPane {
         } catch (NumberFormatException e) {
             return false;
         }
-    }
-
-    private Button createDeleteBtn() {
-        Button deleteBtn = new Button("Delete");
-
-        deleteBtn.setOnAction(e ->
-                System.out.printf("Should call ViewManager.getInstance.confirmDelete(vehicle, garagesystem.deleteVehicle(%d)",
-                        vehicle.getId())
-        );
-        return deleteBtn;
     }
 }

@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.hibernate.boot.jaxb.internal.stax.HbmEventReader;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -21,21 +22,24 @@ public class CustomerSelection extends VBox {
         this.customers = customers;
         this.onCustomerSelected = onCustomerSelected;
 
-        getChildren().add(createCustomerSelection());
+        this.getStyleClass().addAll("form-field-container");
+
+        createCustomerSelection();
     }
 
-    private Node createCustomerSelection() {
+    private void createCustomerSelection() {
         Label label = new Label("Choose customer");
+        label.getStyleClass().add("form-field-label");
         TextField searchField = new TextField();
 
-        selectedCustomer.getStyleClass().add("selected-customer");
+        selectedCustomer.setStyle(selectedCustomer.getStyle() + " -fx-font-weight: 700;");
 
         searchField.textProperty().addListener(
                 (observable, oldValue, newValue) ->
                         updateCustomerResults(newValue)
         );
 
-        return new VBox(label, searchField, customerResults, selectedCustomer);
+        this.getChildren().addAll(label, searchField, customerResults, selectedCustomer);
     }
 
 
@@ -52,7 +56,7 @@ public class CustomerSelection extends VBox {
 
         //Add different styling to even and uneven customers
         for(int i = 0; i < customerMatch.size(); i++){
-            Node rowOfCustomer = createCustomerResult(customerMatch.get(i));
+            HBox rowOfCustomer = createCustomerResult(customerMatch.get(i));
             String rowStyle = i % 2 == 0
                     ? "row-even"
                     : "row-odd";
@@ -63,7 +67,7 @@ public class CustomerSelection extends VBox {
     }
 
 
-    private Node createCustomerResult(Customer customer) {
+    private HBox createCustomerResult(Customer customer) {
         Label customerInfo = new Label(
                 String.format(
                         "ID: %d - %s",
@@ -73,7 +77,7 @@ public class CustomerSelection extends VBox {
         );
         HBox row = new HBox(customerInfo);
         row.setMaxWidth(Double.MAX_VALUE);
-        row.getStyleClass().add("customer-row");
+        row.getStyleClass().addAll("clickable");
 
         row.setOnMouseClicked(e -> {
             selectedCustomer.setText(String.format("Selected customer: ID: %d - %s",

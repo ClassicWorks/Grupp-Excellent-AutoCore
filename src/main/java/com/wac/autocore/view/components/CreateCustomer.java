@@ -26,24 +26,34 @@ public class CreateCustomer {
     public Parent show() {
         boolean editMode = customer != null;
 
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(20));
+        VBox root = new VBox();
+        root.getStyleClass().add("form-container");
 
         Label title = new Label(editMode
                 ? LanguageManager.getString("customer.form.title.edit")
                 : LanguageManager.getString("customer.form.title.create"));
+        title.getStyleClass().add("form-title");
 
         Label nameLabel = new Label(LanguageManager.getString("customer.form.name"));
+        nameLabel.getStyleClass().add("form-field-label");
         TextField nameField = new TextField();
         nameField.setPromptText(LanguageManager.getString("customer.form.name.prompt"));
+        VBox nameBox = new VBox(nameLabel, nameField);
+        nameBox.getStyleClass().add("form-field-container");
 
         Label phoneLabel = new Label(LanguageManager.getString("customer.form.phone"));
+        phoneLabel.getStyleClass().add("form-field-label");
         TextField phoneField = new TextField();
         phoneField.setPromptText(LanguageManager.getString("customer.form.phone.prompt"));
+        VBox phoneBox = new VBox(phoneLabel, phoneField);
+        phoneBox.getStyleClass().add("form-field-container");
 
         Label emailLabel = new Label(LanguageManager.getString("customer.form.email"));
+        emailLabel.getStyleClass().add("form-field-label");
         TextField emailField = new TextField();
         emailField.setPromptText(LanguageManager.getString("customer.form.email.prompt"));
+        VBox emailBox = new VBox(emailLabel, emailField);
+        emailBox.getStyleClass().add("form-field-container");
 
         if (editMode) {
             nameField.setText(customer.getName());
@@ -52,12 +62,18 @@ public class CreateCustomer {
         }
 
         Label errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: red;");
+        errorLabel.getStyleClass().add("error-label");
 
         Button submitBtn = new Button(editMode
                 ? LanguageManager.getString("customer.form.submit.edit")
                 : LanguageManager.getString("customer.form.submit.create"));
+        submitBtn.getStyleClass().add("confirm-btn");
         Button cancelBtn = new Button(LanguageManager.getString("customer.form.cancel"));
+        cancelBtn.getStyleClass().add("cancel-btn");
+
+        submitBtn.disableProperty().bind(
+                nameField.textProperty().isEmpty()
+        );
 
         submitBtn.setOnAction(e -> {
             errorLabel.setText("");
@@ -87,13 +103,14 @@ public class CreateCustomer {
 
         cancelBtn.setOnAction(e -> popupStage.close());
 
-        HBox buttonBox = new HBox(10, submitBtn, cancelBtn);
+        HBox buttonBox = new HBox(submitBtn, cancelBtn);
+        buttonBox.getStyleClass().add("btn-container");
 
         root.getChildren().addAll(
                 title,
-                nameLabel, nameField,
-                phoneLabel, phoneField,
-                emailLabel, emailField,
+                nameBox,
+                phoneBox,
+                emailBox,
                 buttonBox, errorLabel
         );
 

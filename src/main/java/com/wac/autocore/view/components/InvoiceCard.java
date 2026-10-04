@@ -6,12 +6,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class InvoiceCard extends HBox {
+public class InvoiceCard extends VBox {
 
     public InvoiceCard(Invoice invoice) {
-        VBox invoiceCard = new VBox();
-        invoiceCard.getStyleClass().add("invoice-card");
-
         Label idLabel = new Label(String.format(LanguageManager.getString("invoice.id"), invoice.getId()));
         Label workOrderLabel = new Label(String.format(LanguageManager.getString("invoice.workorder"), invoice.getWorkOrder().getId()));
         Label dateLabel = new Label(invoice.getInvoiceDate().toString());
@@ -20,8 +17,13 @@ public class InvoiceCard extends HBox {
                 ? LanguageManager.getString("invoice.status.paid")
                 : LanguageManager.getString("invoice.status.unpaid"));
 
-        invoiceCard.getChildren().addAll(idLabel, workOrderLabel, dateLabel, totalLabel, statusLabel);
+        this.getChildren().addAll(
+                idLabel,
+                workOrderLabel,
+                dateLabel,
+                totalLabel,
+                statusLabel);
 
-        this.getChildren().add(invoiceCard);
+        this.getStyleClass().add("card");
     }
 }

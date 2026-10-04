@@ -20,37 +20,69 @@ public class MechanicDetails extends BorderPane {
     public MechanicDetails(Mechanic mechanic) {
         this.mechanic = mechanic;
 
-        Label idLabel = new Label(String.format("Mechanic ID: %d", mechanic.getId()));
+        Label idLabel = new Label(
+                String.format("Mechanic ID: %d", mechanic.getId())
+        );
+
+        Label nameLabel = new Label("Name");
+        nameLabel.getStyleClass().add("form-field-label");
 
         nameField.setText(mechanic.getName());
+
+        VBox nameBox = new VBox(nameLabel, nameField);
+        nameBox.getStyleClass().add("form-field-container");
+
+        Label phoneLabel = new Label("Phone");
+        phoneLabel.getStyleClass().add("form-field-label");
+
         phoneField.setText(mechanic.getPhone());
+
+        VBox phoneBox = new VBox(phoneLabel, phoneField);
+        phoneBox.getStyleClass().add("form-field-container");
+
+        Label specializationLabel = new Label("Specialization");
+        specializationLabel.getStyleClass().add("form-field-label");
+
         specializationField.setText(mechanic.getSpecialization());
 
-        Label availabilityLabel = new Label(String.format(
-                "Status: %s", mechanic.isAvailable() ? "Available" : "Busy"));
+        VBox specializationBox = new VBox(specializationLabel, specializationField);
+        specializationBox.getStyleClass().add("form-field-container");
 
-        errorLabel.setStyle("-fx-text-fill: red;");
 
-        VBox fields = new VBox(10,
-                new Label("Name"),
-                nameField,
-                new Label("Phone"),
-                phoneField,
-                new Label("Specialization"),
-                specializationField,
+        Label availabilityLabel = new Label(
+                String.format(
+                        "Status: %s",
+                        mechanic.isAvailable() ? "Available" : "Busy"
+                )
+        );
+        availabilityLabel.getStyleClass().add("status-label");
+        //TODO add styling and logic for status-label
+
+        errorLabel.getStyleClass().add("error-label");
+
+
+        VBox fields = new VBox(
+                nameBox,
+                phoneBox,
+                specializationBox,
                 availabilityLabel,
                 errorLabel
         );
 
-        HBox actionableButtons = new HBox(20, createSaveBtn());
 
-        this.setTop(idLabel);
-        this.setCenter(fields);
-        this.setBottom(actionableButtons);
+        HBox actionableButtons = new HBox(createSaveBtn());
+        actionableButtons.getStyleClass().add("btn-container");
+
+        setTop(idLabel);
+        setCenter(fields);
+        setBottom(actionableButtons);
+
+        getStyleClass().add("details-container");
     }
 
     private Button createSaveBtn() {
         Button saveBtn = new Button("Save changes");
+        saveBtn.getStyleClass().addAll("confirm-btn");
 
         saveBtn.disableProperty().bind(nameField.textProperty().isEmpty());
 

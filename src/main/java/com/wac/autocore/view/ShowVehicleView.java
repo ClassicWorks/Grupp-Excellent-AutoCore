@@ -4,6 +4,8 @@ import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.StylingUtil;
+import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.view.components.kanban.KanbanGridUtil;
 import com.wac.autocore.view.components.VehicleCard;
 import com.wac.autocore.view.components.VehicleDetails;
@@ -21,10 +23,12 @@ public class ShowVehicleView {
 
     public Parent show(){
         BorderPane layout = new BorderPane();
-        layout.setTop(getHeader());
+        Node header = getHeader();
+        header.getStyleClass().add("content-header-container");
+        layout.setTop(header);
 
         //Split Stage 50/50
-        GridPane mainContent = KanbanGridUtil.getKanbanGrid(2);
+        GridPane mainContent = new KanbanGrid(2);
 
         //Filtrerings nodes
         //TODO Just nu finns ingen logik för filtrering, är det något som ska implementeras? Vilka typer?
@@ -39,38 +43,41 @@ public class ShowVehicleView {
 
         //List all cards for vehicles
         VBox vehiclesBox = new VBox();
+        vehiclesBox.getStyleClass().add("card-container");
+
+        VBox detailsContainer = new VBox();
 
         //Show details of car
-
-        //TODO listan ska kunna uppdateras baserat på filtering
         for (Vehicle vehicle : garageSystem.getVehicles()){
             Customer customer = vehicle.getCustomer();
-            VehicleCard vehicleCard = new VehicleCard(vehicle, customer, v -> ViewManager.getInstance().showCreateBooking(v.getId()));
-            vehicleCard.setOnMouseClicked(e-> {
-                //If anything is in right column, remove content
-                mainContent.getChildren().removeIf(node ->
-                        GridPane.getColumnIndex(node) != null
-                                && GridPane.getColumnIndex(node) == 1);
+            VehicleCard vehicleCard = new VehicleCard(vehicle, customer,
+                    v -> ViewManager.getInstance().showCreateBooking(v.getId())
+            );
 
-                //Add vehicle details
-                VehicleDetails  vehicleDetails = new VehicleDetails(vehicle, customer);
-                vehicleDetails.setMaxHeight(Double.MAX_VALUE);
-                mainContent.add(
-                        vehicleDetails,
-                        1, 0
-                );
-                //Make vehicleDetail as big as allowed
-                GridPane.setVgrow(vehicleDetails, Priority.ALWAYS);
+            vehicleCard.setOnMouseClicked(e-> {
+                VehicleDetails vehicleDetails = new VehicleDetails(vehicle, customer);
+                detailsContainer.getChildren().setAll(vehicleDetails);
+                VBox.setVgrow(vehicleDetails, Priority.ALWAYS);
+
+                StylingUtil.setSelected(vehicleCard, "card");
             });
+            vehicleCard.getStyleClass().add("clickable");
             vehiclesBox.getChildren().add(vehicleCard);
         }
 
-        VBox vehiclesScroll = KanbanGridUtil.getScrollableColumnWithTitle("", vehiclesBox, "");
+        ScrollPane vehiclesScroll = new ScrollPane(vehiclesBox);
+        vehiclesScroll.setFitToWidth(true);
+        vehiclesScroll.setFitToHeight(true);
+
         GridPane.setVgrow(vehiclesScroll, Priority.ALWAYS);
+        GridPane.setVgrow(detailsContainer, Priority.ALWAYS);
 
         mainContent.add(
                 vehiclesScroll,
                 0, 0);
+        mainContent.add(
+                detailsContainer,
+                1, 0);
 
         layout.setCenter(mainContent);
         return layout;
@@ -80,9 +87,11 @@ public class ShowVehicleView {
         BorderPane headerPane = new BorderPane();
         Label title = new Label("Vehicles");
         title.getStyleClass().setAll("page-title");
+
         Button createBookingBtn = new Button("Create new vehicle");
-        createBookingBtn.getStyleClass().addAll("create-btn");
+        createBookingBtn.getStyleClass().addAll("confirm-btn");
         createBookingBtn.setOnAction(e -> ViewManager.getInstance().showCreateVehiclePopup());
+
         headerPane.setCenter(title);
         headerPane.setRight(createBookingBtn);
         return headerPane;

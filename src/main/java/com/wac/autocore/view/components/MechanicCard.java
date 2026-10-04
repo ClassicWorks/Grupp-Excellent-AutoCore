@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Mechanic;
+import com.wac.autocore.util.StylingUtil;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
@@ -20,16 +21,15 @@ public class MechanicCard extends HBox {
         Label availabilityLabel = new Label(mechanic.isAvailable() ? "Available" : "Busy");
 
         VBox mechanicInfo = new VBox(nameLabel, specializationlabel, availabilityLabel);
+        mechanicInfo.getStyleClass().addAll("card-info-box");
 
         this.getChildren().addAll(mechanicIcon, mechanicInfo);
         this.setAlignment(Pos.CENTER_LEFT);
-        this.getStyleClass().addAll("mechanic-card", "card");
+        this.getStyleClass().addAll("card", "clickable");
 
-        //Remove later when CSS-sheet exists.
-        this.setStyle("-fx-border-color: blue;");
-
-        this.setCursor(Cursor.HAND);
-
-        this.setOnMouseClicked(e -> onCardClick.accept(mechanic));
+        this.setOnMouseClicked(e -> {
+            StylingUtil.setSelected(this, "card");
+            onCardClick.accept(mechanic);
+        });
     }
 }

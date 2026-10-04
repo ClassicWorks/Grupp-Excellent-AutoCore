@@ -27,32 +27,48 @@ public class CreateVehicleForm {
     }
 
     public Parent show() {
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(20));
+        VBox root = new VBox();
+        root.getStyleClass().add("form-container");
 
         Label title = new Label("Create new vehicle");
+        title.getStyleClass().add("form-title");
 
         TextField regField = new TextField();
         regField.setPromptText("Registration number");
+        VBox regBox = new VBox(regField);
+        regBox.getStyleClass().add("form-field-container");
 
         TextField brandField = new TextField();
         brandField.setPromptText("Brand");
+        VBox brandBox = new VBox(brandField);
+        brandBox.getStyleClass().add("form-field-container");
 
         TextField modelField = new TextField();
         modelField.setPromptText("Model");
+        VBox modelBox = new VBox(modelField);
+        modelBox.getStyleClass().add("form-field-container");
 
         TextField yearField = new TextField();
         yearField.setPromptText("Year");
+        VBox yearBox = new VBox(yearField);
+        yearBox.getStyleClass().add("form-field-container");
 
-        ObservableList<Customer> customers = FXCollections.observableArrayList(Database.getCustomers());
+        ObservableList<Customer> customers =
+                FXCollections.observableArrayList(Database.getCustomers());
+
         ComboBox<Customer> customerComboBox = new ComboBox<>(customers);
         customerComboBox.setPromptText("Choose customer");
+        VBox customerBox = new VBox(customerComboBox);
+        customerBox.getStyleClass().add("form-field-container");
 
         Label errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: red;");
+        errorLabel.getStyleClass().add("error-label");
 
         Button createBtn = new Button("Create vehicle");
+        createBtn.getStyleClass().add("confirm-btn");
+
         Button cancelBtn = new Button("Cancel");
+        cancelBtn.getStyleClass().add("cancel-btn");
 
         createBtn.setOnAction(e -> {
             errorLabel.setText("");
@@ -94,11 +110,18 @@ public class CreateVehicleForm {
 
         cancelBtn.setOnAction(e -> popupStage.close());
 
-        HBox buttonBox = new HBox(10, createBtn, cancelBtn);
+        HBox buttonBox = new HBox(createBtn, cancelBtn);
+        buttonBox.getStyleClass().add("btn-container");
 
         root.getChildren().addAll(
-                title, regField, brandField, modelField, yearField,
-                customerComboBox, buttonBox, errorLabel
+                title,
+                regBox,
+                brandBox,
+                modelBox,
+                yearBox,
+                customerBox,
+                buttonBox,
+                errorLabel
         );
 
         return root;

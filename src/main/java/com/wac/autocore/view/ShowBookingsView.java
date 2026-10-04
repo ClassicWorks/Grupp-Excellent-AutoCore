@@ -5,6 +5,7 @@ import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.BookingCard;
 import com.wac.autocore.view.components.BookingDetails;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
@@ -67,6 +68,7 @@ public class ShowBookingsView {
                         booking,
                         vehicle,
                         mechanic);
+                bookingCard.getStyleClass().add("clickable");
 
                 bookingCard.setOnMouseClicked(e -> {
                     //If anything is in right column, remove content
@@ -89,18 +91,7 @@ public class ShowBookingsView {
                     bookingDetails.setMaxHeight(Double.MAX_VALUE);
                     GridPane.setVgrow(bookingDetails, Priority.ALWAYS);
 
-                    //Remove is-selected styling on other cards
-                    Parent parent = bookingCard.getParent();
-
-                    if (parent != null) {
-                        parent.getChildrenUnmodifiable().forEach(node -> {
-                            if (node.getStyleClass().contains("card")) {
-                                node.getStyleClass().remove("is-selected");
-                            }
-                        });
-                    }
-
-                    bookingCard.getStyleClass().add("is-selected");
+                    StylingUtil.setSelected(bookingCard, "card");
                 });
                 bookingsBox.getChildren().add(bookingCard);
             } catch (Exception e){

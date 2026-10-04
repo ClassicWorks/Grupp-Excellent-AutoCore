@@ -2,6 +2,7 @@ package com.wac.autocore.view;
 
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.IconImageView;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -65,42 +66,42 @@ public class SideNav {
 
         customerBtn.setOnAction(e -> {
             ViewManager.getInstance().showCustomers();
-            setIsSelected(customerBtn);
+            StylingUtil.setSelected(customerBtn, "menu-btn");
 
         });
         vehicleBtn.setOnAction(e -> {
             ViewManager.getInstance().showVehicles();
-            setIsSelected(vehicleBtn);
+            StylingUtil.setSelected(vehicleBtn, "menu-btn");
 
         });
         bookingBtn.setOnAction(e -> {
             ViewManager.getInstance().showBookings();
-            setIsSelected(bookingBtn);
+            StylingUtil.setSelected(bookingBtn, "menu-btn");
 
         });
         mechanicsBtn.setOnAction(e -> {
             ViewManager.getInstance().showMechanics();
-            setIsSelected(mechanicsBtn);
+            StylingUtil.setSelected(mechanicsBtn, "menu-btn");
 
         });
         serviceBtn.setOnAction(e -> {
             ViewManager.getInstance().showServices();
-            setIsSelected(serviceBtn);
+            StylingUtil.setSelected(serviceBtn, "menu-btn");
 
         });
         workOrderBtn.setOnAction(e -> {
             ViewManager.getInstance().showWorkOrders();
-            setIsSelected(workOrderBtn);
+            StylingUtil.setSelected(workOrderBtn, "menu-btn");
 
         });
         invoiceBtn.setOnAction(e -> {
             ViewManager.getInstance().showInvoices();
-            setIsSelected(invoiceBtn);
+            StylingUtil.setSelected(invoiceBtn, "menu-btn");
 
         });
         paymentBtn.setOnAction(e -> {
             ViewManager.getInstance().showPayments();
-            setIsSelected(paymentBtn);
+            StylingUtil.setSelected(paymentBtn, "menu-btn");
 
         });
         exitBtn.setOnAction(e -> {
@@ -135,15 +136,5 @@ public class SideNav {
         navPane.setBottom(exitBox);
 
         return navPane;
-    }
-
-    private void setIsSelected(Button button) {
-        navBox.getChildrenUnmodifiable().forEach(node -> {
-            if (node.getStyleClass().contains("menu-btn")) {
-                node.getStyleClass().remove("is-selected");
-            }
-        });
-
-        button.getStyleClass().add("is-selected");
     }
 }

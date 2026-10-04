@@ -23,29 +23,61 @@ public class CustomerDetails extends BorderPane {
 
         Label idLabel = new Label(String.format(LanguageManager.getString("customer.id"), customer.getId()));
 
+        Label nameLabel = new Label(
+                LanguageManager.getString("customer.name")
+        );
+        nameLabel.getStyleClass().add("form-field-label");
+
         nameField.setText(customer.getName());
+        VBox nameBox = new VBox(nameLabel, nameField);
+        nameBox.getStyleClass().add("form-field-container");
+
+
+        Label phoneLabel = new Label(
+                LanguageManager.getString("customer.phone")
+        );
+        phoneLabel.getStyleClass().add("form-field-label");
+
         phoneField.setText(customer.getPhone());
+        VBox phoneBox = new VBox(phoneLabel, phoneField);
+        phoneBox.getStyleClass().add("form-field-container");
+
+
+        Label emailLabel = new Label(
+                LanguageManager.getString("customer.email")
+        );
+        emailLabel.getStyleClass().add("form-field-label");
+
         emailField.setText(customer.getEmail());
+        VBox emailBox = new VBox(emailLabel, emailField);
+        emailBox.getStyleClass().add("form-field-container");
 
-        Label vipLabel = new Label(customer.isVip()
-                ? LanguageManager.getString("customer.vip.yes")
-                : LanguageManager.getString("customer.vip.no"));
 
-        errorLabel.setStyle("-fx-text-fill: red;");
+        Label vipLabel = new Label(
+                customer.isVip()
+                        ? LanguageManager.getString("customer.vip.yes")
+                        : LanguageManager.getString("customer.vip.no")
+        );
 
-        VBox fields = new VBox(10,
-                new Label(LanguageManager.getString("customer.name")),
-                nameField,
-                new Label(LanguageManager.getString("customer.phone")),
-                phoneField,
-                new Label(LanguageManager.getString("customer.email")),
-                emailField,
-                vipLabel,
+        VBox vipBox = new VBox(vipLabel);
+        vipBox.getStyleClass().add("form-field-container");
+
+
+        errorLabel.getStyleClass().add("error-label");
+
+
+        VBox fields = new VBox(
+                nameBox,
+                phoneBox,
+                emailBox,
+                vipBox,
                 errorLabel
         );
 
-        HBox actionableButtons = new HBox(20, createSaveBtn());
+        HBox actionableButtons = new HBox(createSaveBtn());
+        actionableButtons.getStyleClass().add("btn-container");
 
+        this.getStyleClass().add("details-container");
         this.setTop(idLabel);
         this.setCenter(fields);
         this.setBottom(actionableButtons);
@@ -53,6 +85,7 @@ public class CustomerDetails extends BorderPane {
 
     private Button createSaveBtn() {
         Button saveBtn = new Button(LanguageManager.getString("customer.save"));
+        saveBtn.getStyleClass().add("confirm-btn");
 
         saveBtn.disableProperty().bind(nameField.textProperty().isEmpty());
 

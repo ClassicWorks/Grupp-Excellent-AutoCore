@@ -29,10 +29,11 @@ public class CreateInvoiceForm {
     }
 
     public Parent show() {
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(20));
+        VBox root = new VBox();
+        root.getStyleClass().add("form-container");
 
         Label title = new Label(LanguageManager.getString("invoice.form.title"));
+        title.getStyleClass().add("form-title");
 
         List<Integer> invoicedWorkOrderIds = garageSystem.getInvoices().stream()
                 .map(invoice -> invoice.getWorkOrder().getId())
@@ -44,17 +45,27 @@ public class CreateInvoiceForm {
                 .collect(Collectors.toList());
 
         ObservableList<WorkOrder> workOrderItems = FXCollections.observableArrayList(availableWorkOrders);
+
         ComboBox<WorkOrder> workOrderComboBox = new ComboBox<>(workOrderItems);
         workOrderComboBox.setPromptText(LanguageManager.getString("invoice.form.workorder.prompt"));
+
+        VBox workOrderBox = new VBox(workOrderComboBox);
+        workOrderBox.getStyleClass().add("form-field-container");
 
         TextField discountCodeField = new TextField();
         discountCodeField.setPromptText(LanguageManager.getString("invoice.form.discount.prompt"));
 
+        VBox discountBox = new VBox(discountCodeField);
+        discountBox.getStyleClass().add("form-field-container");
+
         Label errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: red;");
+        errorLabel.getStyleClass().add("error-label");
 
         Button createBtn = new Button(LanguageManager.getString("invoice.form.submit"));
+        createBtn.getStyleClass().add("confirm-btn");
+
         Button cancelBtn = new Button(LanguageManager.getString("invoice.form.cancel"));
+        cancelBtn.getStyleClass().add("cancel-btn");
 
         createBtn.setOnAction(e -> {
             errorLabel.setText("");
@@ -80,9 +91,16 @@ public class CreateInvoiceForm {
 
         cancelBtn.setOnAction(e -> popupStage.close());
 
-        HBox buttonBox = new HBox(10, createBtn, cancelBtn);
+        HBox buttonBox = new HBox(createBtn, cancelBtn);
+        buttonBox.getStyleClass().add("btn-container");
 
-        root.getChildren().addAll(title, workOrderComboBox, discountCodeField, buttonBox, errorLabel);
+        root.getChildren().addAll(
+                title,
+                workOrderBox,
+                discountBox,
+                buttonBox,
+                errorLabel
+        );
 
         return root;
     }
