@@ -4,6 +4,7 @@ import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -73,7 +74,7 @@ public class CreateBookingForm {
 
         if (vehicle == null) {
             //TODO dialog window with error message
-            return new ScrollPane(new Label("No vehicle found."));
+            return new ScrollPane(new Label(LanguageManager.getString("booking.error.noVehicle")));
         }
 
         Customer customer = vehicle.getCustomer();
@@ -83,7 +84,7 @@ public class CreateBookingForm {
 
         if (customer == null) {
             //TODO dialog window with error message
-            return new ScrollPane(new Label("No connected customer found."));
+            return new ScrollPane(new Label(LanguageManager.getString("booking.error.noCustomer")));
         }
 
         VBox layout = new VBox();
@@ -102,7 +103,7 @@ public class CreateBookingForm {
     }
 
     private Label createTitle() {
-        return new Label("Create booking");
+        return new Label(LanguageManager.getString("booking.form.title"));
     }
 
     private void showVehiclesOfCustomer(Customer customer) {
@@ -154,10 +155,10 @@ public class CreateBookingForm {
     // =========================================================
     private Node createBookingInformation() {
         Label descriptionLabel =
-                new Label("Describe the problem");
+                new Label(LanguageManager.getString("booking.form.description"));
 
         Label mechanicLabel =
-                new Label("Choose mechanic (optionally)");
+                new Label(LanguageManager.getString("booking.form.mechanicOptional"));
 
         descriptionField.setPrefRowCount(3);
 
@@ -182,7 +183,7 @@ public class CreateBookingForm {
 
         ComboBox<Mechanic> comboBox = new ComboBox<>(mechanics);
 
-        comboBox.setPromptText("Choose mechanic");
+        comboBox.setPromptText(LanguageManager.getString("booking.chooseMechanic"));
 
         return comboBox;
     }
@@ -192,10 +193,10 @@ public class CreateBookingForm {
     // =========================================================
     private HBox createActionButtons() {
         Button cancelButton =
-                new Button("Cancel booking");
+                new Button(LanguageManager.getString("booking.form.cancel"));
 
         Button createButton =
-                new Button("Create booking");
+                new Button(LanguageManager.getString("booking.form.submit"));
 
         createButton.disableProperty().bind(
                 selectedVehicle.isNull()

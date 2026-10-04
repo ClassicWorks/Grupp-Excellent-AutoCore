@@ -5,6 +5,7 @@ import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.BookingCard;
 import com.wac.autocore.view.components.BookingDetails;
 import com.wac.autocore.view.components.KanbanGridUtil;
@@ -54,7 +55,7 @@ public class ShowBookingsView {
 
                 Vehicle vehicle = booking.getVehicle();
                 if(vehicle == null){
-                    throw new NullPointerException("No vehicle found.");
+                    throw new NullPointerException(LanguageManager.getString("booking.error.noVehicle"));
                 }
 
                 Mechanic mechanic = booking.getMechanic();
@@ -77,7 +78,7 @@ public class ShowBookingsView {
                     //If anything is in right column, remove content
                     mainContent.getChildren().removeIf(node ->
                             GridPane.getColumnIndex(node) != null
-                    && GridPane.getColumnIndex(node) == 1);
+                                    && GridPane.getColumnIndex(node) == 1);
 
                     mainContent.add(
                             bookingDetails,
@@ -88,8 +89,8 @@ public class ShowBookingsView {
                 });
                 bookingsBox.getChildren().add(bookingCard);
             } catch (Exception e){
-                Label errorMessage = new Label(String.format("Booking faulty. booking ID: %d, error: %s",
-                    booking.getId(), e.getMessage()));
+                Label errorMessage = new Label(String.format(LanguageManager.getString("booking.error.faulty"),
+                        booking.getId(), e.getMessage()));
                 bookingsBox.getChildren().add(errorMessage);
             }
         }
@@ -109,9 +110,9 @@ public class ShowBookingsView {
 
     private Node getHeader(){
         BorderPane headerPane = new BorderPane();
-        Label title = new Label("Bookings");
+        Label title = new Label(LanguageManager.getString("bookings.title"));
         title.getStyleClass().setAll("page-title");
-        Button createBookingBtn = new Button("Create new booking");
+        Button createBookingBtn = new Button(LanguageManager.getString("bookings.create"));
         createBookingBtn.getStyleClass().addAll("create-btn");
         createBookingBtn.setOnAction(e -> ViewManager.getInstance().showCreateBooking());
         headerPane.setCenter(title);
