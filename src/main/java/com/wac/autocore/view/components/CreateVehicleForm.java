@@ -4,6 +4,7 @@ import com.wac.autocore.data.Database;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -48,6 +49,7 @@ public class CreateVehicleForm {
         ObservableList<Customer> customers = FXCollections.observableArrayList(Database.getCustomers());
         ComboBox<Customer> customerComboBox = new ComboBox<>(customers);
         customerComboBox.setPromptText(LanguageManager.getString("vehicle.form.customer.prompt"));
+        customerComboBox.setConverter(ComboBoxLabels.customer());
 
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
