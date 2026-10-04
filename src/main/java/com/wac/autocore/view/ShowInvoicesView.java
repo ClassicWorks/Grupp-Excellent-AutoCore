@@ -3,6 +3,7 @@ package com.wac.autocore.view;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.InvoiceCard;
 import com.wac.autocore.view.components.kanban.KanbanGridUtil;
 import javafx.scene.Node;
@@ -31,10 +32,10 @@ public class ShowInvoicesView {
         GridPane kanbanGrid = KanbanGridUtil.getKanbanGrid(2);
 
         VBox unpaidView =
-                KanbanGridUtil.getScrollableColumnWithTitle("Unpaid", getUnpaidList(), "unhandled");
+                KanbanGridUtil.getScrollableColumnWithTitle(LanguageManager.getString("invoices.unpaid", getUnpaidList(), "unhandled");
 
         VBox paidView =
-                KanbanGridUtil.getScrollableColumnWithTitle("Paid", getPaidList(), "completed");
+                KanbanGridUtil.getScrollableColumnWithTitle(LanguageManager.getString("invoices.paid"), getPaidList(), "completed");
 
         kanbanGrid.add(unpaidView, 0, 0);
         kanbanGrid.add(paidView, 1, 0);
@@ -53,7 +54,7 @@ public class ShowInvoicesView {
                 .collect(Collectors.toList());
 
         if (unpaidInvoices.isEmpty()) {
-            return new Label("No unpaid invoices found");
+            return new Label(LanguageManager.getString("invoices.empty.unpaid"));
         }
         return getInvoiceCardsFromList(unpaidInvoices);
     }
@@ -64,7 +65,7 @@ public class ShowInvoicesView {
                 .collect(Collectors.toList());
 
         if (paidInvoices.isEmpty()) {
-            return new Label("No paid invoices found");
+            return new Label(LanguageManager.getString("invoices.empty.paid"));
         }
         return getInvoiceCardsFromList(paidInvoices);
     }
@@ -79,8 +80,8 @@ public class ShowInvoicesView {
 
     private BorderPane getHeader() {
         BorderPane header = new BorderPane();
-        Label title = new Label("Invoices");
-        Button createInvoiceBtn = new Button("Create invoice");
+        Label title = new Label(LanguageManager.getString("invoices.title"));
+        Button createInvoiceBtn = new Button(LanguageManager.getString("invoices.create"));
         header.setCenter(title);
         header.setRight(createInvoiceBtn);
         createInvoiceBtn.setOnAction(e -> ViewManager.getInstance().showCreateInvoicePopup());

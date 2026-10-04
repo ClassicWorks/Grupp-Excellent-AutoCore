@@ -3,6 +3,7 @@ package com.wac.autocore.view;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.CustomerCard;
 import com.wac.autocore.view.components.CustomerDetails;
 import com.wac.autocore.view.components.kanban.KanbanGridUtil;
@@ -63,9 +64,9 @@ public class ShowCustomersView {
 
     private Node getHeader(){
         BorderPane headerPane = new BorderPane();
-        Label title = new Label("Customers");
+        Label title = new Label(LanguageManager.getString("customers.title"));
         title.getStyleClass().setAll("page-title");
-        Button createCustomerBtn = new Button("Create new customer");
+        Button createCustomerBtn = new Button(LanguageManager.getString("customers.create"));
         createCustomerBtn.getStyleClass().addAll("create-btn");
         createCustomerBtn.setOnAction(e -> ViewManager.getInstance().showCreateCustomerPopup());
         headerPane.setCenter(title);

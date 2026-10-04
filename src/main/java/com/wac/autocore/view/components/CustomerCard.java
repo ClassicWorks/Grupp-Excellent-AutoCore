@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Customer;
+import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -16,7 +17,7 @@ public class CustomerCard extends HBox {
         VBox customerInfoBox = new VBox(nameLabel, contactLabel);
 
         if (customer.isVip()) {
-            Label vipLabel = new Label("VIP");
+            Label vipLabel = new Label(LanguageManager.getString("customer.vip"));
             customerInfoBox.getChildren().add(vipLabel);
         }
 

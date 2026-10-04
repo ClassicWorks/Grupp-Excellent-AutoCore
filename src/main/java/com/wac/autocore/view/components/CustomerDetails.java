@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Customer;
+import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -20,22 +21,24 @@ public class CustomerDetails extends BorderPane {
     public CustomerDetails(Customer customer) {
         this.customer = customer;
 
-        Label idLabel = new Label(String.format("Customer ID: %d", customer.getId()));
+        Label idLabel = new Label(String.format(LanguageManager.getString("customer.id"), customer.getId()));
 
         nameField.setText(customer.getName());
         phoneField.setText(customer.getPhone());
         emailField.setText(customer.getEmail());
 
-        Label vipLabel = new Label(customer.isVip() ? "VIP: Yes" : "VIP: No");
+        Label vipLabel = new Label(customer.isVip()
+                ? LanguageManager.getString("customer.vip.yes")
+                : LanguageManager.getString("customer.vip.no"));
 
         errorLabel.setStyle("-fx-text-fill: red;");
 
         VBox fields = new VBox(10,
-                new Label("Name"),
+                new Label(LanguageManager.getString("customer.name")),
                 nameField,
-                new Label("Phone"),
+                new Label(LanguageManager.getString("customer.phone")),
                 phoneField,
-                new Label("Email"),
+                new Label(LanguageManager.getString("customer.email")),
                 emailField,
                 vipLabel,
                 errorLabel
@@ -49,7 +52,7 @@ public class CustomerDetails extends BorderPane {
     }
 
     private Button createSaveBtn() {
-        Button saveBtn = new Button("Save changes");
+        Button saveBtn = new Button(LanguageManager.getString("customer.save"));
 
         saveBtn.disableProperty().bind(nameField.textProperty().isEmpty());
 
@@ -57,7 +60,7 @@ public class CustomerDetails extends BorderPane {
             errorLabel.setText("");
 
             if (nameField.getText().trim().isEmpty()) {
-                errorLabel.setText("Name cannot be empty.");
+                errorLabel.setText(LanguageManager.getString("customer.error.nameEmpty"));
                 return;
             }
 

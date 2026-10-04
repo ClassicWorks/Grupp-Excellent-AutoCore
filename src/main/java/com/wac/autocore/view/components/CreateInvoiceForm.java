@@ -3,6 +3,7 @@ package com.wac.autocore.view.components;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.WorkOrder;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -31,7 +32,7 @@ public class CreateInvoiceForm {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20));
 
-        Label title = new Label("Create invoice");
+        Label title = new Label(LanguageManager.getString("invoice.form.title"));
 
         List<Integer> invoicedWorkOrderIds = garageSystem.getInvoices().stream()
                 .map(invoice -> invoice.getWorkOrder().getId())
@@ -44,16 +45,16 @@ public class CreateInvoiceForm {
 
         ObservableList<WorkOrder> workOrderItems = FXCollections.observableArrayList(availableWorkOrders);
         ComboBox<WorkOrder> workOrderComboBox = new ComboBox<>(workOrderItems);
-        workOrderComboBox.setPromptText("Choose work order");
+        workOrderComboBox.setPromptText(LanguageManager.getString("invoice.form.workorder.prompt"));
 
         TextField discountCodeField = new TextField();
-        discountCodeField.setPromptText("Discount code (optional)");
+        discountCodeField.setPromptText(LanguageManager.getString("invoice.form.discount.prompt"));
 
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
 
-        Button createBtn = new Button("Create invoice");
-        Button cancelBtn = new Button("Cancel");
+        Button createBtn = new Button(LanguageManager.getString("invoice.form.submit"));
+        Button cancelBtn = new Button(LanguageManager.getString("invoice.form.cancel"));
 
         createBtn.setOnAction(e -> {
             errorLabel.setText("");
@@ -61,7 +62,7 @@ public class CreateInvoiceForm {
             WorkOrder selectedWorkOrder = workOrderComboBox.getValue();
 
             if (selectedWorkOrder == null) {
-                errorLabel.setText("You must select a work order.");
+                errorLabel.setText(LanguageManager.getString("invoice.form.error.noWorkOrder"));
                 return;
             }
 
@@ -70,7 +71,7 @@ public class CreateInvoiceForm {
             Invoice invoice = garageSystem.createInvoice(selectedWorkOrder.getId(), discountCode);
 
             if (invoice == null) {
-                errorLabel.setText("Could not create invoice.");
+                errorLabel.setText(LanguageManager.getString("invoice.form.error.failed"));
                 return;
             }
 

@@ -3,6 +3,7 @@ package com.wac.autocore.view;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Payment;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.PaymentCard;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -35,8 +36,8 @@ public class ShowPaymentsView {
 
     private Node getHeader() {
         BorderPane header = new BorderPane();
-        Label title = new Label("Payments");
-        Button processPaymentBtn = new Button("Process payment");
+        Label title = new Label(LanguageManager.getString("payments.title"));
+        Button processPaymentBtn = new Button(LanguageManager.getString("payments.create"));
         header.setCenter(title);
         header.setRight(processPaymentBtn);
         processPaymentBtn.setOnAction(e -> ViewManager.getInstance().showProcessPaymentPopup());

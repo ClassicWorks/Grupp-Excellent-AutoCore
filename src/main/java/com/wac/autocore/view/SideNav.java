@@ -1,6 +1,8 @@
 package com.wac.autocore.view;
 
 import com.wac.autocore.manager.ViewManager;
+import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.view.components.IconImageView;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -10,14 +12,14 @@ import javafx.scene.layout.VBox;
 
 public class SideNav {
     /*customer
-    * Vehicles
-    * Bookings
-    * Mechanics
-    * Services
-    * work orders
-    * invoices
-    * Payments
-    * Exit*/
+     * Vehicles
+     * Bookings
+     * Mechanics
+     * Services
+     * work orders
+     * invoices
+     * Payments
+     * Exit*/
 
 
     private VBox navBox;
@@ -38,15 +40,16 @@ public class SideNav {
         logoBox.getStyleClass().add("logo-container");
 
         //Create all nav buttons
-        Button customerBtn = new Button("Kunder");
-        Button vehicleBtn = new Button("Fordon");
-        Button bookingBtn = new Button("Bokningar");
-        Button mechanicsBtn = new Button("Mekaniker");
-        Button serviceBtn = new Button("Service");
-        Button workOrderBtn = new Button("Ordrar");
-        Button invoiceBtn = new Button("Fakturor");
-        Button paymentBtn = new Button("Betalningar");
-        Button exitBtn = new Button("Avsluta");
+        Button customerBtn = new Button(LanguageManager.getString("nav.customers"));
+        Button vehicleBtn = new Button(LanguageManager.getString("nav.vehicles"));
+        Button bookingBtn = new Button(LanguageManager.getString("nav.bookings"));
+        Button mechanicsBtn = new Button(LanguageManager.getString("nav.mechanics"));
+        Button serviceBtn = new Button(LanguageManager.getString("nav.services"));
+        Button workOrderBtn = new Button(LanguageManager.getString("nav.workorders"));
+        Button invoiceBtn = new Button(LanguageManager.getString("nav.invoices"));
+        Button paymentBtn = new Button(LanguageManager.getString("nav.payments"));
+        Button exitBtn = new Button(LanguageManager.getString("nav.exit"));
+        Button languageBtn = new Button(LanguageManager.getCurrentLanguage().equals("sv") ? "English" : "Svenska");
 
         customerBtn.getStyleClass().addAll("menu-btn", "customer");
         vehicleBtn.getStyleClass().addAll("menu-btn", "vehicle");
@@ -57,6 +60,7 @@ public class SideNav {
         invoiceBtn.getStyleClass().addAll("menu-btn", "invoice");
         paymentBtn.getStyleClass().addAll("menu-btn", "payment");
         exitBtn.getStyleClass().addAll("menu-btn", "exit-btn");
+        languageBtn.getStyleClass().addAll("menu-btn", "language");
 
 
         customerBtn.setOnAction(e -> {
@@ -103,6 +107,12 @@ public class SideNav {
             ViewManager.getInstance().exit();
         });
 
+        languageBtn.setOnAction(e -> {
+            LanguageManager.toggleLanguage();
+            ViewManager.getInstance().refreshSideNav();
+            ViewManager.getInstance().refreshCurrentView();
+        });
+
         //Place all buttons in navPane
         navBox = new VBox(
                 customerBtn,
@@ -112,7 +122,8 @@ public class SideNav {
                 serviceBtn,
                 workOrderBtn,
                 invoiceBtn,
-                paymentBtn);
+                paymentBtn,
+                languageBtn);
 
         VBox exitBox = new VBox(exitBtn);
 
