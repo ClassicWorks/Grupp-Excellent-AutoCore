@@ -39,6 +39,8 @@ public class VehicleDetails extends BorderPane {
         getCustomerSection();
         customerSection.getStyleClass().add("form-field-container");
 
+        errorLabel.getStyleClass().add("error-label");
+
         VBox mainContent = new VBox(
                 createVehicleEditForm(),
                 customerSection,
