@@ -381,3 +381,27 @@ DatePicker:focused {
 CheckBox {
     -fx-text-fill: -fx-dark-ink;
 }
+
+/*-------------
+     Alerts
+---------------*/
+
+.app-dialog {
+    -fx-background-color: -fx-surface-background-color;
+}
+
+.app-dialog .header-panel {
+    -fx-background-color: -fx-primary-color;
+    -fx-padding: 12px;
+}
+
+.app-dialog .header-panel .label {
+    -fx-text-fill: -fx-light-ink;
+    -fx-font-family: "Space Grotesk", sans-serif;
+    -fx-font-weight: 700;
+    -fx-font-size: 20px;
+}
+
+.app-dialog .content {
+    -fx-padding: 16px;
+}
