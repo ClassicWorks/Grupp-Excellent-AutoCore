@@ -62,6 +62,8 @@ public class ShowServiceItemsView {
             serviceItemsBox.getChildren().add(errorLabel);
         }
 
+        serviceItemsBox.getChildren().clear();
+
         for (ServiceItem serviceItem : serviceItems) {
             ServiceItemCard card = new ServiceItemCard(serviceItem, s ->
                     detailPanel.getChildren().setAll(
