@@ -7,6 +7,7 @@ import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.view.components.AppDialog;
 import com.wac.autocore.view.components.BookingCard;
 import com.wac.autocore.view.components.BookingDetails;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
@@ -131,6 +132,12 @@ public class ShowBookingsView {
     }
 
     private Booking saveBooking(Booking updatedBooking){
+        AppDialog.showInformation(
+                LanguageManager.getString("dialog.booking.title"),
+                LanguageManager.getString("dialog.booking.title"),
+                LanguageManager.getString("dialog.booking.header")
+        );
+
         System.out.printf("Should call ViewManager.getInstance.saveBooking(%d, %s)\n", updatedBooking.getId(), updatedBooking);
         //garageSystem.updateBooking(updatedBooking.getId(), updatedBooking);
         return updatedBooking;
