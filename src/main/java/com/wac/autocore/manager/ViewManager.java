@@ -136,7 +136,7 @@ public class ViewManager {
         Stage popup = new Stage();
         Parent content = new CreateWorkOrderForm(popup).show(bookingId);
 
-        showPopup(popup, LanguageManager.getString("workorder.form.title"), content, this::showWorkOrders);
+        showPopup(popup, LanguageManager.getString("workorder.form.title"), content, null);
     }
 
     public void showEditWorkOrderItemsPopUp(int workOrderId) {
