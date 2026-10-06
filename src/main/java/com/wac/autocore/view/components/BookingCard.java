@@ -27,8 +27,8 @@ public class BookingCard extends VBox {
         HBox vehicleBox = new HBox(vehicleIcon, vehicleInfoBox);
 
         //Info about mechanic
-        Hyperlink mechanicLink = new MechanicHyperLink(mechanic);
-        mechanicLink.getStyleClass().add("card-info-box");
+        /*Hyperlink mechanicLink = new MechanicHyperLink(mechanic);
+        mechanicLink.getStyleClass().add("card-info-box");*/
 
         //Actionable buttons
         Button createWorkOrderBtn = getCreateWorkOrderBtn(booking);
@@ -42,7 +42,7 @@ public class BookingCard extends VBox {
 
         this.getChildren().add(dateBox);
         this.getChildren().add(vehicleBox);
-        this.getChildren().add(mechanicLink);
+        //this.getChildren().add(mechanicLink);
         this.getChildren().add(buttonBox);
         this.getChildren().addAll(bookingCard);
     }
