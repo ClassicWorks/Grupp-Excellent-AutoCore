@@ -64,7 +64,7 @@ public class CreateBookingForm {
                 createTitle(),
                 vehicleResults,
                 getDescriptionBox(),
-                getMechanicBox(),
+                //getMechanicBox(),
                 actionButtons
         );
 

@@ -63,12 +63,12 @@ public class BookingDetails extends BorderPane {
         VehicleCard vehicleBox = new VehicleCard(vehicle, vehicleOwner);
 
         //Mechanics form
-        mechanicComboBox = createMechanicComboBox();
+        /*mechanicComboBox = createMechanicComboBox();
         Label mechanicLabel = new Label(LanguageManager.getString("booking.mechanic"));
         mechanicLabel.getStyleClass().add("form-field-label");
 
         VBox mechanicBox = new VBox(mechanicLabel, mechanicComboBox);
-        mechanicBox.getStyleClass().add("form-field-container");
+        mechanicBox.getStyleClass().add("form-field-container");*/
 
         //Description form
         descriptionField = new TextArea(description);
@@ -94,7 +94,10 @@ public class BookingDetails extends BorderPane {
 
         BorderPane actionableButtons = new BorderPane(null, null, confirmingButtons, null, destructiveButtons);
 
-        VBox detailsBox = new VBox(vehicleBox, mechanicBox, descriptionBox);
+        VBox detailsBox = new VBox(
+                vehicleBox,
+                //mechanicBox,
+                descriptionBox);
         detailsBox.getStyleClass().add("details-container");
 
         this.setTop(topBox);
@@ -134,7 +137,7 @@ public class BookingDetails extends BorderPane {
         //TODO check if everything is added
         //TODO savefunction
         saveBtn.setOnAction(e ->{
-            currentMechanic = mechanicComboBox.getValue();
+            //currentMechanic = mechanicComboBox.getValue();
             description = descriptionField.getText();
             Booking newBooking = new Booking(vehicle, booking.getDate(), description);
             //newBooking.setMechanic(currentMechanic.getId());
