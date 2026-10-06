@@ -14,7 +14,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -45,7 +44,6 @@ public class CreateBookingForm {
      */
     public Parent show() {
         VBox layout = new VBox();
-        Label title = createTitle();
 
         CustomerSelection customerSelection = new CustomerSelection(
                 garageSystem.getCustomers(),
@@ -64,7 +62,6 @@ public class CreateBookingForm {
                 createTitle(),
                 vehicleResults,
                 getDescriptionBox(),
-                //getMechanicBox(),
                 actionButtons
         );
 
@@ -199,6 +196,7 @@ public class CreateBookingForm {
         return descriptionBox;
     }
 
+    //Behåller då den kan användas för
     private ComboBox<Mechanic> createMechanicComboBox() {
         ObservableList<Mechanic> mechanics =
                 FXCollections.observableArrayList(garageSystem.getAvailableMechanics());

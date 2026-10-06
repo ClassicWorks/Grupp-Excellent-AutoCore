@@ -57,7 +57,7 @@ public class VehicleDetails extends BorderPane {
         HBox destructiveButtons = new HBox(createDeleteBtn());
         destructiveButtons.getStyleClass().add("btn-container");
 
-        BorderPane actionableButtons = new BorderPane(null, null, confirmingButtons, null, destructiveButtons);
+        BorderPane actionableButtons = new BorderPane(null, null, destructiveButtons, null, confirmingButtons);
 
         this.setCenter(mainContent);
         this.setBottom(actionableButtons);
