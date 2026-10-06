@@ -4,6 +4,7 @@ import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.ValueLabels;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -70,7 +71,7 @@ public class WorkOrderCard extends VBox {
                 Label error = new Label(String.format(LanguageManager.getString("workorder.serviceItems.itemMissing"), item.getId()));
                 itemGrid.add(error, 0, i);
             }else {
-                Label itemName = new Label(item.getServiceItem().getName());
+                Label itemName = new Label(ValueLabels.serviceName(item.getServiceItem().getName()));
 
                 totalTime += item.getServiceItem().getEstimatedMinutes();
                 IconImageView clockIcon = new IconImageView("imgs/clock-solid.png", 20, 20);

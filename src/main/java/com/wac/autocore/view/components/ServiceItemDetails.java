@@ -3,7 +3,7 @@ package com.wac.autocore.view.components;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
-import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.ValueLabels;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -25,14 +25,14 @@ public class ServiceItemDetails extends BorderPane {
         this.serviceItem = serviceItem;
         this.onSaved = onSaved;
 
-        Label nameLabel = new Label(serviceItem.getName());
+        Label nameLabel = new Label(ValueLabels.serviceName(serviceItem.getName()));
         nameLabel.getStyleClass().add("details-title");
         //TODO add styling and implement details-title
 
-        Label descriptionFieldLabel = new Label("Description");
+        Label descriptionFieldLabel = new Label(LanguageManager.getString("service.description"));
         descriptionFieldLabel.getStyleClass().add("form-field-label");
 
-        Label descriptionLabel = new Label(serviceItem.getDescription());
+        Label descriptionLabel = new Label(ValueLabels.serviceDescription(serviceItem.getName(), serviceItem.getDescription()));
         descriptionLabel.setWrapText(true);
 
         VBox descriptionBox = new VBox(

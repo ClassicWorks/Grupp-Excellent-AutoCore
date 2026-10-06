@@ -5,6 +5,7 @@ import com.wac.autocore.model.WorkOrder;
 import com.wac.autocore.model.WorkOrderItem;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.ValueLabels;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -67,7 +68,7 @@ public class InvoiceDetailsPopup {
 
         int row = 0;
         for (WorkOrderItem item : workOrder.getItems()) {
-            linesGrid.add(new Label(item.getServiceItem().getName()), 0, row);
+            linesGrid.add(new Label(ValueLabels.serviceName(item.getServiceItem().getName())), 0, row);
             linesGrid.add(new Label(formatAmount(item.getPriceAtOrder())), 1, row);
             row++;
         }

@@ -4,7 +4,7 @@ import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
-import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.ValueLabels;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Parent;
@@ -44,7 +44,7 @@ public class CreateWorkOrderForm {
             Label errorLabel = new Label(LanguageManager.getString("workorder.form.error.bookingNotFound"));
             errorLabel.getStyleClass().add("error-label");
 
-           root.getChildren().addAll(heading, errorLabel, cancelBtn);
+            root.getChildren().addAll(heading, errorLabel, cancelBtn);
             return root;
         }
 
@@ -73,7 +73,7 @@ public class CreateWorkOrderForm {
         VBox mechanicBox = new VBox(mechanicLabel, mechanicComboBox);
         mechanicBox.getStyleClass().add("form-field-container");
 
-        Label serviceItemLabel = new Label("Choose service items");
+        Label serviceItemLabel = new Label(LanguageManager.getString("workorder.form.chooseServiceItems"));
         serviceItemLabel.getStyleClass().add("form-field-label");
 
         VBox serviceItemsCheckBoxes = new VBox();
@@ -81,7 +81,7 @@ public class CreateWorkOrderForm {
 
         List<CheckBox> serviceCheckBoxes = new ArrayList<>();
         for(ServiceItem service : garageSystem.getServiceItems()){
-            CheckBox checkBox = new CheckBox(service.getName());
+            CheckBox checkBox = new CheckBox(ValueLabels.serviceName(service.getName()));
             checkBox.setUserData(service.getId());
             serviceCheckBoxes.add(checkBox);
             serviceItemsCheckBoxes.getChildren().add(checkBox);
