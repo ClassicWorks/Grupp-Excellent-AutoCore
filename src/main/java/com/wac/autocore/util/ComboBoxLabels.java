@@ -42,6 +42,10 @@ public class ComboBoxLabels {
         return converter(ComboBoxLabels::invoiceLabel);
     }
 
+    public static StringConverter<String> paymentType() {
+        return converter(ValueLabels::paymentType);
+    }
+
     private static String mechanicLabel(Mechanic mechanic) {
         String status = mechanic.isAvailable()
                 ? LanguageManager.getString("mechanic.status.available")
@@ -50,7 +54,7 @@ public class ComboBoxLabels {
         return String.format("%d - %s | %s | %s",
                 mechanic.getId(),
                 mechanic.getName(),
-                mechanic.getSpecialization(),
+                ValueLabels.specialization(mechanic.getSpecialization()),
                 status);
     }
 
@@ -86,7 +90,7 @@ public class ComboBoxLabels {
     }
 
     private static String serviceItemLabel(ServiceItem serviceItem) {
-        return String.format("%s | %.0f kr", serviceItem.getName(), serviceItem.getPrice());
+        return String.format("%s | %.0f kr", ValueLabels.serviceName(serviceItem.getName()), serviceItem.getPrice());
     }
 
     public static StringConverter<ServiceItem> serviceItem() {

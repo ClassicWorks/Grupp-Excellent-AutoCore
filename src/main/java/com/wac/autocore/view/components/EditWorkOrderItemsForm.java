@@ -6,6 +6,7 @@ import com.wac.autocore.model.WorkOrderItem;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.ValueLabels;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -94,7 +95,7 @@ public class EditWorkOrderItemsForm {
     }
 
     private Node createItemRow(WorkOrderItem item, boolean isLastItem) {
-        Label nameLabel = new Label(item.getServiceItem().getName());
+        Label nameLabel = new Label(ValueLabels.serviceName(item.getServiceItem().getName()));
         Label priceLabel = new Label(String.format("%.0f kr", item.getPriceAtOrder()));
 
         Button removeBtn = new Button(LanguageManager.getString("workorder.edit.remove"));

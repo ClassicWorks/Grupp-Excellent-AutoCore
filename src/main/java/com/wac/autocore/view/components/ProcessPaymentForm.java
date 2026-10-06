@@ -53,6 +53,7 @@ public class ProcessPaymentForm {
 
         ComboBox<String> paymentTypeComboBox = new ComboBox<>(paymentTypes);
         paymentTypeComboBox.setPromptText(LanguageManager.getString("payment.form.type.prompt"));
+        paymentTypeComboBox.setConverter(ComboBoxLabels.paymentType());
 
         VBox paymentTypeBox = new VBox(paymentTypeComboBox);
         paymentTypeBox.getStyleClass().add("form-field-container");

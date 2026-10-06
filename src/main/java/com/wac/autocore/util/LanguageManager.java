@@ -30,6 +30,13 @@ public class LanguageManager {
         return key;
     }
 
+    public static String getStringOrDefault(String key, String fallback) {
+        if (bundle.containsKey(key)) {
+            return bundle.getString(key);
+        }
+        return fallback;
+    }
+
     public static void setLanguage(String languageCode) {
         currentLocale = new Locale(languageCode);
         bundle = loadBundle(currentLocale);

@@ -3,6 +3,7 @@ package com.wac.autocore.view.components;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
+import com.wac.autocore.util.ValueLabels;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
@@ -18,7 +19,7 @@ public class MechanicCard extends HBox {
         ImageView mechanicIcon = new IconImageView("/imgs/wrench-solid.png", 40, 40);
 
         Label nameLabel = new Label(mechanic.getName());
-        Label specializationlabel = new Label(mechanic.getSpecialization());
+        Label specializationlabel = new Label(ValueLabels.specialization(mechanic.getSpecialization()));
         Label availabilityLabel = new Label(mechanic.isAvailable()
                 ? LanguageManager.getString("mechanic.status.available")
                 : LanguageManager.getString("mechanic.status.busy"));
