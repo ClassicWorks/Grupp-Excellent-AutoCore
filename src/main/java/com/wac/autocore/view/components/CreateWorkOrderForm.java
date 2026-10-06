@@ -58,17 +58,13 @@ public class CreateWorkOrderForm {
             return root;
         }
 
-        Mechanic mechanic = booking.getMechanic();
-
-        VBox bookingCard = createBookingCard(booking, vehicle, mechanic);
+        BookingCard bookingCard = new BookingCard(booking, vehicle);
+        bookingCard.getStyleClass().add("compact");
 
         Label mechanicLabel = new Label(LanguageManager.getString("booking.chooseMechanic"));
         mechanicLabel.getStyleClass().add("form-field-label");
 
         ComboBox<Mechanic> mechanicComboBox = createMechanicComboBox();
-        if(mechanic != null){
-            mechanicComboBox.setValue(mechanic);
-        }
 
         VBox mechanicBox = new VBox(mechanicLabel, mechanicComboBox);
         mechanicBox.getStyleClass().add("form-field-container");
@@ -97,20 +93,29 @@ public class CreateWorkOrderForm {
         actionableBtns.getStyleClass().add("btn-container");
 
         submitBtn.setOnAction(e -> {
-                    Mechanic selectedMechanic = mechanicComboBox.getValue();
+                Mechanic selectedMechanic = mechanicComboBox.getValue();
 
-                    int[] selectedServiceItems = serviceCheckBoxes.stream()
-                            .filter(CheckBox::isSelected)
-                            .mapToInt(s -> (int) s.getUserData())
-                            .toArray();
+                int[] selectedServiceItems = serviceCheckBoxes.stream()
+                        .filter(CheckBox::isSelected)
+                        .mapToInt(s -> (int) s.getUserData())
+                        .toArray();
 
-                    WorkOrder createdWorkOrder = garageSystem.createWorkOrder(
-                            bookingId,
-                            selectedMechanic.getId(),
-                            selectedServiceItems);
-                    //TODO dialog box for confirmation
-                    popupStage.close();
-                }
+                WorkOrder createdWorkOrder = garageSystem.createWorkOrder(
+                        bookingId,
+                        selectedMechanic.getId(),
+                        selectedServiceItems);
+                //TODO dialog box if error occurs
+
+                popupStage.close();
+
+                AppDialog.showInformation(
+                        LanguageManager.getString("workorder.form.dialog.workorderCreated.title"),
+                        LanguageManager.getString("workorder.form.dialog.workorderCreated.header"),
+                        String.format(LanguageManager.getString("workorder.form.dialog.workorderCreated.message"),
+                            createdWorkOrder.getId())
+
+                );
+            }
         );
 
         root.getChildren().addAll(
@@ -124,37 +129,6 @@ public class CreateWorkOrderForm {
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
         return scrollPane;
-    }
-
-
-    //TODO move to BookingCard
-    private VBox createBookingCard(Booking booking, Vehicle vehicle, Mechanic mechanic){
-        //date
-        Label date = new Label(booking.getDate().toString());
-        VBox dateBox = new VBox(date);
-
-        //Info about booked vehicle
-        IconImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40, 40);
-
-        Label regNumberLabel = new Label(vehicle.getRegistrationNumber());
-        Label brandModelYearLabel = new Label(String.format("%s - %2s, %d",
-                vehicle.getBrand(), vehicle.getModel(), vehicle.getYear()));
-        VBox vehicleInfoBox = new VBox(regNumberLabel, brandModelYearLabel);
-
-        HBox vehicleBox = new HBox(vehicleIcon, vehicleInfoBox);
-
-        //Info about mechanic
-        Hyperlink mechanicLink = new MechanicHyperLink(mechanic);
-
-        VBox bookingCard = new VBox();
-        bookingCard.getStyleClass().addAll("card");
-
-        bookingCard.getChildren().addAll(
-                dateBox,
-                vehicleBox,
-                mechanicLink
-        );
-        return bookingCard;
     }
 
     private ComboBox<Mechanic> createMechanicComboBox() {

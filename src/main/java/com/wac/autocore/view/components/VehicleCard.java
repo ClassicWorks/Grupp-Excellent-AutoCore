@@ -63,7 +63,7 @@ public class VehicleCard extends VBox{
 
     private static HBox actionableButtons(Consumer<Vehicle> onCreateBooking, Vehicle vehicle) {
         Button bookingBtn = new Button(LanguageManager.getString("vehicle.createBooking"));
-        bookingBtn.getStyleClass().addAll("confirm-btn");
+        bookingBtn.getStyleClass().addAll("confirm-btn",  "card-action-btn");
 
         bookingBtn.setOnAction(e -> onCreateBooking.accept(vehicle));
 

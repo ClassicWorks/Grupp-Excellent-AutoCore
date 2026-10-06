@@ -2,7 +2,6 @@ package com.wac.autocore.view;
 
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Booking;
-import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.StylingUtil;
@@ -63,13 +62,11 @@ public class ShowBookingsView {
                     throw new NullPointerException(LanguageManager.getString("booking.error.noVehicle"));
                 }
 
-                Mechanic mechanic = booking.getMechanic();
-
-                //TODO Include consumer in constructor
                 BookingCard bookingCard = new BookingCard(
                         booking,
                         vehicle,
-                        mechanic);
+                        b -> ViewManager.getInstance().showCreateWorkOrderPopup(booking.getId())
+                );
                 bookingCard.getStyleClass().add("clickable");
 
                 bookingCard.setOnMouseClicked(e -> {
@@ -80,7 +77,6 @@ public class ShowBookingsView {
                     //Add bookingDetails
                     BookingDetails bookingDetails = new BookingDetails(
                             booking,
-                            garageSystem.getAvailableMechanics(),
                             this::saveBooking,
                             this::deleteBooking
                     );

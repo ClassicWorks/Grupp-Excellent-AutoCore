@@ -14,10 +14,6 @@ public class Booking {
     @ManyToOne
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
-    @ManyToOne
-    @JoinColumn(name = "mechanic_id")
-    // Optional; 0 means no mechanic has been assigned.
-    private Mechanic mechanic;
 
     @Column(name = "date")
     private LocalDate date;
@@ -60,14 +56,6 @@ public class Booking {
 
     public void setVehicle(Vehicle vehicle) {
         this.vehicle = vehicle;
-    }
-
-    public Mechanic getMechanic() {
-        return mechanic;
-    }
-
-    public void setMechanic(Mechanic mechanic) {
-        this.mechanic = mechanic;
     }
 
     public LocalDate getDate() {
