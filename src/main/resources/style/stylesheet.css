@@ -15,7 +15,7 @@
     -fx-primary-hover-color: #2F4A2C;
 
     -fx-dark-ink:#2B2A22;
-    -fx-muted-ink: #6E6B5C;
+    -fx-muted-ink: #575449;
     -fx-light-ink: #e6e6e6;
     -fx-error-ink: #A6432E;
 
@@ -81,7 +81,7 @@ HyperLink{
 .form-field-label{
     -fx-font-family: "IBM Plex Mono", monospace;
     -fx-font-weight: 500;
-    color: -fx-muted-ink;
+    -fx-text-fill: -fx-muted-ink;
 }
 
 .error-label{
