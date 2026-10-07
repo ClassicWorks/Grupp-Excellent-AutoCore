@@ -19,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 public class CreateBookingForm {
     private final GarageSystem garageSystem;
@@ -34,9 +35,9 @@ public class CreateBookingForm {
     private ComboBox<Mechanic> mechanicComboBox;
 
 
-    public CreateBookingForm(Stage popupStage) {
+    public CreateBookingForm(Stage popupStage, GarageSystem garageSystem) {
         this.popupStage = popupStage;
-        this.garageSystem = new GarageSystem();
+        this.garageSystem = garageSystem;
     }
 
     /**
@@ -50,17 +51,19 @@ public class CreateBookingForm {
                 this::showVehiclesOfCustomer);
         customerSelection.getStyleClass().addAll("form-field-container");
 
+        Label selectVehicleLabel = new Label(LanguageManager.getString("booking.form.selectVehicle"));
+        selectVehicleLabel.getStyleClass().add("form-field-label");
         vehicleResults.getStyleClass().addAll("card-container", "compact");
+        VBox selectVehicleBox = new VBox(selectVehicleLabel, vehicleResults);
+        selectVehicleBox.getStyleClass().add("form-field-container");
 
         HBox actionButtons = createActionButtons();
         actionButtons.getStyleClass().add("btn-container");
 
-        layout.getChildren().add(
-                customerSelection
-        );
         layout.getChildren().addAll(
                 createTitle(),
-                vehicleResults,
+                customerSelection,
+                selectVehicleBox,
                 getDescriptionBox(),
                 actionButtons
         );
@@ -78,22 +81,26 @@ public class CreateBookingForm {
      * Vehicle is already chosen
      */
     public Parent show(int vehicleId) {
-        Vehicle vehicle = garageSystem.getVehicle(vehicleId).orElse(null);
+        Optional<Vehicle> optionalVehicle = garageSystem.getVehicle(vehicleId);
 
-        if (vehicle == null) {
-            //TODO dialog window with error message
-            Label errorLabel = new Label(LanguageManager.getString("booking.error.noVehicle"));
-            errorLabel.getStyleClass().add("error-label");
-            return new ScrollPane(errorLabel);
+        if (!optionalVehicle.isPresent()) {
+            AppDialog.showError(String.format(LanguageManager.getString("booking.error.noVehicle"),vehicleId),
+                    String.format(LanguageManager.getString("booking.error.noVehicle"),vehicleId),
+                    String.format(LanguageManager.getString("booking.error.noVehicle"),vehicleId));
+
+            popupStage.close();
+            return null;
         }
+        Vehicle vehicle = optionalVehicle.get();
 
         Customer customer = vehicle.getCustomer();
 
         if (customer == null) {
-            //TODO dialog window with error message
-            Label errorLabel = new Label(LanguageManager.getString("booking.error.noCustomer"));
-            errorLabel.getStyleClass().add("error-label");
-            return new ScrollPane(errorLabel);
+            AppDialog.showError(LanguageManager.getString("booking.error.noCustomer"),
+                    LanguageManager.getString("booking.error.noCustomer"),
+                    LanguageManager.getString("booking.error.noCustomer"));
+            popupStage.close();
+            return null;
         }
 
         VehicleCard vehicleCard = new VehicleCard(vehicle, customer);

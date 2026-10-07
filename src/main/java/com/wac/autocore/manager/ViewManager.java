@@ -1,5 +1,6 @@
 package com.wac.autocore.manager;
 
+import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.*;
 import com.wac.autocore.view.components.*;
@@ -17,8 +18,10 @@ public class ViewManager {
     private Stage primaryStage;
     private BorderPane rootLayout;
     private Runnable currentViewRefresher;
+    private final GarageSystem garageSystem;
 
     private ViewManager() {
+        garageSystem = new GarageSystem();
     }
 
     public static synchronized ViewManager getInstance() {
@@ -123,13 +126,13 @@ public class ViewManager {
 
     public void showCreateBooking() {
         Stage popup = new Stage();
-        Parent content = new CreateBookingForm(popup).show();
+        Parent content = new CreateBookingForm(popup, garageSystem).show();
         showPopup(popup, LanguageManager.getString("bookings.create"), content, this::showBookings);
     }
 
     public void showCreateBooking(int vehicleId) {
         Stage popup = new Stage();
-        Parent content = new CreateBookingForm(popup).show(vehicleId);
+        Parent content = new CreateBookingForm(popup, garageSystem).show(vehicleId);
         showPopup(popup, LanguageManager.getString("bookings.create"), content, null);
     }
     public void showCreateWorkOrderPopup(int bookingId) {

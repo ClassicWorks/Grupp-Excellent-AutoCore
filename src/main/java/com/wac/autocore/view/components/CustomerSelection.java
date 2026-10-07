@@ -31,7 +31,8 @@ public class CustomerSelection extends VBox {
     private void createCustomerSelection() {
         Label label = new Label(LanguageManager.getString("customer.select.choose"));
         label.getStyleClass().add("form-field-label");
-        TextField searchField = new TextField();
+        TextField searchField = new TextField("");
+        searchField.setPromptText(LanguageManager.getString("customer.select.search"));
 
         selectedCustomer.setStyle(selectedCustomer.getStyle() + " -fx-font-weight: 700;");
 

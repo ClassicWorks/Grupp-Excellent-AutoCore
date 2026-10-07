@@ -9,7 +9,8 @@ import javafx.scene.layout.VBox;
 public class CustomerCard extends VBox {
 
     public CustomerCard(Customer customer) {
-        IconImageView customerIcon = new IconImageView("/imgs/user-solid.png", 40, 40);
+        ImageViewWithAltText customerIcon = new ImageViewWithAltText("/imgs/user-solid.png", 40, 40,
+                LanguageManager.getString("image.user-solid"));
 
         Label nameLabel = new Label(customer.getName());
         Label contactLabel = new Label(String.format("%s | %s", customer.getPhone(), customer.getEmail()));

@@ -73,7 +73,8 @@ public class VehicleCard extends VBox{
     }
 
     private static HBox createVehicleBox(Vehicle vehicle) {
-        ImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40, 40);
+        ImageViewWithAltText vehicleIcon = new ImageViewWithAltText("/imgs/car-solid.png", 40, 40,
+                LanguageManager.getString("image.car-solid"));
 
         Label regNumberLabel = new Label(vehicle.getRegistrationNumber());
         Label brandModelYearLabel = new Label(String.format("%s - %s, %d",

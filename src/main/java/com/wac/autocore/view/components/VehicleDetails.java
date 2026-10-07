@@ -64,8 +64,9 @@ public class VehicleDetails extends BorderPane {
     }
 
     private void getCustomerSection() {
-        IconImageView customerIcon = new IconImageView(
-                "/imgs/user-solid.png", 20, 20
+        ImageViewWithAltText customerIcon = new ImageViewWithAltText(
+                "/imgs/user-solid.png", 20, 20,
+                LanguageManager.getString("image.user-solid")
         );
 
         Label customerLabel = new Label(LanguageManager.getString("vehicle.owner"));
@@ -75,8 +76,9 @@ public class VehicleDetails extends BorderPane {
         notificationLabel.getStyleClass().add("error-label");
         VBox customerText = new VBox(customerName, customerInfo, notificationLabel);
 
-        IconImageView editIcon = new IconImageView(
-                "/imgs/pen-to-square-solid.png", 20, 20
+        ImageViewWithAltText editIcon = new ImageViewWithAltText(
+                "/imgs/pen-to-square-solid.png", 20, 20,
+                LanguageManager.getString("image.pen-to-square-solid")
         );
 
         Button editCustomerBtn = new Button(LanguageManager.getString("vehicle.editCustomer"), editIcon);
@@ -131,8 +133,9 @@ public class VehicleDetails extends BorderPane {
     }
 
     private HBox createVehicleEditForm() {
-        IconImageView vehicleIcon =
-                new IconImageView("/imgs/car-solid.png", 40, 40);
+        ImageViewWithAltText vehicleIcon =
+                new ImageViewWithAltText("/imgs/car-solid.png", 40, 40,
+                        LanguageManager.getString("image.car-solid"));
 
         vehicleIdLabel.setText(String.format(LanguageManager.getString("vehicle.id"), vehicle.getId()));
         vehicleIdLabel.getStyleClass().add("details-id");
