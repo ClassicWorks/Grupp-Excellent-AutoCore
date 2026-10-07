@@ -8,7 +8,6 @@ import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
 import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -41,11 +40,12 @@ public class EditWorkOrderItemsForm {
     }
 
     public Parent show() {
-        content.setPadding(new Insets(20));
+        content.getStyleClass().add("form-container");
         refresh();
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
         return scrollPane;
     }
 
@@ -65,7 +65,7 @@ public class EditWorkOrderItemsForm {
 
         Label title = new Label(String.format(
                 LanguageManager.getString("workorder.edit.title"), workOrder.getId()));
-        title.getStyleClass().add("form-heading");
+        title.getStyleClass().add("form-title");
         content.getChildren().add(title);
 
         if (!workOrder.getStatus().equals("CREATED")) {
@@ -75,13 +75,20 @@ public class EditWorkOrderItemsForm {
             return;
         }
 
-        content.getChildren().add(new Label(LanguageManager.getString("workorder.edit.currentServices")));
+        //Show all the current service items
+        Label currentServicesLabel = new Label(LanguageManager.getString("workorder.edit.currentServices"));
+        currentServicesLabel.getStyleClass().add("form-field-label");
+
+        VBox currentServiceBox = new VBox(currentServicesLabel);
+        currentServiceBox.getStyleClass().add("form-field-container");
 
         boolean isLastItem = workOrder.getItems().size() <= 1;
         for (WorkOrderItem item : workOrder.getItems()) {
-            content.getChildren().add(createItemRow(item, isLastItem));
+            currentServiceBox.getChildren().add(createItemRow(item, isLastItem));
         }
+        content.getChildren().add(currentServiceBox);
 
+        //Show total price for WorkOrder
         double total = workOrder.getItems().stream()
                 .mapToDouble(WorkOrderItem::getPriceAtOrder)
                 .sum();
@@ -100,6 +107,7 @@ public class EditWorkOrderItemsForm {
 
         Button removeBtn = new Button(LanguageManager.getString("workorder.edit.remove"));
         removeBtn.setDisable(isLastItem);
+        removeBtn.getStyleClass().add("destroy-btn");
         removeBtn.setOnAction(e -> {
             WorkOrder updated = garageSystem.removeItemFromWorkOrder(workOrderId, item.getId());
             if (updated == null) {
@@ -125,6 +133,7 @@ public class EditWorkOrderItemsForm {
         serviceComboBox.setConverter(ComboBoxLabels.serviceItem());
 
         Button addBtn = new Button(LanguageManager.getString("workorder.edit.add"));
+        addBtn.getStyleClass().add("confirm-btn");
         addBtn.disableProperty().bind(serviceComboBox.valueProperty().isNull());
         addBtn.setOnAction(e -> {
             ServiceItem selected = serviceComboBox.getValue();
@@ -137,7 +146,12 @@ public class EditWorkOrderItemsForm {
         });
 
         Label addLabel = new Label(LanguageManager.getString("workorder.edit.addService"));
-        return new VBox(5, addLabel, new HBox(10, serviceComboBox, addBtn));
+        addLabel.getStyleClass().add("form-field-label");
+
+        HBox comboBoxContainer = new HBox(10, serviceComboBox, addBtn);
+        VBox container = new VBox(addLabel, comboBoxContainer);
+        container.getStyleClass().add("form-field-container");
+        return container;
     }
 
     private Button createCloseBtn() {
