@@ -19,6 +19,7 @@ public class GarageSystem {
     private final WorkOrderRepo workOrderRepo;
     private final InvoiceRepo invoiceRepo;
     private final PaymentRepo paymentRepo;
+    private final ServicePackRepo servicePackRepo;
 
     public GarageSystem() {
         vehicleRepo = new VehicleRepoImpl();
@@ -29,6 +30,7 @@ public class GarageSystem {
         workOrderRepo = new WorkOrderRepoImpl();
         invoiceRepo = new InvoiceRepoImpl();
         paymentRepo  = new PaymentRepoImpl();
+        servicePackRepo = new ServicePackRepoImpl();
     }
 
     public void showCustomers() {
@@ -169,6 +171,37 @@ public class GarageSystem {
         System.out.println("Price for " + savedServiceItem.getName() + " updated to " + newPrice + " SEK.");
 
         return savedServiceItem;
+    }
+
+    public void showServicePacks() {
+        System.out.println();
+        System.out.println("=== SERVICE PACKS ===");
+        if (servicePackRepo.getAll().isEmpty()) {
+            System.out.println("No services found.");
+            return;
+        }
+        for (ServicePack servicePack : servicePackRepo.getAll()) {
+            System.out.println(servicePack);
+        }
+    }
+
+    public ServicePack createServicePack(String name, int... serviceItemIds) throws IllegalArgumentException {
+        if(!servicePackRepo.nameAvailable(name)){
+            throw new IllegalArgumentException("Service pack with name \"" + name + "\" already exists.");
+        }
+        ServicePack servicePack = new ServicePack(name);
+
+        for(int serviceItemId : serviceItemIds) {
+            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
+            if(!optionalServiceItem.isPresent()) {
+                throw new  IllegalArgumentException("Service item with ID " + serviceItemId + " does not exist.");
+            }
+            ServiceItem serviceItem = optionalServiceItem.get();
+
+            servicePack.addServiceItem(serviceItem);
+        }
+
+        return servicePackRepo.save(servicePack);
     }
 
     public void showMechanics() {
@@ -406,19 +439,6 @@ public class GarageSystem {
         return savedBooking;
     }
 
-    @Deprecated
-    public Booking createBooking(int vehicleId,
-                                 LocalDate date,
-                                 String description,
-                                 int mechanicId) {
-        Booking booking = createBooking(vehicleId, date, description);
-        //TODO should not be use
-        /*if (booking != null) {
-
-            booking.setMechanic(mechanicId);
-        }*/
-        return booking;
-    }
 
     public WorkOrder createWorkOrder(int bookingId,
                                      int mechanicId,

@@ -23,5 +23,6 @@
         <mapping class="com.wac.autocore.model.Payment"/>
         <mapping class="com.wac.autocore.model.Invoice"/>
         <mapping class="com.wac.autocore.model.WorkOrderItem"/>
+        <mapping class="com.wac.autocore.model.ServicePack"/>
     </session-factory>
 </hibernate-configuration>
