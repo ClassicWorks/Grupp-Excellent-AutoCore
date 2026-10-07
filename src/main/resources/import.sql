@@ -41,25 +41,25 @@ INSERT INTO service_item (name, description, price, estimated_minutes) VALUES ('
 
 -- Bookings
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (1, '2026-09-01', 'Oil change and routine inspection', 'WORK_ORDER_CREATED');
+INSERT INTO bookings (vehicle_id, date, description, description_lang, description_translated, status) VALUES (1, '2026-09-01', 'Oil change and routine inspection', 'en', 'Oljebyte och rutinkontroll', 'WORK_ORDER_CREATED');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (2, '2026-09-02', 'Brake inspection and service', 'IN_PROGRESS');
+INSERT INTO bookings (vehicle_id, date, description, description_lang, description_translated, status) VALUES (2, '2026-09-02', 'Brake inspection and service', 'en', 'Bromskontroll och service', 'IN_PROGRESS');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (3, '2026-09-03', 'Electrical system diagnostics', 'COMPLETED');
+INSERT INTO bookings (vehicle_id, date, description, description_lang, description_translated, status) VALUES (3, '2026-09-03', 'Electrical system diagnostics', 'en', 'Diagnostik av elsystemet', 'COMPLETED');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (4, '2026-09-05', 'Engine performance inspection', 'BOOKED');
+INSERT INTO bookings (vehicle_id, date, description, description_lang, description_translated, status) VALUES (4, '2026-09-05', 'Engine performance inspection', 'en', 'Kontroll av motorns prestanda', 'BOOKED');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (5, '2026-09-06', 'Annual vehicle service', 'WORK_ORDER_CREATED');
+INSERT INTO bookings (vehicle_id, date, description, description_lang, description_translated, status) VALUES (5, '2026-09-06', 'Annual vehicle service', 'en', CONVERT(UNHEX('C385726C696720666F72646F6E7373657276696365') USING utf8mb4), 'WORK_ORDER_CREATED');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (6, '2026-09-07', 'Brake pads inspection', 'BOOKED');
+INSERT INTO bookings (vehicle_id, date, description, description_lang, description_translated, status) VALUES (6, '2026-09-07', 'Brake pads inspection', 'en', 'Kontroll av bromsklossar', 'BOOKED');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (7, '2026-09-08', 'Oil change and filter replacement', 'IN_PROGRESS');
+INSERT INTO bookings (vehicle_id, date, description, description_lang, description_translated, status) VALUES (7, '2026-09-08', 'Oil change and filter replacement', 'en', 'Oljebyte och filterbyte', 'IN_PROGRESS');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (8, '2026-09-09', 'Annual service and safety inspection', 'BOOKED');
+INSERT INTO bookings (vehicle_id, date, description, description_lang, description_translated, status) VALUES (8, '2026-09-09', 'Annual service and safety inspection', 'en', CONVERT(UNHEX('C385726C69672073657276696365206F63682073C3A46B6572686574736B6F6E74726F6C6C') USING utf8mb4), 'BOOKED');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (9, '2026-09-12', 'Diagnostic scan and fault investigation', 'COMPLETED');
+INSERT INTO bookings (vehicle_id, date, description, description_lang, description_translated, status) VALUES (9, '2026-09-12', 'Diagnostic scan and fault investigation', 'en', CONVERT(UNHEX('446961676E6F737469736B20736B616E6E696E67206F63682066656C73C3B66B6E696E67') USING utf8mb4), 'COMPLETED');
 
-INSERT INTO bookings (vehicle_id, date, description, status) VALUES (1, '2026-09-14', 'Follow-up vehicle inspection', 'BOOKED');
+INSERT INTO bookings (vehicle_id, date, description, description_lang, description_translated, status) VALUES (1, '2026-09-14', 'Follow-up vehicle inspection', 'en', CONVERT(UNHEX('55707066C3B66C6A616E646520666F72646F6E736B6F6E74726F6C6C') USING utf8mb4), 'BOOKED');
 
 -- Workorders
 -- WorkOrder 1: En tjänst, ännu inte påbörjad
