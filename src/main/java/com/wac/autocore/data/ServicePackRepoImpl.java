@@ -1,13 +1,10 @@
 package com.wac.autocore.data;
 
 import com.wac.autocore.model.ServicePack;
-import com.wac.autocore.model.ServicePack;
 import com.wac.autocore.util.HibernateUtil;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,7 +39,7 @@ public class ServicePackRepoImpl implements ServicePackRepo {
     }
 
     @Override
-    public Optional<ServicePack> getById(String id) {
+    public Optional<ServicePack> getById(int id) {
         try(Session s = HibernateUtil.getSessionFactory().openSession()) {
             return s.createQuery(
                             "from ServicePack sp where sp.id = :id" ,ServicePack.class)
@@ -62,7 +59,15 @@ public class ServicePackRepoImpl implements ServicePackRepo {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(int id) {
+        try(Session s = HibernateUtil.getSessionFactory().openSession()){
+            Transaction transaction = s.beginTransaction();
+            ServicePack sp = s.get(ServicePack.class, id);
+            if(sp != null){
+                s.delete(sp);
+            }
 
+            transaction.commit();
+        }
     }
 }

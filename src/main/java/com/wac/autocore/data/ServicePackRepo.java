@@ -9,8 +9,8 @@ public interface ServicePackRepo {
     ServicePack save(ServicePack sp);
     ServicePack update(ServicePack sp);
     List<ServicePack> getAll();
-    Optional<ServicePack> getById(String id);
+    Optional<ServicePack> getById(int id);
     boolean nameAvailable(String name);
-    void delete(String id);
+    void delete(int id);
 
 }

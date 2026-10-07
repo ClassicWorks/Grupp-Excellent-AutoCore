@@ -185,6 +185,39 @@ public class GarageSystem {
         }
     }
 
+    public List<ServicePack> getServicePacks() {
+        return servicePackRepo.getAll();
+    }
+
+    public Optional<ServicePack> getServicePack(int id){
+        return servicePackRepo.getById(id);
+    }
+
+    public ServicePack addServiceItemToPack(int servicePackId, int... serviceItemIds) {
+        Optional<ServicePack> optionalServicePack = getServicePack(servicePackId);
+        if(!optionalServicePack.isPresent()){
+            throw new IllegalArgumentException("Service pack with ID " + servicePackId + " does not exist.");
+        }
+        ServicePack servicePack = optionalServicePack.get();
+
+        for(int serviceItemId : serviceItemIds) {
+            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
+            if(!optionalServiceItem.isPresent()) {
+                throw new  IllegalArgumentException("Service item with ID " + serviceItemId + " does not exist.");
+            }
+            ServiceItem serviceItem = optionalServiceItem.get();
+
+            servicePack.addServiceItem(serviceItem);
+        }
+        return servicePackRepo.update(servicePack);
+    }
+
+    public void deleteServicePack(int id){
+        servicePackRepo.delete(id);
+    }
+
+
+
     public ServicePack createServicePack(String name, int... serviceItemIds) throws IllegalArgumentException {
         if(!servicePackRepo.nameAvailable(name)){
             throw new IllegalArgumentException("Service pack with name \"" + name + "\" already exists.");
