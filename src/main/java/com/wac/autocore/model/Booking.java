@@ -21,6 +21,12 @@ public class Booking {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "description_lang", length = 5)
+    private String descriptionLang;
+
+    @Column(name = "description_translated", length = 1000)
+    private String descriptionTranslated;
+
     @Column(name = "status", nullable = false, length = 30)
     private String status;
 
@@ -37,6 +43,13 @@ public class Booking {
         this.date = date;
         this.description = description;
         this.status = "BOOKED";
+    }
+
+    public Booking(Vehicle vehicle, LocalDate date, String description,
+                   String descriptionLang, String descriptionTranslated) {
+        this(vehicle, date, description);
+        this.descriptionLang = descriptionLang;
+        this.descriptionTranslated = descriptionTranslated;
     }
 
     protected Booking() {
@@ -72,6 +85,31 @@ public class Booking {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getDescriptionLang() {
+        return descriptionLang;
+    }
+
+    public void setDescriptionLang(String descriptionLang) {
+        this.descriptionLang = descriptionLang;
+    }
+
+    public String getDescriptionTranslated() {
+        return descriptionTranslated;
+    }
+
+    public void setDescriptionTranslated(String descriptionTranslated) {
+        this.descriptionTranslated = descriptionTranslated;
+    }
+
+    public String getDescriptionFor(String language) {
+        boolean hasTranslation = descriptionTranslated != null && !descriptionTranslated.trim().isEmpty();
+        boolean otherLanguage = descriptionLang != null && language != null && !descriptionLang.equals(language);
+        if (hasTranslation && otherLanguage) {
+            return descriptionTranslated;
+        }
+        return description;
     }
 
     public String getStatus() {

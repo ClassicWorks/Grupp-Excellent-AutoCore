@@ -11,6 +11,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -258,19 +259,39 @@ public class CreateBookingForm {
             return;
         }
 
-        Mechanic mechanic = mechanicComboBox.getValue();
+        int vehicleId = vehicle.getId();
+        String description = descriptionField.getText();
+        String language = LanguageManager.getCurrentLanguage();
 
-        int mechanicId = mechanic != null
-                ? mechanic.getId()
-                : 0;
+        Node root = popupStage.getScene() != null
+                ? popupStage.getScene().getRoot()
+                : null;
+        if (root != null) {
+            root.setDisable(true);
+        }
 
-        garageSystem.createBooking(
-                vehicle.getId(),
-                LocalDate.now(),
-                descriptionField.getText(),
-                mechanicId
-        );
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() {
+                garageSystem.createBookingWithTranslation(
+                        vehicleId,
+                        LocalDate.now(),
+                        description,
+                        language
+                );
+                return null;
+            }
+        };
 
-        popupStage.close();
+        task.setOnSucceeded(e -> popupStage.close());
+        task.setOnFailed(e -> {
+            if (root != null) {
+                root.setDisable(false);
+            }
+        });
+
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 }

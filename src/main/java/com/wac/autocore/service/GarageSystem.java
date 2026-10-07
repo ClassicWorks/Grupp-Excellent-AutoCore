@@ -2,6 +2,7 @@ package com.wac.autocore.service;
 
 import com.wac.autocore.data.*;
 import com.wac.autocore.model.*;
+import com.wac.autocore.util.TranslationService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -374,6 +375,37 @@ public class GarageSystem {
         return savedBooking;
     }
 
+    public Booking createBookingWithTranslation(int vehicleId,
+                                                LocalDate date,
+                                                String description,
+                                                String descriptionLang) {
+
+        Optional<Vehicle> optionalVehicle = getVehicle(vehicleId);
+
+        if (!optionalVehicle.isPresent()) {
+            System.out.println("Vehicle with ID " + vehicleId + " does not exist.");
+            return null;
+        }
+
+        String targetLang = "sv".equals(descriptionLang) ? "en" : "sv";
+        String translated = TranslationService.translate(description, descriptionLang, targetLang);
+
+        Booking booking = new Booking(
+                optionalVehicle.get(),
+                date,
+                description,
+                descriptionLang,
+                translated
+        );
+
+        Booking savedBooking = bookingRepo.save(booking);
+
+        System.out.println("Booking created successfully.");
+        System.out.println(savedBooking);
+
+        return savedBooking;
+    }
+
     @Deprecated
     public Booking createBooking(int vehicleId,
                                  LocalDate date,
@@ -579,7 +611,7 @@ public class GarageSystem {
         double amount = 0.0;
 
         for (WorkOrderItem item : workOrder.getItems()) {
-                amount += item.getPriceAtOrder();
+            amount += item.getPriceAtOrder();
         }
 
         double discount = 0.0;

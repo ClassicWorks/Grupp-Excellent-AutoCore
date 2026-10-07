@@ -38,7 +38,7 @@ public class WorkOrderCard extends VBox {
         //mechanic info
         Hyperlink mechanicLink = new MechanicHyperLink(mechanic);
 
-        Text description = new Text(booking.getDescription());
+        Text description = new Text(booking.getDescriptionFor(LanguageManager.getCurrentLanguage()));
 
         VBox serviceItemBox = getServiceItemBox(workOrderItems);
 
@@ -77,7 +77,7 @@ public class WorkOrderCard extends VBox {
                 ImageViewWithAltText clockIcon = new ImageViewWithAltText(
                         "imgs/clock-solid.png", 20, 20,
                         LanguageManager.getString("image.clock-solid")
-                        );
+                );
                 Label timeLabel = new Label(Integer.toString(item.getServiceItem().getEstimatedMinutes()) + " min",
                         clockIcon);
                 timeLabel.setAlignment(Pos.CENTER_RIGHT);
