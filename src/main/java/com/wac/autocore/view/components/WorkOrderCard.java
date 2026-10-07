@@ -74,7 +74,10 @@ public class WorkOrderCard extends VBox {
                 Label itemName = new Label(ValueLabels.serviceName(item.getServiceItem().getName()));
 
                 totalTime += item.getServiceItem().getEstimatedMinutes();
-                IconImageView clockIcon = new IconImageView("imgs/clock-solid.png", 20, 20);
+                ImageViewWithAltText clockIcon = new ImageViewWithAltText(
+                        "imgs/clock-solid.png", 20, 20,
+                        LanguageManager.getString("image.clock-solid")
+                        );
                 Label timeLabel = new Label(Integer.toString(item.getServiceItem().getEstimatedMinutes()) + " min",
                         clockIcon);
                 timeLabel.setAlignment(Pos.CENTER_RIGHT);
@@ -97,7 +100,8 @@ public class WorkOrderCard extends VBox {
     }
 
     private HBox getVehicleInfo() {
-        ImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40, 40);
+        ImageViewWithAltText vehicleIcon = new ImageViewWithAltText("/imgs/car-solid.png", 40, 40,
+                LanguageManager.getString("image.car-solid"));
 
         Label registrationNumber = new Label(vehicle.getRegistrationNumber());
 

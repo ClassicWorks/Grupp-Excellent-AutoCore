@@ -22,7 +22,8 @@ public class BookingCard extends VBox {
         VBox vehicleInfoBox = getVehicleInfoBox(vehicle);
         vehicleInfoBox.getStyleClass().add("card-info-box");
 
-        IconImageView vehicleIcon = new IconImageView("/imgs/car-solid.png", 40,40);
+        ImageViewWithAltText vehicleIcon = new ImageViewWithAltText("/imgs/car-solid.png", 40,40,
+                LanguageManager.getString("image.car-solid"));
         HBox vehicleBox = new HBox(vehicleIcon, vehicleInfoBox);
 
         this.getStyleClass().add("card");

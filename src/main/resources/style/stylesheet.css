@@ -95,6 +95,11 @@ HyperLink{
     -fx-font-size: 10px;
 }
 
+.alt-label{
+    -fx-text-fill: -fx-muted-ink;
+    -fx-font-style: italic;
+}
+
 /*-------------
      Buttons
 ---------------*/

@@ -5,7 +5,6 @@ import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.util.ValueLabels;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -16,7 +15,8 @@ import java.util.function.Consumer;
 public class MechanicCard extends HBox {
 
     public MechanicCard(Mechanic mechanic, Consumer<Mechanic> onCardClick) {
-        ImageView mechanicIcon = new IconImageView("/imgs/wrench-solid.png", 40, 40);
+        ImageViewWithAltText mechanicIcon = new ImageViewWithAltText("/imgs/wrench-solid.png", 40, 40,
+                LanguageManager.getString("image.wrench-solid"));
 
         Label nameLabel = new Label(mechanic.getName());
         Label specializationlabel = new Label(ValueLabels.specialization(mechanic.getSpecialization()));

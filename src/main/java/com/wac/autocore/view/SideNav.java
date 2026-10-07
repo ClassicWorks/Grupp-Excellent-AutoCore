@@ -3,7 +3,6 @@ package com.wac.autocore.view;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
-import com.wac.autocore.view.components.IconImageView;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
