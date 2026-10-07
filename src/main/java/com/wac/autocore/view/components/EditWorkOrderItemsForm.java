@@ -26,17 +26,18 @@ import java.util.stream.Collectors;
 
 public class EditWorkOrderItemsForm {
 
-    private final GarageSystem garageSystem = new GarageSystem();
+    private final GarageSystem garageSystem;
     private final Stage popupStage;
     private final int workOrderId;
 
-    private final VBox content = new VBox(10);
+    private final VBox content = new VBox();
     private final Label errorLabel = new Label();
 
-    public EditWorkOrderItemsForm(Stage popupStage, int workOrderId) {
+    public EditWorkOrderItemsForm(Stage popupStage, int workOrderId, GarageSystem garageSystem) {
         this.popupStage = popupStage;
         this.workOrderId = workOrderId;
-        errorLabel.setStyle("-fx-text-fill: red;");
+        this.garageSystem = garageSystem;
+        errorLabel.getStyleClass().add("error-label");
     }
 
     public Parent show() {

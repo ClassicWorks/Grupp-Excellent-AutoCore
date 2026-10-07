@@ -144,7 +144,7 @@ public class ViewManager {
 
     public void showEditWorkOrderItemsPopUp(int workOrderId) {
         Stage popup = new Stage();
-        Parent content = new EditWorkOrderItemsForm(popup, workOrderId).show();
+        Parent content = new EditWorkOrderItemsForm(popup, workOrderId, garageSystem).show();
 
         showPopup(popup,
                 String.format(LanguageManager.getString("workorder.edit.title"), workOrderId),
