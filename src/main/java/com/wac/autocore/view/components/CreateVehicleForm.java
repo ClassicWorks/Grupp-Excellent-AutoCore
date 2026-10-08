@@ -1,6 +1,5 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.data.Database;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
@@ -56,7 +55,7 @@ public class CreateVehicleForm {
         yearBox.getStyleClass().add("form-field-container");
 
         ObservableList<Customer> customers =
-                FXCollections.observableArrayList(Database.getCustomers());
+                FXCollections.observableArrayList(garageSystem.getCustomers());
 
         ComboBox<Customer> customerComboBox = new ComboBox<>(customers);
         customerComboBox.setPromptText(LanguageManager.getString("vehicle.form.customer.prompt"));
