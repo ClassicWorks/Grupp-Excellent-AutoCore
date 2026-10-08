@@ -1,7 +1,9 @@
 package com.wac.autocore.view;
 
 import com.wac.autocore.model.ServiceItem;
+import com.wac.autocore.model.ServicePack;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.view.components.ServicePackCard;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.ServiceItemCard;
@@ -37,14 +39,23 @@ public class ShowServiceItemsView {
         VBox serviceItemsBox = new VBox();
         fillServiceItems(serviceItemsBox, detailPanel);
 
+        VBox servicePackBox = new VBox();
+        fillServicePacks(servicePackBox, detailPanel);
+
         ScrollPane serviceItemsColumn = new ScrollPane(serviceItemsBox);
         serviceItemsColumn.setFitToWidth(true);
         serviceItemsColumn.setFitToHeight(true);
 
+        ScrollPane servicePackColumn = new ScrollPane(servicePackBox);
+        servicePackColumn.setFitToWidth(true);
+        servicePackColumn.setFitToHeight(true);
+
         mainContent.add(serviceItemsColumn, 0, 0);
+        mainContent.add(servicePackColumn, 0, 1);
         mainContent.add(detailPanel, 1, 0);
 
         GridPane.setVgrow(serviceItemsColumn, Priority.ALWAYS);
+        GridPane.setVgrow(servicePackColumn, Priority.ALWAYS);
         GridPane.setVgrow(detailPanel, Priority.ALWAYS);
         VBox.setVgrow(mainContent, Priority.ALWAYS);
 
@@ -71,6 +82,30 @@ public class ShowServiceItemsView {
             );
             card.getStyleClass().add("clickable");
             serviceItemsBox.getChildren().add(card);
+        }
+    }
+
+    private void fillServicePacks(VBox servicePackBox, VBox detailPanel) {
+        servicePackBox.getStyleClass().add("card-container");
+        List<ServicePack> servicePacks = garageSystem.getServicePacks();
+
+        if (servicePacks.isEmpty()) {
+            Label errorLabel = new Label(LanguageManager.getString("services.empty"));
+            errorLabel.getStyleClass().add("error-label");
+            servicePackBox.getChildren().add(errorLabel);
+        }
+
+        servicePackBox.getChildren().clear();
+
+        for (ServicePack servicePack : servicePacks) {
+            ServicePackCard card = new ServicePackCard(servicePack);
+
+            card.setOnMouseClicked(e -> detailPanel.getChildren().setAll(
+                    new Label("Här ska info in")
+                    //new ServiceItemDetails(s, () -> fillServiceItems(servicePackBox, detailPanel)))
+                    ));
+            card.getStyleClass().add("clickable");
+            servicePackBox.getChildren().add(card);
         }
     }
 

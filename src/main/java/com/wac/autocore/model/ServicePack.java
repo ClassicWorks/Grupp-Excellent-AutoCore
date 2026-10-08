@@ -22,7 +22,7 @@ public class ServicePack {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false, unique = true, length = 50)
     private String name;
 
     @ManyToMany(fetch = FetchType.EAGER)
