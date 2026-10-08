@@ -127,6 +127,10 @@ Button{
     -fx-background-insets: 0;
 }
 
+Button.smaller{
+    -fx-padding: 7px 7px;
+}
+
 .confirm-btn{
     -fx-background-color: -fx-primary-color;
     -fx-text-fill: -fx-light-ink;
@@ -303,6 +307,10 @@ Button{
 
 .column-header.unhandled Label{
     -fx-text-fill: -fx-status-unhandled-ink;
+}
+
+.row-container{
+    -fx-spacing: 10;
 }
 
 .row{

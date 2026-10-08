@@ -4,6 +4,7 @@ import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.ServicePack;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.view.components.ServicePackCard;
+import com.wac.autocore.view.components.ServicePackDetails;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.ServiceItemCard;
@@ -52,7 +53,7 @@ public class ShowServiceItemsView {
 
         mainContent.add(serviceItemsColumn, 0, 0);
         mainContent.add(servicePackColumn, 0, 1);
-        mainContent.add(detailPanel, 1, 0);
+        mainContent.add(detailPanel, 1, 0, 1,2);
 
         GridPane.setVgrow(serviceItemsColumn, Priority.ALWAYS);
         GridPane.setVgrow(servicePackColumn, Priority.ALWAYS);
@@ -66,6 +67,7 @@ public class ShowServiceItemsView {
     private void fillServiceItems(VBox serviceItemsBox, VBox detailPanel) {
         serviceItemsBox.getStyleClass().add("card-container");
         List<ServiceItem> serviceItems = garageSystem.getServiceItems();
+        serviceItemsBox.getChildren().clear();
 
         if (serviceItems.isEmpty()) {
             Label errorLabel = new Label(LanguageManager.getString("services.empty"));
@@ -73,12 +75,15 @@ public class ShowServiceItemsView {
             serviceItemsBox.getChildren().add(errorLabel);
         }
 
-        serviceItemsBox.getChildren().clear();
 
         for (ServiceItem serviceItem : serviceItems) {
             ServiceItemCard card = new ServiceItemCard(serviceItem, s ->
-                    detailPanel.getChildren().setAll(
-                            new ServiceItemDetails(s, () -> fillServiceItems(serviceItemsBox, detailPanel)))
+            {
+                ServiceItemDetails details = new ServiceItemDetails(s, () -> fillServiceItems(serviceItemsBox, detailPanel));
+                VBox.setVgrow(details, Priority.ALWAYS);
+                detailPanel.getChildren().setAll(
+                        details);
+            }
             );
             card.getStyleClass().add("clickable");
             serviceItemsBox.getChildren().add(card);
@@ -88,6 +93,7 @@ public class ShowServiceItemsView {
     private void fillServicePacks(VBox servicePackBox, VBox detailPanel) {
         servicePackBox.getStyleClass().add("card-container");
         List<ServicePack> servicePacks = garageSystem.getServicePacks();
+        servicePackBox.getChildren().clear();
 
         if (servicePacks.isEmpty()) {
             Label errorLabel = new Label(LanguageManager.getString("services.empty"));
@@ -95,18 +101,30 @@ public class ShowServiceItemsView {
             servicePackBox.getChildren().add(errorLabel);
         }
 
-        servicePackBox.getChildren().clear();
 
         for (ServicePack servicePack : servicePacks) {
             ServicePackCard card = new ServicePackCard(servicePack);
 
-            card.setOnMouseClicked(e -> detailPanel.getChildren().setAll(
-                    new Label("Här ska info in")
-                    //new ServiceItemDetails(s, () -> fillServiceItems(servicePackBox, detailPanel)))
-                    ));
+            card.setOnMouseClicked(e -> {
+                ServicePackDetails servicePackDetails = new ServicePackDetails(servicePack,
+                        garageSystem.getServiceItems(),
+                        s -> saveServicePack(s),
+                        s -> deleteServicePack(s));
+                VBox.setVgrow(servicePackDetails, Priority.ALWAYS);
+
+                detailPanel.getChildren().setAll(servicePackDetails);
+            });
             card.getStyleClass().add("clickable");
             servicePackBox.getChildren().add(card);
         }
+    }
+
+    private void deleteServicePack(ServicePack s) {
+        System.out.println("Should delete " + s);
+    }
+
+    private void saveServicePack(ServicePack s) {
+        System.out.println("Should save servicePack " + s);
     }
 
     private Node getHeader() {

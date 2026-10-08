@@ -74,4 +74,9 @@ public class ServicePack {
                 ", serviceItems=" + serviceItems +
                 '}';
     }
+
+    public boolean hasService(int serviceItemId) {
+        return serviceItems.stream()
+                .anyMatch(item -> item.getId() == serviceItemId);
+    }
 }

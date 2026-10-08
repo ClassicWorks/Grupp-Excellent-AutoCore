@@ -3,6 +3,7 @@ package com.wac.autocore.view.components;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.ServicePack;
 import com.wac.autocore.util.LanguageManager;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -30,13 +31,13 @@ public class ServicePackCard extends VBox {
                 .mapToInt(ServiceItem::getEstimatedMinutes)
                 .sum();
 
-        Label totalTimeLabel = new Label(Integer.toString(totalTime) + " min",
-                new ImageViewWithAltText("imgs/clock-solid.png", 20, 20,
-                        LanguageManager.getString("image.clock-solid"))
-        );
-        Label totalPriceLabel = new Label(Double.toString(totalPrice) + " SEK");
-        HBox totalRow = new HBox(totalTimeLabel, totalPriceLabel);
+        Label priceAndTimeLabel = new Label(String.format("Total price: %.0f | Total time: %d",
+                totalPrice,
+                totalTime
+        ));
+        HBox totalRow = new HBox(priceAndTimeLabel);
         totalRow.getStyleClass().addAll("row", "row-final");
+        totalRow.setAlignment(Pos.CENTER_RIGHT);
         serviceItemBox.getChildren().add(totalRow);
 
         this.getChildren().addAll(
