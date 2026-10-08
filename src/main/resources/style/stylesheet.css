@@ -51,6 +51,10 @@ Text{
     -fx-fill: -fx-dark-ink;
 }
 
+HyperLink{
+
+}
+
 .page-title{
     -fx-font-family: "Space Grotesk", sans-serif;
     -fx-font-size: 28px;
@@ -69,8 +73,10 @@ Text{
     -fx-font-weight: 700;
 }
 
-HyperLink{
-
+.details-title{
+    -fx-font-family: "IBM Plex Sans", sans-serif;
+    -fx-font-weight: 700;
+    -fx-font-size: 20px;
 }
 
 .form-title{

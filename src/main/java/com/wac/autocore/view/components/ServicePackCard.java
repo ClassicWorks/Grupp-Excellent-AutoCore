@@ -31,7 +31,7 @@ public class ServicePackCard extends VBox {
                 .mapToInt(ServiceItem::getEstimatedMinutes)
                 .sum();
 
-        Label priceAndTimeLabel = new Label(String.format("Total price: %.0f | Total time: %d",
+        Label priceAndTimeLabel = new Label(String.format(LanguageManager.getString("servicePack.totalPriceAndTime"),
                 totalPrice,
                 totalTime
         ));

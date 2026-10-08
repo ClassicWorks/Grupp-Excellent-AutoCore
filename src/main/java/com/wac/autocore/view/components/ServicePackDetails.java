@@ -33,13 +33,14 @@ public class ServicePackDetails extends BorderPane{
     private List<ServiceItem> allServiceItems;
 
     private Label errorLabel;
+    private TextField nameField;
     private VBox currentServicesRows;
     private ComboBox<ServiceItem> serviceComboBox;
 
     public ServicePackDetails(ServicePack servicePack,
                               List<ServiceItem> allServiceItems,
                               Consumer<ServicePack> onSave,
-                              Consumer<ServicePack> onDelete){
+                              Consumer<Integer> onDelete){
         this.servicePack = servicePack;
         this.allServiceItems = allServiceItems;
 
@@ -48,14 +49,16 @@ public class ServicePackDetails extends BorderPane{
 
         Label title = createTitle(servicePack.getId());
 
-        Label nameLabel = new Label("Name of Service Pack");
+        Label nameLabel = new Label(LanguageManager.getString("servicePack.name.label"));
         nameLabel.getStyleClass().add("form-field-label");
-        TextField nameField = new TextField(servicePack.getName());
+
+        nameField = new TextField(servicePack.getName());
+
         VBox nameBox = new VBox(nameLabel, nameField);
         nameBox.getStyleClass().add("form-field-container");
 
-        //Show current services in pack
-        Label currentServicesLabel = new Label("Services in pack");
+        // Show current services in pack
+        Label currentServicesLabel = new Label(LanguageManager.getString("servicePack.services.label"));
         currentServicesLabel.getStyleClass().add("form-field-label");
 
         currentServicesRows = new VBox();
@@ -64,6 +67,7 @@ public class ServicePackDetails extends BorderPane{
         VBox currentServicesContainer = new VBox(currentServicesLabel, currentServicesRows);
         VBox addServiceSection = createAddServiceSection(servicePack);
 
+        //Get and set Service items
         refreshServiceItems();
 
         VBox detailsContainer = new VBox(
@@ -110,7 +114,7 @@ public class ServicePackDetails extends BorderPane{
                 .mapToInt(ServiceItem::getEstimatedMinutes)
                 .sum();
 
-        Label priceAndTimeLabel = new Label(String.format("Total price: %.0f SEK | Total time: %d min",
+        Label priceAndTimeLabel = new Label(String.format(LanguageManager.getString("servicePack.totalPriceAndTime"),
                 totalPrice,
                 totalTime
         ));
@@ -125,13 +129,15 @@ public class ServicePackDetails extends BorderPane{
                 .collect(Collectors.toList());
 
         serviceComboBox.getItems().setAll(FXCollections.observableArrayList(availableServices));
-        serviceComboBox.setPromptText("Choose service to add");
+        serviceComboBox.setPromptText(LanguageManager.getString("servicePack.addService.prompt"));
         serviceComboBox.setConverter(ComboBoxLabels.serviceItem());
     }
 
     private Node createItemRow(ServiceItem item, boolean isLastItem) {
         Label nameLabel = new Label(ValueLabels.serviceName(item.getName()));
-        Label priceLabel = new Label(String.format("%.0f kr", item.getPrice()));
+        Label priceLabel = new Label(String.format(LanguageManager.getString("servicePack.price"),
+                item.getPrice())
+        );
 
         Button removeBtn = new Button(LanguageManager.getString("workorder.edit.remove"));
         removeBtn.setDisable(isLastItem);
@@ -139,7 +145,8 @@ public class ServicePackDetails extends BorderPane{
         removeBtn.setOnAction(e -> {
             boolean success = servicePack.removeServiceItem(item);
                 if(!success) {
-                    errorLabel.setText(String.format("Could not remove service item with id %d", item.getId()));
+                    errorLabel.setText(String.format(LanguageManager.getString("servicePack.removeService.error"),
+                            item.getId()));
                     return;
                 }
             refreshServiceItems();
@@ -158,40 +165,63 @@ public class ServicePackDetails extends BorderPane{
     private VBox createAddServiceSection(ServicePack servicePack) {
         serviceComboBox = new ComboBox<>();
 
-        Button addBtn = new Button("Add service");
+        Button addBtn = new Button(LanguageManager.getString("servicePack.addService.button"));
         addBtn.getStyleClass().add("confirm-btn");
+
         addBtn.disableProperty().bind(serviceComboBox.valueProperty().isNull());
+
         addBtn.setOnAction(e -> {
             ServiceItem selected = serviceComboBox.getValue();
+
             boolean success = servicePack.addServiceItem(selected);
+
             if (!success) {
-                errorLabel.setText(String.format("Could not add service item with id %d", selected.getId()));
+                errorLabel.setText(String.format(
+                                LanguageManager.getString("servicePack.addService.error"),
+                                selected.getId()
+                ));
                 return;
             }
+
             refreshServiceItems();
         });
 
-        Label addLabel = new Label("Add more services to pack");
+        Label addLabel = new Label(
+                LanguageManager.getString("servicePack.addService.label")
+        );
         addLabel.getStyleClass().add("form-field-label");
 
         HBox comboBoxContainer = new HBox(serviceComboBox, addBtn);
         comboBoxContainer.getStyleClass().add("row");
+
         VBox container = new VBox(addLabel, comboBoxContainer);
         container.getStyleClass().add("form-field-container");
+
         return container;
     }
 
     private Label createTitle(int id) {
+        Label title = new Label(String.format(LanguageManager.getString("servicePack.title"),
+                id));
+        title.getStyleClass().add("details-title");
 
-        return new Label("dfghsdfh");
+        return title;
     }
 
     private Button createSaveBtn(Consumer<ServicePack> onSave) {
-        return new Button("Save");
+        Button saveBtn = new Button(LanguageManager.getString("servicePack.save"));
+        saveBtn.getStyleClass().add("confirm-btn");
+        saveBtn.setOnAction(e -> {
+            servicePack.setName(nameField.getText().trim());
+            onSave.accept(servicePack);
+        });
+        return saveBtn;
     }
 
-    private Button createDeleteBtn(Consumer<ServicePack> onDelete) {
-
-        return new Button("delete");
+    private Button createDeleteBtn(Consumer<Integer> onDelete) {
+        Button deleteBtn = new Button(LanguageManager.getString("servicePack.delete"));
+        deleteBtn.getStyleClass().add("destroy-btn");
+        deleteBtn.setOnAction(e -> onDelete.accept(servicePack.getId()));
+        return deleteBtn;
     }
 }

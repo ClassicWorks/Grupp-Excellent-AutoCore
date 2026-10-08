@@ -3,12 +3,9 @@ package com.wac.autocore.view;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.ServicePack;
 import com.wac.autocore.service.GarageSystem;
-import com.wac.autocore.view.components.ServicePackCard;
-import com.wac.autocore.view.components.ServicePackDetails;
+import com.wac.autocore.view.components.*;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.util.LanguageManager;
-import com.wac.autocore.view.components.ServiceItemCard;
-import com.wac.autocore.view.components.ServiceItemDetails;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
@@ -27,6 +24,10 @@ public class ShowServiceItemsView {
         garageSystem = new GarageSystem();
     }
 
+    private VBox serviceItemsBox;
+    private VBox servicePackBox;
+    private VBox detailPanel;
+
     public Parent show() {
         BorderPane layout = new BorderPane();
         Node header = getHeader();
@@ -35,13 +36,13 @@ public class ShowServiceItemsView {
 
         GridPane mainContent = new KanbanGrid(2);
 
-        VBox detailPanel = new VBox();
+        detailPanel = new VBox();
 
-        VBox serviceItemsBox = new VBox();
-        fillServiceItems(serviceItemsBox, detailPanel);
+        serviceItemsBox = new VBox();
+        fillServiceItems();
 
-        VBox servicePackBox = new VBox();
-        fillServicePacks(servicePackBox, detailPanel);
+        servicePackBox = new VBox();
+        fillServicePacks();
 
         ScrollPane serviceItemsColumn = new ScrollPane(serviceItemsBox);
         serviceItemsColumn.setFitToWidth(true);
@@ -64,7 +65,7 @@ public class ShowServiceItemsView {
         return layout;
     }
 
-    private void fillServiceItems(VBox serviceItemsBox, VBox detailPanel) {
+    private void fillServiceItems() {
         serviceItemsBox.getStyleClass().add("card-container");
         List<ServiceItem> serviceItems = garageSystem.getServiceItems();
         serviceItemsBox.getChildren().clear();
@@ -79,7 +80,7 @@ public class ShowServiceItemsView {
         for (ServiceItem serviceItem : serviceItems) {
             ServiceItemCard card = new ServiceItemCard(serviceItem, s ->
             {
-                ServiceItemDetails details = new ServiceItemDetails(s, () -> fillServiceItems(serviceItemsBox, detailPanel));
+                ServiceItemDetails details = new ServiceItemDetails(s, () -> fillServiceItems());
                 VBox.setVgrow(details, Priority.ALWAYS);
                 detailPanel.getChildren().setAll(
                         details);
@@ -90,7 +91,7 @@ public class ShowServiceItemsView {
         }
     }
 
-    private void fillServicePacks(VBox servicePackBox, VBox detailPanel) {
+    private void fillServicePacks() {
         servicePackBox.getStyleClass().add("card-container");
         List<ServicePack> servicePacks = garageSystem.getServicePacks();
         servicePackBox.getChildren().clear();
@@ -109,7 +110,7 @@ public class ShowServiceItemsView {
                 ServicePackDetails servicePackDetails = new ServicePackDetails(servicePack,
                         garageSystem.getServiceItems(),
                         s -> saveServicePack(s),
-                        s -> deleteServicePack(s));
+                        id -> deleteServicePack(id));
                 VBox.setVgrow(servicePackDetails, Priority.ALWAYS);
 
                 detailPanel.getChildren().setAll(servicePackDetails);
@@ -119,12 +120,57 @@ public class ShowServiceItemsView {
         }
     }
 
-    private void deleteServicePack(ServicePack s) {
-        System.out.println("Should delete " + s);
+    private void deleteServicePack(int servicePackId) {
+        boolean deleteConfirmed = AppDialog.showConfirm(
+                LanguageManager.getString("servicePack.delete.title"),
+                String.format(
+                        LanguageManager.getString("servicePack.delete.message"),
+                        servicePackId
+                ),
+                LanguageManager.getString("servicePack.delete.warning")
+        );
+
+        if (deleteConfirmed) {
+            garageSystem.deleteServicePack(servicePackId);
+
+            AppDialog.showInformation(
+                    LanguageManager.getString("servicePack.delete.success.title"),
+                    LanguageManager.getString("servicePack.delete.success.message"),
+                    ""
+            );
+
+            detailPanel.getChildren().clear();
+            fillServicePacks();
+        }
     }
 
-    private void saveServicePack(ServicePack s) {
-        System.out.println("Should save servicePack " + s);
+    private void saveServicePack(ServicePack servicePack) {
+        try {
+            ServicePack savedServicePack =
+                    garageSystem.updateServicePack(
+                            servicePack.getId(),
+                            servicePack
+                    );
+
+            AppDialog.showInformation(
+                    LanguageManager.getString("servicePack.save.success.title"),
+                    LanguageManager.getString("servicePack.save.success.message"),
+                    String.format(
+                            LanguageManager.getString("servicePack.save.success.details"),
+                            savedServicePack.getName(),
+                            savedServicePack.getServiceItems().size()
+                    )
+            );
+
+            fillServicePacks();
+
+        } catch (IllegalArgumentException e) {
+            AppDialog.showError(
+                    LanguageManager.getString("servicePack.save.error.title"),
+                    LanguageManager.getString("servicePack.save.error.message"),
+                    e.getMessage()
+            );
+        }
     }
 
     private Node getHeader() {
