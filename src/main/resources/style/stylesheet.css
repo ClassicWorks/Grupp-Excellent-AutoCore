@@ -186,6 +186,31 @@ Button{
     -fx-background-color: -fx-destructive-hover-color;
 }
 
+.language-btn{
+    -fx-background-color: transparent;
+    -fx-border-color: -fx-menu-btn-color;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 10px 14px;
+    -fx-pref-width: 200px;
+    -fx-font-size: 14px;
+    -fx-text-fill: -fx-light-ink;
+    -fx-graphic-text-gap: 8px;
+    -fx-cursor: hand;
+}
+
+.language-btn:hover{
+    -fx-background-color: -fx-primary-hover-color;
+    -fx-border-color: -fx-light-ink;
+}
+
+.globe-icon{
+    -fx-fill: transparent;
+    -fx-stroke: -fx-light-ink;
+    -fx-stroke-width: 1.6px;
+}
+
 .card-action-btn{
     -fx-padding: 4px 10px;
     -fx-font-weight: 500;
