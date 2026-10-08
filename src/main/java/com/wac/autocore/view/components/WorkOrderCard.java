@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class WorkOrderCard extends VBox {
     GarageSystem garageSystem = new GarageSystem();
@@ -24,12 +25,14 @@ public class WorkOrderCard extends VBox {
     private Booking booking;
     private Vehicle vehicle;
     private Mechanic mechanic;
+    private List<WorkOrderItem> workOrderItems;
 
     public WorkOrderCard(WorkOrder workOrder, Booking booking, Vehicle vehicle, Mechanic mechanic, List<WorkOrderItem> workOrderItems) {
         this.workOrder = workOrder;
         this.booking = booking;
         this.vehicle = vehicle;
         this.mechanic = mechanic;
+        this.workOrderItems = workOrderItems;
 
         HBox statusInfo = getStatusInfo();
 
@@ -187,6 +190,23 @@ public class WorkOrderCard extends VBox {
                 });
                 completeWorkBtn.getStyleClass().addAll("confirm-btn", "card-action-btn");
                 return completeWorkBtn;
+            case "COMPLETED":
+                Button rebookBtn = new Button(LanguageManager.getString("workorder.rebook"));
+                rebookBtn.setOnAction(e -> {
+                    List<Integer> serviceIds = workOrderItems.stream()
+                            .filter(item -> item.getServiceItem() != null)
+                            .map(item -> item.getServiceItem().getId())
+                            .collect(Collectors.toList());
+
+                    Booking newBooking = garageSystem.createBookingFrom(booking.getId());
+                    if (newBooking == null) {
+                        return;
+                    }
+
+                    ViewManager.getInstance().showCreateWorkOrderPopup(newBooking.getId(), serviceIds);
+                });
+                rebookBtn.getStyleClass().addAll("confirm-btn", "card-action-btn");
+                return rebookBtn;
         }
         return new Label(LanguageManager.getString("workorder.noAction"));
     }
