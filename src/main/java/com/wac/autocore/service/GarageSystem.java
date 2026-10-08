@@ -193,48 +193,29 @@ public class GarageSystem {
         return servicePackRepo.getById(id);
     }
 
-    public ServicePack addServiceItemToPack(int servicePackId, int... serviceItemIds) {
+    public ServicePack updateServicePack(int servicePackId, ServicePack updatedServicePack){
         Optional<ServicePack> optionalServicePack = getServicePack(servicePackId);
         if(!optionalServicePack.isPresent()){
             throw new IllegalArgumentException("Service pack with ID " + servicePackId + " does not exist.");
         }
-        ServicePack servicePack = optionalServicePack.get();
 
-        for(int serviceItemId : serviceItemIds) {
-            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
+        //Om någon ServiceItem inte finns kasta exception
+        updatedServicePack.getServiceItems().forEach(si -> {
+            Optional<ServiceItem> optionalServiceItem = getServiceItem(si.getId());
             if(!optionalServiceItem.isPresent()) {
-                throw new  IllegalArgumentException("Service item with ID " + serviceItemId + " does not exist.");
+                throw new  IllegalArgumentException("Service item with ID " + si.getId() + " does not exist.");
             }
-            ServiceItem serviceItem = optionalServiceItem.get();
+        });
 
-            servicePack.addServiceItem(serviceItem);
-        }
-        return servicePackRepo.update(servicePack);
+        ServicePack servicePackToUpdate = optionalServicePack.get();
+        servicePackToUpdate.setName(updatedServicePack.getName());
+        servicePackToUpdate.setServiceItems(updatedServicePack.getServiceItems());
+
+        return servicePackRepo.update(servicePackToUpdate);
     }
 
     public void deleteServicePack(int id){
         servicePackRepo.delete(id);
-    }
-
-
-
-    public ServicePack createServicePack(String name, int... serviceItemIds) throws IllegalArgumentException {
-        if(!servicePackRepo.nameAvailable(name)){
-            throw new IllegalArgumentException("Service pack with name \"" + name + "\" already exists.");
-        }
-        ServicePack servicePack = new ServicePack(name);
-
-        for(int serviceItemId : serviceItemIds) {
-            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
-            if(!optionalServiceItem.isPresent()) {
-                throw new  IllegalArgumentException("Service item with ID " + serviceItemId + " does not exist.");
-            }
-            ServiceItem serviceItem = optionalServiceItem.get();
-
-            servicePack.addServiceItem(serviceItem);
-        }
-
-        return servicePackRepo.save(servicePack);
     }
 
     public void showMechanics() {
@@ -472,6 +453,25 @@ public class GarageSystem {
         return savedBooking;
     }
 
+
+    public ServicePack createServicePack(String name, int... serviceItemIds) throws IllegalArgumentException {
+        if(!servicePackRepo.nameAvailable(name)){
+            throw new IllegalArgumentException("Service pack with name \"" + name + "\" already exists.");
+        }
+        ServicePack servicePack = new ServicePack(name);
+
+        for(int serviceItemId : serviceItemIds) {
+            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
+            if(!optionalServiceItem.isPresent()) {
+                throw new  IllegalArgumentException("Service item with ID " + serviceItemId + " does not exist.");
+            }
+            ServiceItem serviceItem = optionalServiceItem.get();
+
+            servicePack.addServiceItem(serviceItem);
+        }
+
+        return servicePackRepo.save(servicePack);
+    }
 
     public WorkOrder createWorkOrder(int bookingId,
                                      int mechanicId,

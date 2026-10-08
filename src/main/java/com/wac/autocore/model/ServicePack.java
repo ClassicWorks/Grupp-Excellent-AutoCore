@@ -11,6 +11,8 @@ public class ServicePack {
     // då tar bort den från kopplade Servicepaket, så man får en varning ifall man vill
     // redigera ServicePaketet innan. (Glöm inte implementera detta i
     // garageSystem.removeServiceItem())
+    //*När man skapar och redigerar ServicePack sparas en temporär lista med ServiceItems,
+    // när man sedan sparar .setServiceItems(list)
     //*Vid CreateWorkOrderForm kan man välja ett servicepaket, då hamnar alla serviceItems
     // som servicepaketet innehåller i den temporära listan ovanför (samma utseende som
     // EditWorkOrderForm) med alla valda ServiceItems, man kan fortsatt ta bort ServiceItems
@@ -58,6 +60,10 @@ public class ServicePack {
 
     public boolean removeServiceItem(ServiceItem serviceItem) {
         return serviceItems.remove(serviceItem);
+    }
+
+    public void setServiceItems (List<ServiceItem> serviceItems){
+        this.serviceItems = serviceItems;
     }
 
     @Override
