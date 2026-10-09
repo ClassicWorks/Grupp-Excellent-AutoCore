@@ -22,13 +22,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ServicePackDetails extends BorderPane{
-
-    //Title
-    //Textfield for name
-    //list of current ServiceItems
-    //ComboBox other services w btn add
-    //Buttons(save, delete)
-
     private ServicePack servicePack;
     private List<ServiceItem> allServiceItems;
 
@@ -47,9 +40,11 @@ public class ServicePackDetails extends BorderPane{
         errorLabel = new Label("");
         errorLabel.getStyleClass().add("error-label");
 
-        Label title = createTitle(servicePack.getId());
+        Label title = createTitle(servicePack.getName());
 
-        Label nameLabel = new Label(LanguageManager.getString("servicePack.name.label"));
+        Label idLabel = new Label(String.format("ID: %d", servicePack.getId()));
+
+        Label nameLabel = new Label(LanguageManager.getString("servicePack.details.name.label"));
         nameLabel.getStyleClass().add("form-field-label");
 
         nameField = new TextField(servicePack.getName());
@@ -58,7 +53,7 @@ public class ServicePackDetails extends BorderPane{
         nameBox.getStyleClass().add("form-field-container");
 
         // Show current services in pack
-        Label currentServicesLabel = new Label(LanguageManager.getString("servicePack.services.label"));
+        Label currentServicesLabel = new Label(LanguageManager.getString("servicePack.details.services.label"));
         currentServicesLabel.getStyleClass().add("form-field-label");
 
         currentServicesRows = new VBox();
@@ -71,9 +66,11 @@ public class ServicePackDetails extends BorderPane{
         refreshServiceItems();
 
         VBox detailsContainer = new VBox(
+                idLabel,
                 nameBox,
                 currentServicesContainer,
-                addServiceSection
+                addServiceSection,
+                errorLabel
         );
         detailsContainer.getStyleClass().add("details-container");
 
@@ -135,8 +132,9 @@ public class ServicePackDetails extends BorderPane{
 
     private Node createItemRow(ServiceItem item, boolean isLastItem) {
         Label nameLabel = new Label(ValueLabels.serviceName(item.getName()));
-        Label priceLabel = new Label(String.format(LanguageManager.getString("servicePack.price"),
-                item.getPrice())
+        Label priceAndTimeLabel = new Label(String.format(LanguageManager.getString("service.priceAndTime"),
+                item.getPrice(),
+                item.getEstimatedMinutes())
         );
 
         Button removeBtn = new Button(LanguageManager.getString("workorder.edit.remove"));
@@ -155,7 +153,7 @@ public class ServicePackDetails extends BorderPane{
         nameLabel.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(nameLabel, Priority.ALWAYS);
 
-        HBox row = new HBox(nameLabel, priceLabel, removeBtn);
+        HBox row = new HBox(nameLabel, priceAndTimeLabel, removeBtn);
         row.getStyleClass().add("row");
         row.setMaxWidth(Double.MAX_VALUE);
         row.setAlignment(Pos.CENTER_LEFT);
@@ -200,9 +198,9 @@ public class ServicePackDetails extends BorderPane{
         return container;
     }
 
-    private Label createTitle(int id) {
-        Label title = new Label(String.format(LanguageManager.getString("servicePack.title"),
-                id));
+    private Label createTitle(String name) {
+        Label title = new Label(String.format(LanguageManager.getString("servicePack.details.title"),
+                name));
         title.getStyleClass().add("details-title");
 
         return title;

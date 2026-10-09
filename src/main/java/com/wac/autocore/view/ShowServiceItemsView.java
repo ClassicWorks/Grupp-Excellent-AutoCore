@@ -1,19 +1,20 @@
 package com.wac.autocore.view;
 
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.ServicePack;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.*;
+import com.wac.autocore.view.components.kanban.KanbanColumn;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.util.LanguageManager;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 import java.util.List;
 
@@ -41,6 +42,8 @@ public class ShowServiceItemsView {
         serviceItemsBox = new VBox();
         fillServiceItems();
 
+        BorderPane servicePackColumnHeader = getServicePackColumnHeader();
+
         servicePackBox = new VBox();
         fillServicePacks();
 
@@ -48,9 +51,7 @@ public class ShowServiceItemsView {
         serviceItemsColumn.setFitToWidth(true);
         serviceItemsColumn.setFitToHeight(true);
 
-        ScrollPane servicePackColumn = new ScrollPane(servicePackBox);
-        servicePackColumn.setFitToWidth(true);
-        servicePackColumn.setFitToHeight(true);
+        KanbanColumn servicePackColumn = new KanbanColumn(servicePackColumnHeader, servicePackBox);
 
         mainContent.add(serviceItemsColumn, 0, 0);
         mainContent.add(servicePackColumn, 0, 1);
@@ -91,6 +92,25 @@ public class ShowServiceItemsView {
         }
     }
 
+    private static BorderPane getServicePackColumnHeader() {
+        Label servicePackColumnTitle = new Label(
+                LanguageManager.getString("servicePack.column.title")
+        );
+        servicePackColumnTitle.getStyleClass().add("column-title");
+
+        Button createServicePackBtn = new Button(
+                LanguageManager.getString("servicePack.create.button")
+        );
+        createServicePackBtn.getStyleClass().add("confirm-btn");
+        createServicePackBtn.setOnAction(e -> ViewManager.getInstance().showCreateServicePackPopup());
+
+        BorderPane servicePackColumnHeader = new BorderPane();
+        servicePackColumnHeader.getStyleClass().add("column-header");
+        servicePackColumnHeader.setCenter(servicePackColumnTitle);
+        servicePackColumnHeader.setRight(createServicePackBtn);
+        return servicePackColumnHeader;
+    }
+
     private void fillServicePacks() {
         servicePackBox.getStyleClass().add("card-container");
         List<ServicePack> servicePacks = garageSystem.getServicePacks();
@@ -112,6 +132,10 @@ public class ShowServiceItemsView {
                         s -> saveServicePack(s),
                         id -> deleteServicePack(id));
                 VBox.setVgrow(servicePackDetails, Priority.ALWAYS);
+
+                //TODO när man trycker på Tjänst och sedan servicepaket ser båda ut att vara valda
+                StylingUtil.setSelected(card, "card");
+
 
                 detailPanel.getChildren().setAll(servicePackDetails);
             });

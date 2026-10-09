@@ -187,6 +187,13 @@ public class ViewManager {
                 content,
                 null);
     }
+    public void showCreateServicePackPopup(){
+        Stage popup = new Stage();
+        Parent content = new CreateServicePackForm(garageSystem, popup).show();
+
+        showPopup(popup, LanguageManager.getString("servicePack.form.title"), content, this::showServices);
+
+    }
 
     public void exit() {
         primaryStage.close();

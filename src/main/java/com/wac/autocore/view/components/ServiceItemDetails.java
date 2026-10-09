@@ -25,9 +25,11 @@ public class ServiceItemDetails extends BorderPane {
         this.serviceItem = serviceItem;
         this.onSaved = onSaved;
 
-        Label nameLabel = new Label(ValueLabels.serviceName(serviceItem.getName()));
+        Label nameLabel = new Label(String.format(
+                LanguageManager.getString("service.details.title"),
+                ValueLabels.serviceName(serviceItem.getName()))
+        );
         nameLabel.getStyleClass().add("details-title");
-        //TODO add styling and implement details-title
 
         Label descriptionFieldLabel = new Label(LanguageManager.getString("service.description"));
         descriptionFieldLabel.getStyleClass().add("form-field-label");

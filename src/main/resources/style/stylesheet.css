@@ -237,6 +237,7 @@ Button.smaller{
 .grid{
     -fx-hgap: 20px;
     -fx-padding: 16px;
+    -fx-vgap: 20px;
 }
 
 .details-container {
@@ -273,6 +274,7 @@ Button.smaller{
     -fx-padding: 12px 14px;
     -fx-fill-width: true;
     -fx-border-width: 1px 1px 0px 1px;
+    -fx-border-color: -fx-frame-border-color;
     -fx-border-radius: 8px 8px 0px 0px;
     -fx-background-radius: 8px 8px 0px 0px;
 }

@@ -3,6 +3,7 @@ package com.wac.autocore.view.components;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.ServicePack;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.ValueLabels;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -48,8 +49,11 @@ public class ServicePackCard extends VBox {
     }
 
     private HBox createServiceItemRow(ServiceItem serviceItem) {
-        Label nameLabel = new Label(serviceItem.getName());
-        Label priceLabel = new Label(Double.toString(serviceItem.getPrice()));
+        Label nameLabel = new Label(ValueLabels.serviceName(serviceItem.getName()));
+        Label priceLabel = new Label(String.format(
+                LanguageManager.getString("service.priceAndTime"),
+                serviceItem.getPrice(),
+                serviceItem.getEstimatedMinutes()));
 
         HBox row = new HBox(nameLabel, priceLabel);
         row.getStyleClass().add("row");
