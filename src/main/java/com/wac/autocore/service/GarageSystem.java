@@ -629,6 +629,54 @@ public class GarageSystem {
         return workOrderRepo.update(workOrder);
     }
 
+    public WorkOrder updateWorkOrderServices(int workOrderId,
+                                             List<Integer> serviceItemIdsToAdd,
+                                             List<Integer> itemIdsToRemove) {
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
+
+        if (!optionalWorkOrder.isPresent()) {
+            System.out.println("Work order with ID " + workOrderId + " does not exist.");
+            return null;
+        }
+        WorkOrder workOrder = optionalWorkOrder.get();
+
+        if (!workOrder.getStatus().equals("CREATED")) {
+            System.out.println("Services can only be changed before the work order is started.");
+            return null;
+        }
+
+        for (Integer itemId : itemIdsToRemove) {
+            if (!workOrder.removeItem(itemId)) {
+                System.out.println("Item with ID " + itemId + " is not on the work order.");
+                return null;
+            }
+        }
+
+        for (Integer serviceItemId : serviceItemIdsToAdd) {
+            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
+
+            if (!optionalServiceItem.isPresent()) {
+                System.out.println("Service item with ID " + serviceItemId + " does not exist.");
+                return null;
+            }
+
+            if (workOrder.hasService(serviceItemId)) {
+                System.out.println("Service is already on the work order.");
+                return null;
+            }
+
+            ServiceItem serviceItem = optionalServiceItem.get();
+            workOrder.addItem(serviceItem, serviceItem.getPrice());
+        }
+
+        if (workOrder.getItems().isEmpty()) {
+            System.out.println("A work order must have at least one service.");
+            return null;
+        }
+
+        return workOrderRepo.update(workOrder);
+    }
+
     public void startWorkOrder(int workOrderId) {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
