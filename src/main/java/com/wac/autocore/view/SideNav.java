@@ -14,6 +14,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SideNav {
     /*customer
      * Vehicles
@@ -25,6 +28,16 @@ public class SideNav {
      * Payments
      * Exit*/
 
+    public static final String CUSTOMERS = "customers";
+    public static final String VEHICLES = "vehicles";
+    public static final String BOOKINGS = "bookings";
+    public static final String MECHANICS = "mechanics";
+    public static final String SERVICES = "services";
+    public static final String WORK_ORDERS = "workorders";
+    public static final String INVOICES = "invoices";
+    public static final String PAYMENTS = "payments";
+
+    private final Map<String, Button> navButtons = new HashMap<>();
 
     private VBox navBox;
     /**
@@ -67,47 +80,24 @@ public class SideNav {
         exitBtn.getStyleClass().addAll("menu-btn", "exit-btn");
         languageBtn.getStyleClass().add("language-btn");
 
+        navButtons.put(CUSTOMERS, customerBtn);
+        navButtons.put(VEHICLES, vehicleBtn);
+        navButtons.put(BOOKINGS, bookingBtn);
+        navButtons.put(MECHANICS, mechanicsBtn);
+        navButtons.put(SERVICES, serviceBtn);
+        navButtons.put(WORK_ORDERS, workOrderBtn);
+        navButtons.put(INVOICES, invoiceBtn);
+        navButtons.put(PAYMENTS, paymentBtn);
 
-        customerBtn.setOnAction(e -> {
-            ViewManager.getInstance().showCustomers();
-            StylingUtil.setSelected(customerBtn, "menu-btn");
 
-        });
-        vehicleBtn.setOnAction(e -> {
-            ViewManager.getInstance().showVehicles();
-            StylingUtil.setSelected(vehicleBtn, "menu-btn");
-
-        });
-        bookingBtn.setOnAction(e -> {
-            ViewManager.getInstance().showBookings();
-            StylingUtil.setSelected(bookingBtn, "menu-btn");
-
-        });
-        mechanicsBtn.setOnAction(e -> {
-            ViewManager.getInstance().showMechanics();
-            StylingUtil.setSelected(mechanicsBtn, "menu-btn");
-
-        });
-        serviceBtn.setOnAction(e -> {
-            ViewManager.getInstance().showServices();
-            StylingUtil.setSelected(serviceBtn, "menu-btn");
-
-        });
-        workOrderBtn.setOnAction(e -> {
-            ViewManager.getInstance().showWorkOrders();
-            StylingUtil.setSelected(workOrderBtn, "menu-btn");
-
-        });
-        invoiceBtn.setOnAction(e -> {
-            ViewManager.getInstance().showInvoices();
-            StylingUtil.setSelected(invoiceBtn, "menu-btn");
-
-        });
-        paymentBtn.setOnAction(e -> {
-            ViewManager.getInstance().showPayments();
-            StylingUtil.setSelected(paymentBtn, "menu-btn");
-
-        });
+        customerBtn.setOnAction(e -> ViewManager.getInstance().showCustomers());
+        vehicleBtn.setOnAction(e -> ViewManager.getInstance().showVehicles());
+        bookingBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
+        mechanicsBtn.setOnAction(e -> ViewManager.getInstance().showMechanics());
+        serviceBtn.setOnAction(e -> ViewManager.getInstance().showServices());
+        workOrderBtn.setOnAction(e -> ViewManager.getInstance().showWorkOrders());
+        invoiceBtn.setOnAction(e -> ViewManager.getInstance().showInvoices());
+        paymentBtn.setOnAction(e -> ViewManager.getInstance().showPayments());
         exitBtn.setOnAction(e -> {
             ViewManager.getInstance().exit();
         });
@@ -139,6 +129,13 @@ public class SideNav {
         navPane.setBottom(exitBox);
 
         return navPane;
+    }
+
+    public void select(String name) {
+        Button button = navButtons.get(name);
+        if (button != null) {
+            StylingUtil.setSelected(button, "menu-btn");
+        }
     }
 
     private Group createGlobeIcon() {
