@@ -166,6 +166,12 @@ public class ViewManager {
         showPopup(popup, LanguageManager.getString("vehicle.form.title"), content, this::showVehicles);
     }
 
+    public void showCreateVehiclePopup(int customerId) {
+        Stage popup = new Stage();
+        Parent content = new CreateVehicleForm(garageSystem, popup).show(customerId);
+        showPopup(popup, LanguageManager.getString("vehicle.form.title"), content, null);
+    }
+
     public void showCreateCustomerPopup() {
         Stage popup = new Stage();
         Parent content = new CreateCustomer(popup, null).show();

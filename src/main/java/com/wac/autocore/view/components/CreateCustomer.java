@@ -106,7 +106,7 @@ public class CreateCustomer {
                         )
                 );
                 if(createVehicle){
-                    ViewManager.getInstance().showCreateVehiclePopup();
+                    ViewManager.getInstance().showCreateVehiclePopup(savedCustomer.getId());
                 }
             }
         });
