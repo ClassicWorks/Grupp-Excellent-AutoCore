@@ -11,6 +11,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.List;
+
 public class ViewManager {
 
     private static ViewManager instance;
@@ -140,6 +142,13 @@ public class ViewManager {
         Parent content = new CreateWorkOrderForm(popup).show(bookingId);
 
         showPopup(popup, LanguageManager.getString("workorder.form.title"), content, null);
+    }
+
+    public void showCreateWorkOrderPopup(int bookingId, List<Integer> preselectedServiceIds) {
+        Stage popup = new Stage();
+        Parent content = new CreateWorkOrderForm(popup).show(bookingId, preselectedServiceIds);
+
+        showPopup(popup, LanguageManager.getString("workorder.form.title"), content, this::showWorkOrders);
     }
 
     public void showEditWorkOrderItemsPopUp(int workOrderId) {

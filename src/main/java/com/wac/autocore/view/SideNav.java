@@ -3,12 +3,16 @@ package com.wac.autocore.view;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.Line;
 
 public class SideNav {
     /*customer
@@ -50,6 +54,7 @@ public class SideNav {
         Button paymentBtn = new Button(LanguageManager.getString("nav.payments"));
         Button exitBtn = new Button(LanguageManager.getString("nav.exit"));
         Button languageBtn = new Button(LanguageManager.getCurrentLanguage().equals("sv") ? "English" : "Svenska");
+        languageBtn.setGraphic(createGlobeIcon());
 
         customerBtn.getStyleClass().addAll("menu-btn", "customer");
         vehicleBtn.getStyleClass().addAll("menu-btn", "vehicle");
@@ -60,7 +65,7 @@ public class SideNav {
         invoiceBtn.getStyleClass().addAll("menu-btn", "invoice");
         paymentBtn.getStyleClass().addAll("menu-btn", "payment");
         exitBtn.getStyleClass().addAll("menu-btn", "exit-btn");
-        languageBtn.getStyleClass().addAll("menu-btn", "language");
+        languageBtn.getStyleClass().add("language-btn");
 
 
         customerBtn.setOnAction(e -> {
@@ -122,10 +127,9 @@ public class SideNav {
                 serviceBtn,
                 workOrderBtn,
                 invoiceBtn,
-                paymentBtn,
-                languageBtn);
+                paymentBtn);
 
-        VBox exitBox = new VBox(exitBtn);
+        VBox exitBox = new VBox(languageBtn, exitBtn);
 
         navBox.getStyleClass().add("side-nav");
         exitBox.getStyleClass().add("side-nav");
@@ -135,5 +139,20 @@ public class SideNav {
         navPane.setBottom(exitBox);
 
         return navPane;
+    }
+
+    private Group createGlobeIcon() {
+        Circle outline = new Circle(12, 12, 10);
+        Ellipse meridian = new Ellipse(12, 12, 4.5, 10);
+        Line equator = new Line(2, 12, 22, 12);
+
+        outline.getStyleClass().add("globe-icon");
+        meridian.getStyleClass().add("globe-icon");
+        equator.getStyleClass().add("globe-icon");
+
+        Group globe = new Group(outline, meridian, equator);
+        globe.setScaleX(0.75);
+        globe.setScaleY(0.75);
+        return globe;
     }
 }

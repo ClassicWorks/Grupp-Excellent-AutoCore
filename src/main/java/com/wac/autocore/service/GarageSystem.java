@@ -472,6 +472,50 @@ public class GarageSystem {
 
         return servicePackRepo.save(servicePack);
     }
+  
+    public Booking createBookingFrom(int previousBookingId) {
+        Optional<Booking> optionalPrevious = getBooking(previousBookingId);
+
+        if (!optionalPrevious.isPresent()) {
+            System.out.println("Booking with ID " + previousBookingId + " does not exist.");
+            return null;
+        }
+        Booking previous = optionalPrevious.get();
+
+        if (previous.getVehicle() == null) {
+            System.out.println("Booking with ID " + previousBookingId + " has no vehicle.");
+            return null;
+        }
+
+        Booking booking = new Booking(
+                previous.getVehicle(),
+                LocalDate.now(),
+                previous.getDescription(),
+                previous.getDescriptionLang(),
+                previous.getDescriptionTranslated()
+        );
+
+        Booking savedBooking = bookingRepo.save(booking);
+
+        System.out.println("Booking created from booking " + previousBookingId + ".");
+        System.out.println(savedBooking);
+
+        return savedBooking;
+    }
+
+    @Deprecated
+    public Booking createBooking(int vehicleId,
+                                 LocalDate date,
+                                 String description,
+                                 int mechanicId) {
+        Booking booking = createBooking(vehicleId, date, description);
+        //TODO should not be use
+        /*if (booking != null) {
+
+            booking.setMechanic(mechanicId);
+        }*/
+        return booking;
+    }
 
     public WorkOrder createWorkOrder(int bookingId,
                                      int mechanicId,
