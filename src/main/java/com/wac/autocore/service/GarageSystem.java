@@ -579,7 +579,7 @@ public class GarageSystem {
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (!workOrder.getStatus().equals("CREATED")) {
+        if (!workOrder.getStatus().canEditServices()) {
             System.out.println("Services can only be changed before the work order is started.");
             return null;
         }
@@ -611,7 +611,7 @@ public class GarageSystem {
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (!workOrder.getStatus().equals("CREATED")) {
+        if (!workOrder.getStatus().canEditServices()) {
             System.out.println("Services can only be changed before the work order is started.");
             return null;
         }
@@ -629,6 +629,26 @@ public class GarageSystem {
         return workOrderRepo.update(workOrder);
     }
 
+    public void confirmWorkOrder (int workOrderId) {
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
+
+        if (!optionalWorkOrder.isPresent()) {
+            System.out.println("Work order with ID " + workOrderId + " does not exist.");
+            return;
+        }
+
+        WorkOrder workOrder = optionalWorkOrder.get();
+
+        if (workOrder.getStatus() != WorkOrderStatus.DRAFT) {
+            System.out.println("Only draft work orders can be confirmed.");
+            return;
+        }
+
+        workOrder.setStatus(WorkOrderStatus.CONFIRMED);
+        workOrderRepo.update(workOrder);
+
+        System.out.println("Work order " + workOrderId + " has been confirmed.");
+    }
     public WorkOrder updateWorkOrderServices(int workOrderId,
                                              List<Integer> serviceItemIdsToAdd,
                                              List<Integer> itemIdsToRemove) {
@@ -640,7 +660,7 @@ public class GarageSystem {
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (!workOrder.getStatus().equals("CREATED")) {
+        if (!workOrder.getStatus().canEditServices()) {
             System.out.println("Services can only be changed before the work order is started.");
             return null;
         }
@@ -686,8 +706,8 @@ public class GarageSystem {
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (!workOrder.getStatus().equals("CREATED")) {
-            System.out.println("Work order cannot be started.");
+        if (workOrder.getStatus() != WorkOrderStatus.CONFIRMED) {
+            System.out.println("Only confirmed work orders can be started.");
             return;
         }
 
@@ -702,7 +722,7 @@ public class GarageSystem {
             booking.setStatus("IN_PROGRESS");
         }
 
-        workOrder.setStatus("IN_PROGRESS");
+        workOrder.setStatus(WorkOrderStatus.IN_PROGRESS);
         workOrderRepo.update(workOrder);
 
         System.out.println("Work order " + workOrderId + " has been started.");
@@ -717,7 +737,7 @@ public class GarageSystem {
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (!workOrder.getStatus().equals("IN_PROGRESS")) {
+        if (workOrder.getStatus() != WorkOrderStatus.IN_PROGRESS) {
             System.out.println("Only work orders in progress can be completed.");
             return;
         }
@@ -733,10 +753,42 @@ public class GarageSystem {
             booking.setStatus("COMPLETED");
         }
 
-        workOrder.setStatus("COMPLETED");
+        workOrder.setStatus(WorkOrderStatus.COMPLETED);
         workOrderRepo.update(workOrder);
 
         System.out.println("Work order " + workOrderId + " has been completed.");
+    }
+
+    public void cancelWorkOrder(int workOrderId) {
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
+
+        if (!optionalWorkOrder.isPresent()) {
+            System.out.println("Work order with ID " + workOrderId + " does not exist.");
+            return;
+        }
+
+        WorkOrder workOrder = optionalWorkOrder.get();
+
+        if (!workOrder.getStatus().canBeCancelled()) {
+            System.out.println("Work order cannot be cancelled.");
+            return;
+        }
+
+        Mechanic mechanic = workOrder.getMechanic();
+        Booking booking = workOrder.getBooking();
+
+        if (workOrder.getStatus() == WorkOrderStatus.IN_PROGRESS && mechanic != null) {
+            mechanic.setAvailable(true);
+        }
+
+        if (booking != null) {
+            booking.setStatus("CANCELLED");
+        }
+
+        workOrder.setStatus(WorkOrderStatus.CANCELLED);
+        workOrderRepo.update(workOrder);
+
+        System.out.println("Work order " + workOrderId + " has been cancelled.");
     }
 
     public Invoice createInvoice(int workOrderId, String discountCode) {
@@ -748,7 +800,7 @@ public class GarageSystem {
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (!workOrder.getStatus().equals("COMPLETED")) {
+        if (workOrder.getStatus() != WorkOrderStatus.COMPLETED) {
             System.out.println("Invoice can only be created for a completed work order.");
             return null;
         }

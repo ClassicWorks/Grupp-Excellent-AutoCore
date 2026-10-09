@@ -2,6 +2,7 @@ package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.WorkOrder;
+import com.wac.autocore.model.WorkOrderStatus;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
@@ -41,7 +42,7 @@ public class CreateInvoiceForm {
                 .collect(Collectors.toList());
 
         List<WorkOrder> availableWorkOrders = garageSystem.getWorkOrders().stream()
-                .filter(workOrder -> workOrder.getStatus().equalsIgnoreCase("COMPLETED"))
+                .filter(workOrder -> workOrder.getStatus() == WorkOrderStatus.COMPLETED)
                 .filter(workOrder -> !invoicedWorkOrderIds.contains(workOrder.getId()))
                 .collect(Collectors.toList());
 

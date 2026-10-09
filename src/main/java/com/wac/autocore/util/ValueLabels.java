@@ -1,5 +1,7 @@
 package com.wac.autocore.util;
 
+import com.wac.autocore.model.WorkOrderStatus;
+
 public class ValueLabels {
 
     public static String paymentType(String value) {
@@ -24,6 +26,10 @@ public class ValueLabels {
         }
         String key = prefix + normalize(value);
         return LanguageManager.getStringOrDefault(key, fallback == null ? "" : fallback);
+    }
+
+    public static String workOrderStatus(WorkOrderStatus status) {
+        return lookup("workorder.status.", status.name(), status.name());
     }
 
     private static String normalize(String value) {

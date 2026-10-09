@@ -23,13 +23,14 @@ public class WorkOrder {
     @OneToMany(mappedBy = "workOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkOrderItem> items = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 15)
-    private String status;
+    private WorkOrderStatus status;
 
     public WorkOrder(Booking booking, Mechanic mechanic) {
         this.booking = booking;
         this.mechanic = mechanic;
-        this.status = "CREATED";
+        this.status = WorkOrderStatus.DRAFT;
     }
 
     protected WorkOrder() {
@@ -59,11 +60,11 @@ public class WorkOrder {
         this.mechanic = mechanic;
     }
 
-    public String getStatus() {
+    public WorkOrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(WorkOrderStatus status) {
         this.status = status;
     }
 
