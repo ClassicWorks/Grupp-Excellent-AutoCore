@@ -33,7 +33,8 @@ public class ServiceItemRepoImpl implements ServiceItemRepo {
         try(Session s = HibernateUtil.getSessionFactory().openSession()){
             return s.createQuery("from ServiceItem", ServiceItem.class)
                     .list();
-        }    }
+        }
+    }
 
     @Override
     public Optional<ServiceItem> get(int id) {

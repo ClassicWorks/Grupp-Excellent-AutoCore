@@ -11,12 +11,16 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.List;
+
 public class ViewManager {
 
     private static ViewManager instance;
 
     private Stage primaryStage;
     private BorderPane rootLayout;
+    private SideNav sideNav;
+    private String currentNav;
     private Runnable currentViewRefresher;
     private final GarageSystem garageSystem;
 
@@ -35,7 +39,8 @@ public class ViewManager {
         this.primaryStage = stage;
 
         rootLayout = new BorderPane();
-        rootLayout.setLeft(new SideNav().show());
+        sideNav = new SideNav();
+        rootLayout.setLeft(sideNav.show());
 
         Scene scene = new Scene(rootLayout, 1300, 1000);
         scene.getStylesheets().add("style/stylesheet.css");
@@ -65,6 +70,13 @@ public class ViewManager {
         }
     }
 
+    private void selectNav(String name) {
+        currentNav = name;
+        if (sideNav != null) {
+            sideNav.select(name);
+        }
+    }
+
 
     /*
      * Byt ut placeholder-metoder (Labels) mot riktig view allt eftersom de byggs.
@@ -76,46 +88,58 @@ public class ViewManager {
 
     public void showCustomers() {
         currentViewRefresher = this::showCustomers;
+        selectNav(SideNav.CUSTOMERS);
         showView(new ShowCustomersView().show());
     }
 
     public void showVehicles() {
         currentViewRefresher = this::showVehicles;
+        selectNav(SideNav.VEHICLES);
         showView(new ShowVehicleView().show());
     }
 
     public void showBookings() {
         currentViewRefresher = this::showBookings;
+        selectNav(SideNav.BOOKINGS);
         showView(new ShowBookingsView().show());
     }
 
     public void showMechanics() {
         currentViewRefresher = this::showMechanics;
+        selectNav(SideNav.MECHANICS);
         showView(new ShowMechanicsView().show());
     }
 
     public void showServices() {
         currentViewRefresher = this::showServices;
+        selectNav(SideNav.SERVICES);
         showView(new ShowServiceItemsView().show());
     }
 
     public void showWorkOrders() {
         currentViewRefresher = this::showWorkOrders;
+        selectNav(SideNav.WORK_ORDERS);
         showView(new ShowWorkOrdersView().show());
     }
 
     public void showInvoices() {
         currentViewRefresher = this::showInvoices;
+        selectNav(SideNav.INVOICES);
         showView(new ShowInvoicesView().show());
     }
 
     public void showPayments() {
         currentViewRefresher = this::showPayments;
+        selectNav(SideNav.PAYMENTS);
         showView(new ShowPaymentsView().show());
     }
 
     public void refreshSideNav() {
-        rootLayout.setLeft(new SideNav().show());
+        sideNav = new SideNav();
+        rootLayout.setLeft(sideNav.show());
+        if (currentNav != null) {
+            sideNav.select(currentNav);
+        }
     }
 
     public void refreshCurrentView() {
@@ -142,9 +166,16 @@ public class ViewManager {
         showPopup(popup, LanguageManager.getString("workorder.form.title"), content, null);
     }
 
-    public void showEditWorkOrderItemsPopUp(int workOrderId, Runnable onClose) {
+    public void showCreateWorkOrderPopup(int bookingId, List<Integer> preselectedServiceIds) {
         Stage popup = new Stage();
-        Parent content = new EditWorkOrderItemsForm(popup, workOrderId).show();
+        Parent content = new CreateWorkOrderForm(popup).show(bookingId, preselectedServiceIds);
+
+        showPopup(popup, LanguageManager.getString("workorder.form.title"), content, this::showWorkOrders);
+    }
+
+    public void showEditWorkOrderItemsPopUp(int workOrderId) {
+        Stage popup = new Stage();
+        Parent content = new EditWorkOrderItemsForm(popup, workOrderId, garageSystem).show();
 
         showPopup(popup,
                 String.format(LanguageManager.getString("workorder.edit.title"), workOrderId),
@@ -186,6 +217,13 @@ public class ViewManager {
                 String.format(LanguageManager.getString("invoice.id"), invoiceId),
                 content,
                 null);
+    }
+    public void showCreateServicePackPopup(){
+        Stage popup = new Stage();
+        Parent content = new CreateServicePackForm(garageSystem, popup).show();
+
+        showPopup(popup, LanguageManager.getString("servicePack.form.title"), content, this::showServices);
+
     }
 
     public void exit() {

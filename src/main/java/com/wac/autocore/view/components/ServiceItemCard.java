@@ -6,7 +6,6 @@ import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.util.ValueLabels;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import javafx.scene.Cursor;
 
 import java.util.function.Consumer;
 

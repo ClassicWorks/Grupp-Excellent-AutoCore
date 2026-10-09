@@ -19,6 +19,7 @@ public class GarageSystem {
     private final WorkOrderRepo workOrderRepo;
     private final InvoiceRepo invoiceRepo;
     private final PaymentRepo paymentRepo;
+    private final ServicePackRepo servicePackRepo;
 
     public GarageSystem() {
         vehicleRepo = new VehicleRepoImpl();
@@ -29,6 +30,7 @@ public class GarageSystem {
         workOrderRepo = new WorkOrderRepoImpl();
         invoiceRepo = new InvoiceRepoImpl();
         paymentRepo  = new PaymentRepoImpl();
+        servicePackRepo = new ServicePackRepoImpl();
     }
 
     public void showCustomers() {
@@ -169,6 +171,51 @@ public class GarageSystem {
         System.out.println("Price for " + savedServiceItem.getName() + " updated to " + newPrice + " SEK.");
 
         return savedServiceItem;
+    }
+
+    public void showServicePacks() {
+        System.out.println();
+        System.out.println("=== SERVICE PACKS ===");
+        if (servicePackRepo.getAll().isEmpty()) {
+            System.out.println("No services found.");
+            return;
+        }
+        for (ServicePack servicePack : servicePackRepo.getAll()) {
+            System.out.println(servicePack);
+        }
+    }
+
+    public List<ServicePack> getServicePacks() {
+        return servicePackRepo.getAll();
+    }
+
+    public Optional<ServicePack> getServicePack(int id){
+        return servicePackRepo.getById(id);
+    }
+
+    public ServicePack updateServicePack(int servicePackId, ServicePack updatedServicePack){
+        Optional<ServicePack> optionalServicePack = getServicePack(servicePackId);
+        if(!optionalServicePack.isPresent()){
+            throw new IllegalArgumentException("Service pack with ID " + servicePackId + " does not exist.");
+        }
+
+        //Om någon ServiceItem inte finns kasta exception
+        updatedServicePack.getServiceItems().forEach(si -> {
+            Optional<ServiceItem> optionalServiceItem = getServiceItem(si.getId());
+            if(!optionalServiceItem.isPresent()) {
+                throw new  IllegalArgumentException("Service item with ID " + si.getId() + " does not exist.");
+            }
+        });
+
+        ServicePack servicePackToUpdate = optionalServicePack.get();
+        servicePackToUpdate.setName(updatedServicePack.getName());
+        servicePackToUpdate.setServiceItems(updatedServicePack.getServiceItems());
+
+        return servicePackRepo.update(servicePackToUpdate);
+    }
+
+    public void deleteServicePack(int id){
+        servicePackRepo.delete(id);
     }
 
     public void showMechanics() {
@@ -406,6 +453,56 @@ public class GarageSystem {
         return savedBooking;
     }
 
+
+    public ServicePack createServicePack(String name, int... serviceItemIds) throws IllegalArgumentException {
+        if(!servicePackRepo.nameAvailable(name)){
+            throw new IllegalArgumentException("Service pack with name \"" + name + "\" already exists.");
+        }
+        ServicePack servicePack = new ServicePack(name);
+
+        for(int serviceItemId : serviceItemIds) {
+            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
+            if(!optionalServiceItem.isPresent()) {
+                throw new  IllegalArgumentException("Service item with ID " + serviceItemId + " does not exist.");
+            }
+            ServiceItem serviceItem = optionalServiceItem.get();
+
+            servicePack.addServiceItem(serviceItem);
+        }
+
+        return servicePackRepo.save(servicePack);
+    }
+  
+    public Booking createBookingFrom(int previousBookingId) {
+        Optional<Booking> optionalPrevious = getBooking(previousBookingId);
+
+        if (!optionalPrevious.isPresent()) {
+            System.out.println("Booking with ID " + previousBookingId + " does not exist.");
+            return null;
+        }
+        Booking previous = optionalPrevious.get();
+
+        if (previous.getVehicle() == null) {
+            System.out.println("Booking with ID " + previousBookingId + " has no vehicle.");
+            return null;
+        }
+
+        Booking booking = new Booking(
+                previous.getVehicle(),
+                LocalDate.now(),
+                previous.getDescription(),
+                previous.getDescriptionLang(),
+                previous.getDescriptionTranslated()
+        );
+
+        Booking savedBooking = bookingRepo.save(booking);
+
+        System.out.println("Booking created from booking " + previousBookingId + ".");
+        System.out.println(savedBooking);
+
+        return savedBooking;
+    }
+
     @Deprecated
     public Booking createBooking(int vehicleId,
                                  LocalDate date,
@@ -551,6 +648,52 @@ public class GarageSystem {
         workOrderRepo.update(workOrder);
 
         System.out.println("Work order " + workOrderId + " has been confirmed.");
+    public WorkOrder updateWorkOrderServices(int workOrderId,
+                                             List<Integer> serviceItemIdsToAdd,
+                                             List<Integer> itemIdsToRemove) {
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
+
+        if (!optionalWorkOrder.isPresent()) {
+            System.out.println("Work order with ID " + workOrderId + " does not exist.");
+            return null;
+        }
+        WorkOrder workOrder = optionalWorkOrder.get();
+
+        if (!workOrder.getStatus().equals("CREATED")) {
+            System.out.println("Services can only be changed before the work order is started.");
+            return null;
+        }
+
+        for (Integer itemId : itemIdsToRemove) {
+            if (!workOrder.removeItem(itemId)) {
+                System.out.println("Item with ID " + itemId + " is not on the work order.");
+                return null;
+            }
+        }
+
+        for (Integer serviceItemId : serviceItemIdsToAdd) {
+            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
+
+            if (!optionalServiceItem.isPresent()) {
+                System.out.println("Service item with ID " + serviceItemId + " does not exist.");
+                return null;
+            }
+
+            if (workOrder.hasService(serviceItemId)) {
+                System.out.println("Service is already on the work order.");
+                return null;
+            }
+
+            ServiceItem serviceItem = optionalServiceItem.get();
+            workOrder.addItem(serviceItem, serviceItem.getPrice());
+        }
+
+        if (workOrder.getItems().isEmpty()) {
+            System.out.println("A work order must have at least one service.");
+            return null;
+        }
+
+        return workOrderRepo.update(workOrder);
     }
 
     public void startWorkOrder(int workOrderId) {

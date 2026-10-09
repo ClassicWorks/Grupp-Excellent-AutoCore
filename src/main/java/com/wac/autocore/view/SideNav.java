@@ -3,12 +3,19 @@ package com.wac.autocore.view;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.Line;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SideNav {
     /*customer
@@ -21,6 +28,16 @@ public class SideNav {
      * Payments
      * Exit*/
 
+    public static final String CUSTOMERS = "customers";
+    public static final String VEHICLES = "vehicles";
+    public static final String BOOKINGS = "bookings";
+    public static final String MECHANICS = "mechanics";
+    public static final String SERVICES = "services";
+    public static final String WORK_ORDERS = "workorders";
+    public static final String INVOICES = "invoices";
+    public static final String PAYMENTS = "payments";
+
+    private final Map<String, Button> navButtons = new HashMap<>();
 
     private VBox navBox;
     /**
@@ -50,6 +67,7 @@ public class SideNav {
         Button paymentBtn = new Button(LanguageManager.getString("nav.payments"));
         Button exitBtn = new Button(LanguageManager.getString("nav.exit"));
         Button languageBtn = new Button(LanguageManager.getCurrentLanguage().equals("sv") ? "English" : "Svenska");
+        languageBtn.setGraphic(createGlobeIcon());
 
         customerBtn.getStyleClass().addAll("menu-btn", "customer");
         vehicleBtn.getStyleClass().addAll("menu-btn", "vehicle");
@@ -60,49 +78,26 @@ public class SideNav {
         invoiceBtn.getStyleClass().addAll("menu-btn", "invoice");
         paymentBtn.getStyleClass().addAll("menu-btn", "payment");
         exitBtn.getStyleClass().addAll("menu-btn", "exit-btn");
-        languageBtn.getStyleClass().addAll("menu-btn", "language");
+        languageBtn.getStyleClass().add("language-btn");
+
+        navButtons.put(CUSTOMERS, customerBtn);
+        navButtons.put(VEHICLES, vehicleBtn);
+        navButtons.put(BOOKINGS, bookingBtn);
+        navButtons.put(MECHANICS, mechanicsBtn);
+        navButtons.put(SERVICES, serviceBtn);
+        navButtons.put(WORK_ORDERS, workOrderBtn);
+        navButtons.put(INVOICES, invoiceBtn);
+        navButtons.put(PAYMENTS, paymentBtn);
 
 
-        customerBtn.setOnAction(e -> {
-            ViewManager.getInstance().showCustomers();
-            StylingUtil.setSelected(customerBtn, "menu-btn");
-
-        });
-        vehicleBtn.setOnAction(e -> {
-            ViewManager.getInstance().showVehicles();
-            StylingUtil.setSelected(vehicleBtn, "menu-btn");
-
-        });
-        bookingBtn.setOnAction(e -> {
-            ViewManager.getInstance().showBookings();
-            StylingUtil.setSelected(bookingBtn, "menu-btn");
-
-        });
-        mechanicsBtn.setOnAction(e -> {
-            ViewManager.getInstance().showMechanics();
-            StylingUtil.setSelected(mechanicsBtn, "menu-btn");
-
-        });
-        serviceBtn.setOnAction(e -> {
-            ViewManager.getInstance().showServices();
-            StylingUtil.setSelected(serviceBtn, "menu-btn");
-
-        });
-        workOrderBtn.setOnAction(e -> {
-            ViewManager.getInstance().showWorkOrders();
-            StylingUtil.setSelected(workOrderBtn, "menu-btn");
-
-        });
-        invoiceBtn.setOnAction(e -> {
-            ViewManager.getInstance().showInvoices();
-            StylingUtil.setSelected(invoiceBtn, "menu-btn");
-
-        });
-        paymentBtn.setOnAction(e -> {
-            ViewManager.getInstance().showPayments();
-            StylingUtil.setSelected(paymentBtn, "menu-btn");
-
-        });
+        customerBtn.setOnAction(e -> ViewManager.getInstance().showCustomers());
+        vehicleBtn.setOnAction(e -> ViewManager.getInstance().showVehicles());
+        bookingBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
+        mechanicsBtn.setOnAction(e -> ViewManager.getInstance().showMechanics());
+        serviceBtn.setOnAction(e -> ViewManager.getInstance().showServices());
+        workOrderBtn.setOnAction(e -> ViewManager.getInstance().showWorkOrders());
+        invoiceBtn.setOnAction(e -> ViewManager.getInstance().showInvoices());
+        paymentBtn.setOnAction(e -> ViewManager.getInstance().showPayments());
         exitBtn.setOnAction(e -> {
             ViewManager.getInstance().exit();
         });
@@ -122,10 +117,9 @@ public class SideNav {
                 serviceBtn,
                 workOrderBtn,
                 invoiceBtn,
-                paymentBtn,
-                languageBtn);
+                paymentBtn);
 
-        VBox exitBox = new VBox(exitBtn);
+        VBox exitBox = new VBox(languageBtn, exitBtn);
 
         navBox.getStyleClass().add("side-nav");
         exitBox.getStyleClass().add("side-nav");
@@ -135,5 +129,27 @@ public class SideNav {
         navPane.setBottom(exitBox);
 
         return navPane;
+    }
+
+    public void select(String name) {
+        Button button = navButtons.get(name);
+        if (button != null) {
+            StylingUtil.setSelected(button, "menu-btn");
+        }
+    }
+
+    private Group createGlobeIcon() {
+        Circle outline = new Circle(12, 12, 10);
+        Ellipse meridian = new Ellipse(12, 12, 4.5, 10);
+        Line equator = new Line(2, 12, 22, 12);
+
+        outline.getStyleClass().add("globe-icon");
+        meridian.getStyleClass().add("globe-icon");
+        equator.getStyleClass().add("globe-icon");
+
+        Group globe = new Group(outline, meridian, equator);
+        globe.setScaleX(0.75);
+        globe.setScaleY(0.75);
+        return globe;
     }
 }

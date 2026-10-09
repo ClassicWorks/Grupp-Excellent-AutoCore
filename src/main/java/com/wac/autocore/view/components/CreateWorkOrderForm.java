@@ -27,6 +27,10 @@ public class CreateWorkOrderForm {
     }
 
     public Parent show(int bookingId) {
+        return show(bookingId, new ArrayList<>());
+    }
+
+    public Parent show(int bookingId, List<Integer> preselectedServiceIds) {
         VBox root = new VBox();
         root.getStyleClass().add("form-container");
 
@@ -79,12 +83,16 @@ public class CreateWorkOrderForm {
         for(ServiceItem service : garageSystem.getServiceItems()){
             CheckBox checkBox = new CheckBox(ValueLabels.serviceName(service.getName()));
             checkBox.setUserData(service.getId());
+            checkBox.setSelected(preselectedServiceIds.contains(service.getId()));
             serviceCheckBoxes.add(checkBox);
             serviceItemsCheckBoxes.getChildren().add(checkBox);
         }
 
         VBox serviceItemsBox = new VBox(serviceItemLabel, serviceItemsCheckBoxes);
         serviceItemsBox.getStyleClass().add("form-field-container");
+
+        Label formErrorLabel = new Label();
+        formErrorLabel.getStyleClass().add("error-label");
 
         Button submitBtn = new Button(LanguageManager.getString("booking.createWorkOrder"));
         submitBtn.getStyleClass().add("confirm-btn");
@@ -93,29 +101,41 @@ public class CreateWorkOrderForm {
         actionableBtns.getStyleClass().add("btn-container");
 
         submitBtn.setOnAction(e -> {
-                Mechanic selectedMechanic = mechanicComboBox.getValue();
+                    formErrorLabel.setText("");
 
-                int[] selectedServiceItems = serviceCheckBoxes.stream()
-                        .filter(CheckBox::isSelected)
-                        .mapToInt(s -> (int) s.getUserData())
-                        .toArray();
+                    Mechanic selectedMechanic = mechanicComboBox.getValue();
 
-                WorkOrder createdWorkOrder = garageSystem.createWorkOrder(
-                        bookingId,
-                        selectedMechanic.getId(),
-                        selectedServiceItems);
-                //TODO dialog box if error occurs
+                    if (selectedMechanic == null) {
+                        formErrorLabel.setText(LanguageManager.getString("workorder.form.error.noMechanic"));
+                        return;
+                    }
 
-                popupStage.close();
+                    int[] selectedServiceItems = serviceCheckBoxes.stream()
+                            .filter(CheckBox::isSelected)
+                            .mapToInt(s -> (int) s.getUserData())
+                            .toArray();
 
-                AppDialog.showInformation(
-                        LanguageManager.getString("workorder.form.dialog.workorderCreated.title"),
-                        LanguageManager.getString("workorder.form.dialog.workorderCreated.header"),
-                        String.format(LanguageManager.getString("workorder.form.dialog.workorderCreated.message"),
-                            createdWorkOrder.getId())
+                    WorkOrder createdWorkOrder = garageSystem.createWorkOrder(
+                            bookingId,
+                            selectedMechanic.getId(),
+                            selectedServiceItems);
+                    //TODO dialog box if error occurs
 
-                );
-            }
+                    if (createdWorkOrder == null) {
+                        formErrorLabel.setText(LanguageManager.getString("workorder.form.error.failed"));
+                        return;
+                    }
+
+                    popupStage.close();
+
+                    AppDialog.showInformation(
+                            LanguageManager.getString("workorder.form.dialog.workorderCreated.title"),
+                            LanguageManager.getString("workorder.form.dialog.workorderCreated.header"),
+                            String.format(LanguageManager.getString("workorder.form.dialog.workorderCreated.message"),
+                                    createdWorkOrder.getId())
+
+                    );
+                }
         );
 
         root.getChildren().addAll(
@@ -123,6 +143,7 @@ public class CreateWorkOrderForm {
                 bookingCard,
                 mechanicBox,
                 serviceItemsBox,
+                formErrorLabel,
                 actionableBtns
         );
         ScrollPane scrollPane = new ScrollPane(root);
