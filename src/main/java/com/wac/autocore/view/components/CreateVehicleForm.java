@@ -20,10 +20,11 @@ import javafx.stage.Stage;
 
 public class CreateVehicleForm {
 
-    private final GarageSystem garageSystem = new GarageSystem();
+    private final GarageSystem garageSystem;
     private final Stage popupStage;
 
-    public CreateVehicleForm(Stage popUpStage) {
+    public CreateVehicleForm(GarageSystem garageSystem, Stage popUpStage) {
+        this.garageSystem = garageSystem;
         this.popupStage = popUpStage;
     }
 
@@ -34,33 +35,44 @@ public class CreateVehicleForm {
         Label title = new Label(LanguageManager.getString("vehicle.form.title"));
         title.getStyleClass().add("form-title");
 
+        VBox regBox = new VBox();
+        Label regLabel = new Label(LanguageManager.getString("vehicle.form.regNumber.label"));
+        regLabel.getStyleClass().add("form-field-label");
         TextField regField = new TextField();
         regField.setPromptText(LanguageManager.getString("vehicle.form.regNumber.prompt"));
-        VBox regBox = new VBox(regField);
+        regBox.getChildren().addAll(regLabel, regField);
         regBox.getStyleClass().add("form-field-container");
 
+        Label brandLabel = new Label(LanguageManager.getString("vehicle.form.brand.label"));
+        brandLabel.getStyleClass().add("form-field-label");
         TextField brandField = new TextField();
         brandField.setPromptText(LanguageManager.getString("vehicle.form.brand.prompt"));
-        VBox brandBox = new VBox(brandField);
+        VBox brandBox = new VBox(brandLabel, brandField);
         brandBox.getStyleClass().add("form-field-container");
 
+        Label modelLabel = new Label(LanguageManager.getString("vehicle.form.model.label"));
+        modelLabel.getStyleClass().add("form-field-label");
         TextField modelField = new TextField();
         modelField.setPromptText(LanguageManager.getString("vehicle.form.model.prompt"));
-        VBox modelBox = new VBox(modelField);
+        VBox modelBox = new VBox(modelLabel, modelField);
         modelBox.getStyleClass().add("form-field-container");
 
+        Label yearLabel = new Label(LanguageManager.getString("vehicle.form.year.label"));
+        yearLabel.getStyleClass().add("form-field-label");
         TextField yearField = new TextField();
         yearField.setPromptText(LanguageManager.getString("vehicle.form.year.prompt"));
-        VBox yearBox = new VBox(yearField);
+        VBox yearBox = new VBox(yearLabel, yearField);
         yearBox.getStyleClass().add("form-field-container");
 
+        Label customerLabel = new Label(LanguageManager.getString("vehicle.form.customer.label"));
+        customerLabel.getStyleClass().add("form-field-label");
         ObservableList<Customer> customers =
                 FXCollections.observableArrayList(garageSystem.getCustomers());
 
         ComboBox<Customer> customerComboBox = new ComboBox<>(customers);
         customerComboBox.setPromptText(LanguageManager.getString("vehicle.form.customer.prompt"));
         customerComboBox.setConverter(ComboBoxLabels.customer());
-        VBox customerBox = new VBox(customerComboBox);
+        VBox customerBox = new VBox(customerLabel, customerComboBox);
         customerBox.getStyleClass().add("form-field-container");
 
         Label errorLabel = new Label();

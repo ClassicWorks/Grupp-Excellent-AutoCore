@@ -162,7 +162,7 @@ public class ViewManager {
     }
     public void showCreateVehiclePopup() {
         Stage popup = new Stage();
-        Parent content = new CreateVehicleForm(popup).show();
+        Parent content = new CreateVehicleForm(garageSystem, popup).show();
         showPopup(popup, LanguageManager.getString("vehicle.form.title"), content, this::showVehicles);
     }
 
