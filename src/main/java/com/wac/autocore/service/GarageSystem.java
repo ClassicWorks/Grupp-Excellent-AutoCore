@@ -648,6 +648,7 @@ public class GarageSystem {
         workOrderRepo.update(workOrder);
 
         System.out.println("Work order " + workOrderId + " has been confirmed.");
+    }
     public WorkOrder updateWorkOrderServices(int workOrderId,
                                              List<Integer> serviceItemIdsToAdd,
                                              List<Integer> itemIdsToRemove) {
@@ -659,7 +660,7 @@ public class GarageSystem {
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (!workOrder.getStatus().equals("CREATED")) {
+        if (!workOrder.getStatus().canEditServices()) {
             System.out.println("Services can only be changed before the work order is started.");
             return null;
         }

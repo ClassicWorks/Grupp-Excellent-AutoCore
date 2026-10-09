@@ -11,6 +11,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class WorkOrderDetails extends VBox {
 
     private final GarageSystem garageSystem = new GarageSystem();
@@ -152,6 +155,10 @@ public class WorkOrderDetails extends VBox {
             }));
         }
 
+        if (status == WorkOrderStatus.COMPLETED) {
+            buttons.getChildren().add(createButton("workorder.rebook", "confirm-btn", this::rebook));
+        }
+
         if (status.canBeCancelled()) {
             buttons.getChildren().add(createButton("workorder.cancel", "destroy-btn",
                     this::cancelWithConfirmation));
@@ -181,5 +188,24 @@ public class WorkOrderDetails extends VBox {
             garageSystem.cancelWorkOrder(workOrder.getId());
             onChanged.run();
         }
+    }
+
+    private void rebook() {
+        Booking booking = workOrder.getBooking();
+        if (booking == null) {
+            return;
+        }
+
+        List<Integer> serviceIds = workOrder.getItems().stream()
+                .filter(item -> item.getServiceItem() != null)
+                .map(item -> item.getServiceItem().getId())
+                .collect(Collectors.toList());
+
+        Booking newBooking = garageSystem.createBookingFrom(booking.getId());
+        if (newBooking == null) {
+            return;
+        }
+
+        ViewManager.getInstance().showCreateWorkOrderPopup(newBooking.getId(), serviceIds);
     }
 }
