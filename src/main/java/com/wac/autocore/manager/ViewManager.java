@@ -173,7 +173,7 @@ public class ViewManager {
         showPopup(popup, LanguageManager.getString("workorder.form.title"), content, this::showWorkOrders);
     }
 
-    public void showEditWorkOrderItemsPopUp(int workOrderId) {
+    public void showEditWorkOrderItemsPopUp(int workOrderId, Runnable onClose) {
         Stage popup = new Stage();
         Parent content = new EditWorkOrderItemsForm(popup, workOrderId, garageSystem).show();
 
