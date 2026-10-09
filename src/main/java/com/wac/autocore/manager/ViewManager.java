@@ -142,14 +142,14 @@ public class ViewManager {
         showPopup(popup, LanguageManager.getString("workorder.form.title"), content, null);
     }
 
-    public void showEditWorkOrderItemsPopUp(int workOrderId) {
+    public void showEditWorkOrderItemsPopUp(int workOrderId, Runnable onClose) {
         Stage popup = new Stage();
         Parent content = new EditWorkOrderItemsForm(popup, workOrderId).show();
 
         showPopup(popup,
                 String.format(LanguageManager.getString("workorder.edit.title"), workOrderId),
                 content,
-                this::showWorkOrders);
+                onClose);
     }
     public void showCreateVehiclePopup() {
         Stage popup = new Stage();

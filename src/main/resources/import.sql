@@ -63,7 +63,7 @@ INSERT INTO bookings (vehicle_id, date, description, description_lang, descripti
 
 -- Workorders
 -- WorkOrder 1: En tjänst, ännu inte påbörjad
-INSERT INTO work_orders (booking_id, mechanic_id, status) VALUES ( 1, 1, 'CREATED');
+INSERT INTO work_orders (booking_id, mechanic_id, status) VALUES ( 1, 1, 'DRAFT');
 
 -- WorkOrder 2: Två tjänster, arbete pågår
 INSERT INTO work_orders (booking_id, mechanic_id, status) VALUES ( 2, 2, 'IN_PROGRESS');
@@ -72,7 +72,7 @@ INSERT INTO work_orders (booking_id, mechanic_id, status) VALUES ( 2, 2, 'IN_PRO
 INSERT INTO work_orders (booking_id, mechanic_id, status) VALUES (3, 3, 'COMPLETED');
 
 -- WorkOrder 4: Två tjänster, ännu inte påbörjad
-INSERT INTO work_orders (booking_id, mechanic_id, status) VALUES ( 5, 2, 'CREATED');
+INSERT INTO work_orders (booking_id, mechanic_id, status) VALUES ( 5, 2, 'DRAFT');
 
 -- WorkOrder 5: Fyra tjänster, arbete pågår
 INSERT INTO work_orders (booking_id, mechanic_id, status) VALUES ( 7, 3, 'IN_PROGRESS');

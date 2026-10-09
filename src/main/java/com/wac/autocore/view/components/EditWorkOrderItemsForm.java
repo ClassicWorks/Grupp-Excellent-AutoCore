@@ -68,7 +68,7 @@ public class EditWorkOrderItemsForm {
         title.getStyleClass().add("form-heading");
         content.getChildren().add(title);
 
-        if (!workOrder.getStatus().equals("CREATED")) {
+        if (!workOrder.getStatus().canEditServices()) {
             content.getChildren().addAll(
                     new Label(LanguageManager.getString("workorder.edit.locked")),
                     createCloseBtn());
