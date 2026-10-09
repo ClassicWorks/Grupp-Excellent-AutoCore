@@ -210,7 +210,15 @@ public class ServicePackDetails extends BorderPane{
         Button saveBtn = new Button(LanguageManager.getString("servicePack.save"));
         saveBtn.getStyleClass().add("confirm-btn");
         saveBtn.setOnAction(e -> {
-            servicePack.setName(nameField.getText().trim());
+            errorLabel.setText("");
+
+            String nameValue = nameField.getText().trim();
+
+            if (nameValue.isEmpty()) {
+                errorLabel.setText(LanguageManager.getString("customer.form.error.nameRequired"));
+                return;
+            }
+            servicePack.setName(nameValue);
             onSave.accept(servicePack);
         });
         return saveBtn;
