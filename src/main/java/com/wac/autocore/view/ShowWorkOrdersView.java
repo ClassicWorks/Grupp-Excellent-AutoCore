@@ -3,21 +3,24 @@ package com.wac.autocore.view;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.ValueLabels;
+import com.wac.autocore.view.components.WorkOrderDetails;
 import com.wac.autocore.view.components.kanban.KanbanColumn;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.WorkOrderCard;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ShowWorkOrdersView {
+
     private final GarageSystem garageSystem;
+    private final TabPane tabPane = new TabPane();
 
     public ShowWorkOrdersView() {
         garageSystem = new GarageSystem();
@@ -25,125 +28,75 @@ public class ShowWorkOrdersView {
 
     public Parent show() {
         BorderPane root = new BorderPane();
-        Node header = getHeader();
-        header.getStyleClass().add("content-header-container");
+        root.setTop(getHeader());
 
-        //Could be added later
-        //Node filterView = getFilter();
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        refreshTabs();
 
-        //Create grid with 3 columns
-        KanbanGrid kanbanGrid = new KanbanGrid(3);
-
-        //Create columns
-        VBox incomingOrdersView =
-                new KanbanColumn(
-                        LanguageManager.getString("workorders.column.incoming"),
-                        getIncomingList(),
-                        "ready"
-                );
-
-        VBox inProgressOrdersView =
-                new KanbanColumn(
-                        LanguageManager.getString("workorders.column.inProgress"),
-                        getInProgressList(),
-                        "in-progress"
-                );
-
-        VBox completedOrdersView =
-                new KanbanColumn(
-                        LanguageManager.getString("workorders.column.completed"),
-                        getCompletedList(),
-                        "completed"
-                );
-
-        kanbanGrid.add(incomingOrdersView, 0, 0);
-        kanbanGrid.add(inProgressOrdersView, 1, 0);
-        kanbanGrid.add(completedOrdersView, 2, 0);
-
-        //Make columns able to grow
-        GridPane.setVgrow(incomingOrdersView, Priority.ALWAYS);
-        GridPane.setVgrow(inProgressOrdersView, Priority.ALWAYS);
-        GridPane.setVgrow(completedOrdersView, Priority.ALWAYS);
-
-        root.setTop(header);
-        root.setCenter(kanbanGrid);
+        root.setCenter(tabPane);
         return root;
     }
 
-    //TODO move logic to garageSystem
-    private Node getCompletedList() {
-        List<WorkOrder> completedWorkOrders = garageSystem.getWorkOrdersWithItems().stream()
-                .filter(wo -> wo.getStatus().equalsIgnoreCase("COMPLETED"))
-                .collect(Collectors.toList());
-        if (completedWorkOrders.isEmpty()) {
-            return new Label(LanguageManager.getString("workorders.empty.completed"));
+    public void refreshTabs() {
+        int selectedIndex = tabPane.getSelectionModel().getSelectedIndex();
+
+        List<WorkOrder> allWorkOrders = garageSystem.getWorkOrdersWithItems();
+
+        tabPane.getTabs().clear();
+        for (WorkOrderStatus status : WorkOrderStatus.values()) {
+            List<WorkOrder> workOrders = allWorkOrders.stream()
+                    .filter(workOrder -> workOrder.getStatus() == status)
+                    .collect(Collectors.toList());
+
+            tabPane.getTabs().add(createTab(status, workOrders));
         }
 
-        return getWorkOrderCardsFromList(completedWorkOrders);
+        if (selectedIndex >= 0) {
+            tabPane.getSelectionModel().select(selectedIndex);
+        }
     }
 
-    private Node getInProgressList() {
-        List<WorkOrder> completedWorkOrders = garageSystem.getWorkOrdersWithItems().stream()
-                .filter(wo -> wo.getStatus().equalsIgnoreCase("IN_PROGRESS"))
-                .collect(Collectors.toList());
-        if (completedWorkOrders.isEmpty()) {
-            return new Label(LanguageManager.getString("workorders.empty.inProgress"));
+    private Tab createTab(WorkOrderStatus status, List<WorkOrder> workOrders) {
+        VBox detailPanel = new VBox();
+
+        VBox cardList = new VBox();
+        cardList.getStyleClass().add("card-container");
+
+        if (workOrders.isEmpty()) {
+            cardList.getChildren().add(new Label(LanguageManager.getString("workorders.empty")));
         }
 
-        return getWorkOrderCardsFromList(completedWorkOrders);
-    }
-
-    private Node getIncomingList() {
-        List<WorkOrder> completedWorkOrders = garageSystem.getWorkOrdersWithItems().stream()
-                .filter(wo -> wo.getStatus().equalsIgnoreCase("CREATED"))
-                .collect(Collectors.toList());
-        if (completedWorkOrders.isEmpty()) {
-            return new Label(LanguageManager.getString("workorders.empty.incoming"));
+        for (WorkOrder workOrder : workOrders) {
+            cardList.getChildren().add(new WorkOrderCard(workOrder, wo ->
+                    detailPanel.getChildren().setAll(new WorkOrderDetails(wo, this::refreshTabs))));
         }
 
-        return getWorkOrderCardsFromList(completedWorkOrders);
-    }
+        ScrollPane cardScroll = new ScrollPane(cardList);
+        cardScroll.setFitToWidth(true);
 
-    private VBox getWorkOrderCardsFromList(List<WorkOrder> workOrders) {
-        VBox workOrderCards = new VBox();
-        for(WorkOrder workOrder : workOrders) {
-            //Check if necessary objects exists
-            Mechanic mechanic = workOrder.getMechanic();
-            if(mechanic == null){
-                workOrderCards.getChildren().add(new Label(LanguageManager.getString("workorders.error.mechanicNotFound")));
-                continue;
-            }
-            Booking booking = workOrder.getBooking();
-            if(booking == null){
-                workOrderCards.getChildren().add(new Label(LanguageManager.getString("workorders.error.bookingNotFound")));
-                continue;
-            }
-            Vehicle vehicle = booking.getVehicle();
-            if(vehicle == null){
-                workOrderCards.getChildren().add(new Label(LanguageManager.getString("workorders.error.vehicleNotFound")));
-                continue;
-            }
+        KanbanGrid grid = new KanbanGrid(2);
+        grid.add(cardScroll, 0, 0);
+        grid.add(detailPanel, 1, 0);
+        GridPane.setVgrow(cardScroll, Priority.ALWAYS);
+        GridPane.setVgrow(detailPanel, Priority.ALWAYS);
 
-            List<WorkOrderItem> items = workOrder.getItems();
+        String tabTitle = String.format("%s (%d)",
+                ValueLabels.workOrderStatus(status), workOrders.size());
 
-            workOrderCards.getChildren().add(new WorkOrderCard(workOrder, booking, vehicle,mechanic, items));
-        }
-        workOrderCards.getStyleClass().add("card-container");
-        VBox.setVgrow(workOrderCards, Priority.ALWAYS);
-        workOrderCards.setMaxHeight(Double.MAX_VALUE);
-        return workOrderCards;
+        return new Tab (tabTitle, grid);
     }
 
     private BorderPane getHeader() {
         Label title = new Label(LanguageManager.getString("workorders.title"));
         title.getStyleClass().add("page-title");
 
-        Button createWorkOrderBtn = new Button(LanguageManager.getString("workorders.seeBookings"));
-        createWorkOrderBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
+        Button seeBookingsBtn = new Button(LanguageManager.getString("workorders.seeBookings"));
+        seeBookingsBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
 
         BorderPane header = new BorderPane();
         header.setCenter(title);
-        header.setRight(createWorkOrderBtn);
+        header.setRight(seeBookingsBtn);
+        header.getStyleClass().add("content-header-container");
         return header;
     }
 }

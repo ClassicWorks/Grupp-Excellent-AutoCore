@@ -180,7 +180,7 @@ public class ViewManager {
         showPopup(popup,
                 String.format(LanguageManager.getString("workorder.edit.title"), workOrderId),
                 content,
-                this::showWorkOrders);
+                onClose);
     }
     public void showCreateVehiclePopup() {
         Stage popup = new Stage();
