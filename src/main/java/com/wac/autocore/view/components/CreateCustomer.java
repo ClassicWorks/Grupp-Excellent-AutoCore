@@ -1,9 +1,9 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
-import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -92,13 +92,23 @@ public class CreateCustomer {
                 customer.setName(nameValue);
                 customer.setPhone(phoneValue);
                 customer.setEmail(emailValue);
-                System.out.println("Calling ViewManager.showCustomers() to refresh list after edit");
+                popupStage.close();
             } else {
-                garageSystem.createCustomer(nameValue, phoneValue, emailValue);
-                System.out.println("Calling ViewManager.showCustomers() to refresh list after create");
-            }
+                Customer savedCustomer = garageSystem.createCustomer(nameValue, phoneValue, emailValue);
+                popupStage.close();
 
-            popupStage.close();
+                boolean createVehicle = AppDialog.showConfirm(
+                        LanguageManager.getString("customer.form.dialog.success.title"),
+                        LanguageManager.getString("customer.create.vehicle.prompt"),
+                        String.format(
+                                LanguageManager.getString("customer.create.vehicle.message"),
+                                savedCustomer.getId()
+                        )
+                );
+                if(createVehicle){
+                    ViewManager.getInstance().showCreateVehiclePopup();
+                }
+            }
         });
 
         cancelBtn.setOnAction(e -> popupStage.close());
