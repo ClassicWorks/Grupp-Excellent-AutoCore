@@ -12,6 +12,7 @@ import com.wac.autocore.model.WorkOrder;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class Database {
 
     private static final List<Customer> customers = new ArrayList<Customer>();

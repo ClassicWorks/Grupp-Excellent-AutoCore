@@ -51,6 +51,10 @@ Text{
     -fx-fill: -fx-dark-ink;
 }
 
+HyperLink{
+
+}
+
 .page-title{
     -fx-font-family: "Space Grotesk", sans-serif;
     -fx-font-size: 28px;
@@ -59,17 +63,20 @@ Text{
 
 .column-title{
     -fx-font-family: "IBM Plex Sans", sans-serif;
-    -fx-font-weight: 600;
+    -fx-font-weight: 700;
     -fx-font-size: 20px;
 }
 
 .card-title{
     -fx-font-family: "IBM Plex Sans", sans-serif;
-    -fx-font-weight: 600;
+    -fx-font-size: 16;
+    -fx-font-weight: 700;
 }
 
-HyperLink{
-
+.details-title{
+    -fx-font-family: "IBM Plex Sans", sans-serif;
+    -fx-font-weight: 700;
+    -fx-font-size: 20px;
 }
 
 .form-title{
@@ -124,6 +131,10 @@ Button{
 
     -fx-cursor: hand;
     -fx-background-insets: 0;
+}
+
+Button.smaller{
+    -fx-padding: 7px 7px;
 }
 
 .confirm-btn{
@@ -251,6 +262,7 @@ Button{
 .grid{
     -fx-hgap: 20px;
     -fx-padding: 16px;
+    -fx-vgap: 20px;
 }
 
 .details-container {
@@ -287,6 +299,7 @@ Button{
     -fx-padding: 12px 14px;
     -fx-fill-width: true;
     -fx-border-width: 1px 1px 0px 1px;
+    -fx-border-color: -fx-frame-border-color;
     -fx-border-radius: 8px 8px 0px 0px;
     -fx-background-radius: 8px 8px 0px 0px;
 }
@@ -327,6 +340,18 @@ Button{
 
 .column-header.unhandled Label{
     -fx-text-fill: -fx-status-unhandled-ink;
+}
+
+.row-container{
+    -fx-spacing: 10;
+}
+
+.row{
+    -fx-spacing: 16px;
+}
+
+.row-final Label{
+    -fx-font-weight: 700;
 }
 
 .row-even{

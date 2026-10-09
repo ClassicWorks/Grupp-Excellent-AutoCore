@@ -153,7 +153,7 @@ public class ViewManager {
 
     public void showEditWorkOrderItemsPopUp(int workOrderId) {
         Stage popup = new Stage();
-        Parent content = new EditWorkOrderItemsForm(popup, workOrderId).show();
+        Parent content = new EditWorkOrderItemsForm(popup, workOrderId, garageSystem).show();
 
         showPopup(popup,
                 String.format(LanguageManager.getString("workorder.edit.title"), workOrderId),
@@ -195,6 +195,13 @@ public class ViewManager {
                 String.format(LanguageManager.getString("invoice.id"), invoiceId),
                 content,
                 null);
+    }
+    public void showCreateServicePackPopup(){
+        Stage popup = new Stage();
+        Parent content = new CreateServicePackForm(garageSystem, popup).show();
+
+        showPopup(popup, LanguageManager.getString("servicePack.form.title"), content, this::showServices);
+
     }
 
     public void exit() {

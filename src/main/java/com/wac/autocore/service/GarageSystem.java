@@ -19,6 +19,7 @@ public class GarageSystem {
     private final WorkOrderRepo workOrderRepo;
     private final InvoiceRepo invoiceRepo;
     private final PaymentRepo paymentRepo;
+    private final ServicePackRepo servicePackRepo;
 
     public GarageSystem() {
         vehicleRepo = new VehicleRepoImpl();
@@ -29,6 +30,7 @@ public class GarageSystem {
         workOrderRepo = new WorkOrderRepoImpl();
         invoiceRepo = new InvoiceRepoImpl();
         paymentRepo  = new PaymentRepoImpl();
+        servicePackRepo = new ServicePackRepoImpl();
     }
 
     public void showCustomers() {
@@ -169,6 +171,51 @@ public class GarageSystem {
         System.out.println("Price for " + savedServiceItem.getName() + " updated to " + newPrice + " SEK.");
 
         return savedServiceItem;
+    }
+
+    public void showServicePacks() {
+        System.out.println();
+        System.out.println("=== SERVICE PACKS ===");
+        if (servicePackRepo.getAll().isEmpty()) {
+            System.out.println("No services found.");
+            return;
+        }
+        for (ServicePack servicePack : servicePackRepo.getAll()) {
+            System.out.println(servicePack);
+        }
+    }
+
+    public List<ServicePack> getServicePacks() {
+        return servicePackRepo.getAll();
+    }
+
+    public Optional<ServicePack> getServicePack(int id){
+        return servicePackRepo.getById(id);
+    }
+
+    public ServicePack updateServicePack(int servicePackId, ServicePack updatedServicePack){
+        Optional<ServicePack> optionalServicePack = getServicePack(servicePackId);
+        if(!optionalServicePack.isPresent()){
+            throw new IllegalArgumentException("Service pack with ID " + servicePackId + " does not exist.");
+        }
+
+        //Om någon ServiceItem inte finns kasta exception
+        updatedServicePack.getServiceItems().forEach(si -> {
+            Optional<ServiceItem> optionalServiceItem = getServiceItem(si.getId());
+            if(!optionalServiceItem.isPresent()) {
+                throw new  IllegalArgumentException("Service item with ID " + si.getId() + " does not exist.");
+            }
+        });
+
+        ServicePack servicePackToUpdate = optionalServicePack.get();
+        servicePackToUpdate.setName(updatedServicePack.getName());
+        servicePackToUpdate.setServiceItems(updatedServicePack.getServiceItems());
+
+        return servicePackRepo.update(servicePackToUpdate);
+    }
+
+    public void deleteServicePack(int id){
+        servicePackRepo.delete(id);
     }
 
     public void showMechanics() {
@@ -406,6 +453,26 @@ public class GarageSystem {
         return savedBooking;
     }
 
+
+    public ServicePack createServicePack(String name, int... serviceItemIds) throws IllegalArgumentException {
+        if(!servicePackRepo.nameAvailable(name)){
+            throw new IllegalArgumentException("Service pack with name \"" + name + "\" already exists.");
+        }
+        ServicePack servicePack = new ServicePack(name);
+
+        for(int serviceItemId : serviceItemIds) {
+            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
+            if(!optionalServiceItem.isPresent()) {
+                throw new  IllegalArgumentException("Service item with ID " + serviceItemId + " does not exist.");
+            }
+            ServiceItem serviceItem = optionalServiceItem.get();
+
+            servicePack.addServiceItem(serviceItem);
+        }
+
+        return servicePackRepo.save(servicePack);
+    }
+  
     public Booking createBookingFrom(int previousBookingId) {
         Optional<Booking> optionalPrevious = getBooking(previousBookingId);
 
