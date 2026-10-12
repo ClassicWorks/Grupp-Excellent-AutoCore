@@ -327,7 +327,6 @@ public class CreateBookingForm {
             root.setDisable(true);
         }
 
-        //TODO directly to confirmed?
         Task<WorkOrder> task = new Task<WorkOrder>() {
             @Override
             protected WorkOrder call() {
