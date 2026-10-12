@@ -161,14 +161,14 @@ public class ViewManager {
     }
     public void showCreateWorkOrderPopup(int bookingId) {
         Stage popup = new Stage();
-        Parent content = new CreateWorkOrderForm(popup).show(bookingId);
+        Parent content = new CreateWorkOrderForm(popup, garageSystem).show(bookingId);
 
         showPopup(popup, LanguageManager.getString("workorder.form.title"), content, null);
     }
 
     public void showCreateWorkOrderPopup(int bookingId, List<Integer> preselectedServiceIds) {
         Stage popup = new Stage();
-        Parent content = new CreateWorkOrderForm(popup).show(bookingId, preselectedServiceIds);
+        Parent content = new CreateWorkOrderForm(popup, garageSystem).show(bookingId, preselectedServiceIds);
 
         showPopup(popup, LanguageManager.getString("workorder.form.title"), content, this::showWorkOrders);
     }

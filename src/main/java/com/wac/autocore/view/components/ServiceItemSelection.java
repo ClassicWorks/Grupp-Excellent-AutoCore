@@ -1,0 +1,152 @@
+package com.wac.autocore.view.components;
+
+import com.wac.autocore.model.ServiceItem;
+import com.wac.autocore.util.ComboBoxLabels;
+import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.ValueLabels;
+import javafx.collections.FXCollections;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+public class ServiceItemSelection extends VBox{
+    private List<ServiceItem> chosenItems;
+    private List<ServiceItem> allServiceItems;
+    Consumer<ServiceItem> onAddServiceItem;
+    Consumer<ServiceItem> onRemoveServiceItem;
+    Consumer<String> onError;
+
+    private VBox chosenServicesRows;
+    private ComboBox<ServiceItem> serviceComboBox;
+
+    public ServiceItemSelection(List<ServiceItem> chosenItems, List<ServiceItem> allServiceItems,
+                                Consumer<ServiceItem> onAddServiceItem, Consumer<ServiceItem> onRemoveServiceItem,
+                                Consumer<String> onError) {
+        this.chosenItems = chosenItems;
+        this.allServiceItems = allServiceItems;
+        this.onAddServiceItem = onAddServiceItem;
+        this.onRemoveServiceItem = onRemoveServiceItem;
+        this.onError = onError;
+
+        // Show current services in pack
+        Label chosenServicesLabel = new Label(LanguageManager.getString("servicePack.details.services.label"));
+        chosenServicesLabel.getStyleClass().add("form-field-label");
+
+        chosenServicesRows = new VBox();
+        chosenServicesRows.getStyleClass().add("row-container");
+
+        VBox currentServicesContainer = new VBox(chosenServicesLabel, chosenServicesRows);
+        VBox addServiceSection = createAddServiceSection();
+
+        //Get and set Service items
+        refreshServiceItems();
+
+        this.getChildren().addAll(currentServicesContainer, addServiceSection);
+        this.getStyleClass().addAll("form-field-container");
+    }
+
+    private void refreshServiceItems() {
+        chosenServicesRows.getChildren().clear();
+
+        //Add row for every chosen serviceItem
+        boolean isLastItem = chosenItems.size() <= 1;
+        if(chosenItems.isEmpty()){
+            Label noItemsInListLabel = new Label(LanguageManager.getString("servicePack.form.emptyList"));
+            chosenServicesRows.getChildren().add(noItemsInListLabel);
+        }
+        for (ServiceItem item : chosenItems) {
+            chosenServicesRows.getChildren().add(createItemRow(item, isLastItem));
+        }
+
+        //Show total price and time for ServicePack
+        double totalPrice = chosenItems.stream()
+                .mapToDouble(ServiceItem::getPrice)
+                .sum();
+        int totalTime = chosenItems.stream()
+                .mapToInt(ServiceItem::getEstimatedMinutes)
+                .sum();
+
+        Label priceAndTimeLabel = new Label(String.format(LanguageManager.getString("servicePack.totalPriceAndTime"),
+                totalPrice,
+                totalTime
+        ));
+
+        HBox finalRow = new HBox(priceAndTimeLabel);
+        finalRow.getStyleClass().addAll("row", "row-final");
+        finalRow.setAlignment(Pos.CENTER_RIGHT);
+        chosenServicesRows.getChildren().add(finalRow);
+
+        //Update combobox
+        List<ServiceItem> availableServices = allServiceItems.stream()
+                .filter(serviceItem -> !chosenItems.contains(serviceItem))
+                .collect(Collectors.toList());
+
+        serviceComboBox.getItems().setAll(FXCollections.observableArrayList(availableServices));
+        serviceComboBox.setValue(null);
+    }
+
+    private Node createItemRow(ServiceItem item, boolean isLastItem) {
+        Label nameLabel = new Label(ValueLabels.serviceName(item.getName()));
+        Label priceLabel = new Label(String.format(LanguageManager.getString("service.priceAndTime"),
+                item.getPrice(), item.getEstimatedMinutes())
+        );
+
+        Button removeBtn = new Button(LanguageManager.getString("workorder.edit.remove"));
+        removeBtn.setDisable(isLastItem);
+        removeBtn.getStyleClass().addAll("destroy-btn", "smaller");
+        removeBtn.setOnAction(e -> {
+            onRemoveServiceItem.accept(item);
+
+            refreshServiceItems();
+        });
+
+        nameLabel.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(nameLabel, Priority.ALWAYS);
+
+        HBox row = new HBox(nameLabel, priceLabel, removeBtn);
+        row.getStyleClass().add("row");
+        row.setMaxWidth(Double.MAX_VALUE);
+        row.setAlignment(Pos.CENTER_LEFT);
+        return row;
+    }
+
+    private VBox createAddServiceSection() {
+        serviceComboBox = new ComboBox<>();
+        serviceComboBox.setPromptText(LanguageManager.getString("servicePack.addService.prompt"));
+        serviceComboBox.setConverter(ComboBoxLabels.serviceItem());
+
+        Button addBtn = new Button(LanguageManager.getString("servicePack.addService.button"));
+        addBtn.getStyleClass().add("confirm-btn");
+
+        addBtn.disableProperty().bind(serviceComboBox.valueProperty().isNull());
+
+        addBtn.setOnAction(e -> {
+            ServiceItem selected = serviceComboBox.getValue();
+            onAddServiceItem.accept(selected);
+
+            refreshServiceItems();
+        });
+
+        Label addLabel = new Label(
+                LanguageManager.getString("servicePack.addService.label")
+        );
+        addLabel.getStyleClass().add("form-field-label");
+
+        HBox comboBoxContainer = new HBox(serviceComboBox, addBtn);
+        comboBoxContainer.getStyleClass().add("row");
+
+        VBox container = new VBox(addLabel, comboBoxContainer);
+        container.getStyleClass().add("form-field-container");
+
+        return container;
+    }
+}

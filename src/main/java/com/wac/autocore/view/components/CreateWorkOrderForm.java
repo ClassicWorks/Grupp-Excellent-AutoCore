@@ -1,5 +1,6 @@
 package com.wac.autocore.view.components;
 
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.ComboBoxLabels;
@@ -16,13 +17,14 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CreateWorkOrderForm {
     private final GarageSystem garageSystem;
     private final Stage popupStage;
 
-    public CreateWorkOrderForm(Stage popupStage) {
-        garageSystem = new GarageSystem();
+    public CreateWorkOrderForm(Stage popupStage, GarageSystem garageSystem) {
+        this.garageSystem =garageSystem;
         this.popupStage = popupStage;
     }
 
@@ -33,7 +35,6 @@ public class CreateWorkOrderForm {
     public Parent show(int bookingId, List<Integer> preselectedServiceIds) {
         VBox root = new VBox();
         root.getStyleClass().add("form-container");
-
 
         Label heading = new Label(LanguageManager.getString("workorder.form.title"));
         heading.getStyleClass().add("form-title");
@@ -73,7 +74,36 @@ public class CreateWorkOrderForm {
         VBox mechanicBox = new VBox(mechanicLabel, mechanicComboBox);
         mechanicBox.getStyleClass().add("form-field-container");
 
-        Label serviceItemLabel = new Label(LanguageManager.getString("workorder.form.chooseServiceItems"));
+        List<Integer> missingId = new ArrayList<>();
+        Label preselectedError = new Label();
+        preselectedError.getStyleClass().add("error-label");
+
+        List<ServiceItem> selectedItems = preselectedServiceIds.stream()
+                .map(id -> {
+                    Optional<ServiceItem> item = garageSystem.getServiceItem(id);
+                    if(!item.isPresent()){
+                        missingId.add(id);
+                    }
+                    return item;
+                })
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+
+        if(!missingId.isEmpty()){
+            preselectedError.setText("Some service items could not be found in database. Missing ids: "
+            + missingId.stream().map(String::valueOf).collect(Collectors.joining(", ")));
+        }
+
+        ServiceItemSelection serviceItemSelection = new ServiceItemSelection(
+                selectedItems,
+                garageSystem.getServiceItems(),
+                selectedItems::add,
+                selectedItems::remove,
+                error -> preselectedError.setText(preselectedError.getText() + error));
+
+
+/*        Label serviceItemLabel = new Label(LanguageManager.getString("workorder.form.chooseServiceItems"));
         serviceItemLabel.getStyleClass().add("form-field-label");
 
         VBox serviceItemsCheckBoxes = new VBox();
@@ -89,7 +119,7 @@ public class CreateWorkOrderForm {
         }
 
         VBox serviceItemsBox = new VBox(serviceItemLabel, serviceItemsCheckBoxes);
-        serviceItemsBox.getStyleClass().add("form-field-container");
+        serviceItemsBox.getStyleClass().add("form-field-container");*/
 
         Label formErrorLabel = new Label();
         formErrorLabel.getStyleClass().add("error-label");
@@ -110,15 +140,16 @@ public class CreateWorkOrderForm {
                         return;
                     }
 
-                    int[] selectedServiceItems = serviceCheckBoxes.stream()
-                            .filter(CheckBox::isSelected)
-                            .mapToInt(s -> (int) s.getUserData())
+
+
+                    int[] selectedServiceItemIds = selectedItems.stream()
+                            .mapToInt(ServiceItem::getId)
                             .toArray();
 
                     WorkOrder createdWorkOrder = garageSystem.createWorkOrder(
                             bookingId,
                             selectedMechanic.getId(),
-                            selectedServiceItems);
+                            selectedServiceItemIds);
                     //TODO dialog box if error occurs
 
                     if (createdWorkOrder == null) {
@@ -142,7 +173,8 @@ public class CreateWorkOrderForm {
                 heading,
                 bookingCard,
                 mechanicBox,
-                serviceItemsBox,
+                preselectedError,
+                serviceItemSelection,
                 formErrorLabel,
                 actionableBtns
         );
