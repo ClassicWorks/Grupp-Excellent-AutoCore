@@ -1,9 +1,6 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.model.Customer;
-import com.wac.autocore.model.Mechanic;
-import com.wac.autocore.model.ServiceItem;
-import com.wac.autocore.model.Vehicle;
+import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.util.ComboBoxLabels;
@@ -24,6 +21,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class CreateBookingForm {
@@ -32,6 +30,8 @@ public class CreateBookingForm {
 
     private final ObjectProperty<Vehicle> selectedVehicle =
             new SimpleObjectProperty<>();
+    private ObservableList<ServiceItem> selectedItems;
+
 
     private final VBox vehicleResults = new VBox();
     private final VBox bookingInformation = new VBox();
@@ -43,6 +43,7 @@ public class CreateBookingForm {
     public CreateBookingForm(Stage popupStage, GarageSystem garageSystem) {
         this.popupStage = popupStage;
         this.garageSystem = garageSystem;
+        selectedItems = FXCollections.observableArrayList();
     }
 
     /**
@@ -79,9 +80,11 @@ public class CreateBookingForm {
         VBox layout = new VBox();
 
         VBox vehicleContainer;
+        //If vehicleId is greater than 0, get the vehicle card for selected vehicle (Shows error if no vehicle with selected Id exists)
         if(vehicleId > 0){
             vehicleContainer = new VBox(getVehicleCard(vehicleId));
         } else {
+            //Else search for customer and vehicle
             CustomerSelection customerSelection = new CustomerSelection(
                     garageSystem.getCustomers(),
                     this::showVehiclesOfCustomer);
@@ -98,11 +101,13 @@ public class CreateBookingForm {
 
         VBox mechanicBox = getMechanicBox();
 
+        //Show service items
         List<Integer> missingId = new ArrayList<>();
         Label errorLabel = new Label();
         errorLabel.getStyleClass().add("error-label");
 
-        List<ServiceItem> selectedItems = preselectedServiceIds.stream()
+        selectedItems.addAll(
+                preselectedServiceIds.stream()
                 .map(id -> {
                     Optional<ServiceItem> item = garageSystem.getServiceItem(id);
                     if(!item.isPresent()){
@@ -112,8 +117,10 @@ public class CreateBookingForm {
                 })
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+        );
 
+        //If some services has been removed, show this error message
         if(!missingId.isEmpty()){
             errorLabel.setText("Some service items could not be found in database. Missing ids: "
                     + missingId.stream().map(String::valueOf).collect(Collectors.joining(", ")));
@@ -289,7 +296,10 @@ public class CreateBookingForm {
         );
 
         createButton.setOnAction(
-                e -> createBooking()
+                e ->
+                        createBooking(
+                            booking -> createWorkOrderDraft(booking)
+                        )
         );
 
         cancelButton.setOnAction(
@@ -299,8 +309,62 @@ public class CreateBookingForm {
         return btnBox;
     }
 
+    private void createWorkOrderDraft(Booking booking) {
+        Mechanic selectedMechanic = mechanicComboBox.getValue();
 
-    private void createBooking() {
+        int mechanicId = selectedMechanic == null
+                ? 0
+                : selectedMechanic.getId();
+
+        int[] selectedServiceItemIds = selectedItems.stream()
+                .mapToInt(ServiceItem::getId)
+                .toArray();
+
+        Node root = popupStage.getScene() != null
+                ? popupStage.getScene().getRoot()
+                : null;
+        if (root != null) {
+            root.setDisable(true);
+        }
+
+        //TODO directly to confirmed?
+        Task<WorkOrder> task = new Task<WorkOrder>() {
+            @Override
+            protected WorkOrder call() {
+                return garageSystem.createWorkOrder(
+                        booking.getId(),
+                        mechanicId,
+                        selectedServiceItemIds
+                );
+            }
+        };
+
+        task.setOnFailed(e -> {
+            Throwable exception = task.getException();
+            AppDialog.showError("Unable to create work order",
+                    "Could not create work order",
+                    exception.getMessage());
+            //TODO should delete booking?
+        });
+
+        task.setOnSucceeded(e -> {
+            WorkOrder createdWorkOrder = task.getValue();
+            AppDialog.showInformation(
+                            LanguageManager.getString("workorder.form.dialog.workorderCreated.title"),
+                            LanguageManager.getString("workorder.form.dialog.workorderCreated.header"),
+                            String.format(LanguageManager.getString("workorder.form.dialog.workorderCreated.message"),
+                                    createdWorkOrder.getId())
+                    );
+            popupStage.close();
+
+        });
+
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private void createBooking(Consumer<Booking> onCreated) {
         Vehicle vehicle = selectedVehicle.get();
 
         if (vehicle == null) {
@@ -318,21 +382,31 @@ public class CreateBookingForm {
             root.setDisable(true);
         }
 
-        Task<Void> task = new Task<Void>() {
+        Task<Booking> task = new Task<Booking>() {
             @Override
-            protected Void call() {
-                garageSystem.createBookingWithTranslation(
+            protected Booking call() {
+                return garageSystem.createBookingWithTranslation(
                         vehicleId,
                         LocalDate.now(),
                         description,
                         language
                 );
-                return null;
             }
         };
 
-        task.setOnSucceeded(e -> popupStage.close());
+        task.setOnSucceeded(e -> {
+            Booking savedBooking = task.getValue();
+            onCreated.accept(savedBooking);
+        });
         task.setOnFailed(e -> {
+            Throwable exception = task.getException();
+
+            AppDialog.showError(
+                    LanguageManager.getString("booking.form.error.title"),
+                    LanguageManager.getString("booking.form.error.header"),
+                    exception != null ? exception.getMessage() : ""
+            );
+
             if (root != null) {
                 root.setDisable(false);
             }
@@ -342,4 +416,6 @@ public class CreateBookingForm {
         thread.setDaemon(true);
         thread.start();
     }
+
+
 }

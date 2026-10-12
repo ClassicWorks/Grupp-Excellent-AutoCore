@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CreateServicePackForm {
-    private GarageSystem garageSystem;
+    private final GarageSystem garageSystem;
     private final Stage popupStage;
     private List<ServiceItem> allServiceItems;
-    ObservableList<ServiceItem> chosenItems;
+    private ObservableList<ServiceItem> chosenItems;
     private Label errorLabel;
     private TextField nameField;
     private VBox chosenServicesRows;

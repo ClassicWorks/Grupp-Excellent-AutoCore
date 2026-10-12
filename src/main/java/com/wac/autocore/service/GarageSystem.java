@@ -519,7 +519,8 @@ public class GarageSystem {
 
     public WorkOrder createWorkOrder(int bookingId,
                                      int mechanicId,
-                                     int... serviceItemIds) {
+                                     int... serviceItemIds)
+    throws IllegalArgumentException{
 
         Optional<Booking> optionalBooking = getBooking(bookingId);
 
@@ -529,18 +530,20 @@ public class GarageSystem {
         }
         Booking booking = optionalBooking.get();
 
-        //TODO remove check, drafts ska kunna vara utan mekaniekr och services
-        Optional<Mechanic> optionalMechanic = getMechanic(mechanicId);
+        //WorkOrder can in draft have no mechanic and no serviceItems, if mechanic or serviceItem is
+        // selected but does not exist, the method throws IllegalArgumentException
+        Mechanic mechanic = null;
+        if(mechanicId > 0) {
+            Optional<Mechanic> optionalMechanic = getMechanic(mechanicId);
 
-        if (!optionalMechanic.isPresent()) {
-            System.out.println("Mechanic with ID " + mechanicId + " does not exist.");
-            return null;
-        }
-        Mechanic mechanic = optionalMechanic.get();
+            if (!optionalMechanic.isPresent()) {
+                throw new IllegalArgumentException(String.format("There is no mechanic with id %d", mechanicId));
+            }
+            mechanic = optionalMechanic.get();
 
-        if (!mechanic.isAvailable()) {
-            System.out.println("Mechanic " + mechanic.getName() + " is not available.");
-            return null;
+            if (!mechanic.isAvailable()) {
+                throw new IllegalArgumentException("Mechanic " + mechanic.getName() + " is not available.");
+            }
         }
 
         WorkOrder workOrder = new WorkOrder(
@@ -551,10 +554,9 @@ public class GarageSystem {
         for (int serviceItemId : serviceItemIds) {
             Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
             if (!optionalServiceItem.isPresent()) {
-                System.out.println(
+                throw new IllegalArgumentException(
                         "Service item with ID " + serviceItemId + " does not exist."
                 );
-                return null;
             }
             ServiceItem serviceItem = optionalServiceItem.get();
             workOrder.addItem(serviceItem, serviceItem.getPrice());
@@ -631,7 +633,7 @@ public class GarageSystem {
     }
 
     public void confirmWorkOrder (int workOrderId) {
-        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
             System.out.println("Work order with ID " + workOrderId + " does not exist.");
@@ -641,8 +643,11 @@ public class GarageSystem {
         WorkOrder workOrder = optionalWorkOrder.get();
 
         if (workOrder.getStatus() != WorkOrderStatus.DRAFT) {
-            System.out.println("Only draft work orders can be confirmed.");
-            return;
+            throw new IllegalArgumentException("Wrong status on work order. Only draft work orders can be confirmed.");
+        }
+
+        if(workOrder.getItems().isEmpty()){
+            throw new IllegalArgumentException("No service items. Work order must contains at least one service item");
         }
 
         workOrder.setStatus(WorkOrderStatus.CONFIRMED);
@@ -699,7 +704,7 @@ public class GarageSystem {
     }
 
     public void startWorkOrder(int workOrderId) {
-        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
             System.out.println("Work order with ID " + workOrderId + " does not exist.");
@@ -713,11 +718,18 @@ public class GarageSystem {
         }
 
         Mechanic mechanic = workOrder.getMechanic();
-        Booking booking = workOrder.getBooking();
 
-        if (mechanic != null) {
-            mechanic.setAvailable(false);
+        if(mechanic == null){
+            throw new IllegalArgumentException("No mechanic. Mechanic must be selected to confirm order");
         }
+
+        mechanic.setAvailable(false);
+
+        if(workOrder.getItems().isEmpty()){
+            throw new IllegalArgumentException("No service items. Work order must contains at least one service item");
+        }
+
+        Booking booking = workOrder.getBooking();
 
         if (booking != null) {
             booking.setStatus("IN_PROGRESS");
