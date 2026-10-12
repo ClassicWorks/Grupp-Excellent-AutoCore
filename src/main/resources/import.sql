@@ -39,6 +39,16 @@ INSERT INTO service_item (name, description, price, estimated_minutes) VALUES ('
 
 INSERT INTO service_item (name, description, price, estimated_minutes) VALUES ('Annual service', 'Standard annual vehicle service', 3495.0, 120);
 
+-- Service packs
+INSERT INTO service_packs (name) VALUES ('Basservice');
+INSERT INTO join_service_pack_id_service_item_id (service_pack_id, service_item_id) SELECT id, 1 FROM service_packs WHERE name = 'Basservice' UNION ALL SELECT id, 4 FROM service_packs WHERE name = 'Basservice';
+
+INSERT INTO service_packs (name) VALUES ('Vinterkontroll');
+INSERT INTO join_service_pack_id_service_item_id (service_pack_id, service_item_id) SELECT id, 2 FROM service_packs WHERE name = 'Vinterkontroll' UNION ALL SELECT id, 3 FROM service_packs WHERE name = 'Vinterkontroll';
+
+INSERT INTO service_packs (name) VALUES ('Semesterkontroll');
+INSERT INTO join_service_pack_id_service_item_id (service_pack_id, service_item_id) SELECT id, 1 FROM service_packs WHERE name = 'Semesterkontroll' UNION ALL SELECT id, 2 FROM service_packs WHERE name = 'Semesterkontroll' UNION ALL SELECT id, 3 FROM service_packs WHERE name = 'Semesterkontroll';
+
 -- Bookings
 
 INSERT INTO bookings (vehicle_id, date, description, description_lang, description_translated, status) VALUES (1, '2026-09-01', 'Oil change and routine inspection', 'en', 'Oljebyte och rutinkontroll', 'WORK_ORDER_CREATED');
