@@ -1,11 +1,9 @@
 package com.wac.autocore.view.components;
 
-import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
-import com.wac.autocore.util.ValueLabels;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Parent;
@@ -139,8 +137,6 @@ public class CreateWorkOrderForm {
                         formErrorLabel.setText(LanguageManager.getString("workorder.form.error.noMechanic"));
                         return;
                     }
-
-
 
                     int[] selectedServiceItemIds = selectedItems.stream()
                             .mapToInt(ServiceItem::getId)

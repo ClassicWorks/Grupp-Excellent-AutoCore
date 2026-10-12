@@ -529,6 +529,7 @@ public class GarageSystem {
         }
         Booking booking = optionalBooking.get();
 
+        //TODO remove check, drafts ska kunna vara utan mekaniekr och services
         Optional<Mechanic> optionalMechanic = getMechanic(mechanicId);
 
         if (!optionalMechanic.isPresent()) {
