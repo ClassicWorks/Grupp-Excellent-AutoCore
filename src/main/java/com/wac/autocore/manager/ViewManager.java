@@ -98,11 +98,11 @@ public class ViewManager {
         showView(new ShowVehicleView().show());
     }
 
-    public void showBookings() {
+    /*public void showBookings() {
         currentViewRefresher = this::showBookings;
         selectNav(SideNav.BOOKINGS);
         showView(new ShowBookingsView().show());
-    }
+    }*/
 
     public void showMechanics() {
         currentViewRefresher = this::showMechanics;
@@ -151,14 +151,21 @@ public class ViewManager {
     public void showCreateBooking() {
         Stage popup = new Stage();
         Parent content = new CreateBookingForm(popup, garageSystem).show();
-        showPopup(popup, LanguageManager.getString("bookings.create"), content, this::showBookings);
+        showPopup(popup, LanguageManager.getString("bookings.create"), content, this::refreshCurrentView);
     }
 
     public void showCreateBooking(int vehicleId) {
         Stage popup = new Stage();
         Parent content = new CreateBookingForm(popup, garageSystem).show(vehicleId);
-        showPopup(popup, LanguageManager.getString("bookings.create"), content, null);
+        showPopup(popup, LanguageManager.getString("bookings.create"), content, this::refreshCurrentView);
     }
+
+    public void showCreateBooking(int vehicleId, List<Integer> preselectedServiceIds) {
+        Stage popup = new Stage();
+        Parent content = new CreateBookingForm(popup, garageSystem).show(vehicleId, preselectedServiceIds);
+        showPopup(popup, LanguageManager.getString("bookings.create"), content, this::refreshCurrentView);
+    }
+    @Deprecated
     public void showCreateWorkOrderPopup(int bookingId) {
         Stage popup = new Stage();
         Parent content = new CreateWorkOrderForm(popup, garageSystem).show(bookingId);
@@ -166,6 +173,7 @@ public class ViewManager {
         showPopup(popup, LanguageManager.getString("workorder.form.title"), content, null);
     }
 
+    @Deprecated
     public void showCreateWorkOrderPopup(int bookingId, List<Integer> preselectedServiceIds) {
         Stage popup = new Stage();
         Parent content = new CreateWorkOrderForm(popup, garageSystem).show(bookingId, preselectedServiceIds);

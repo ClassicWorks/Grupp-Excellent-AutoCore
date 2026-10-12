@@ -5,11 +5,9 @@ import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.ValueLabels;
 import com.wac.autocore.view.components.WorkOrderDetails;
-import com.wac.autocore.view.components.kanban.KanbanColumn;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.WorkOrderCard;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -90,8 +88,8 @@ public class ShowWorkOrdersView {
         Label title = new Label(LanguageManager.getString("workorders.title"));
         title.getStyleClass().add("page-title");
 
-        Button seeBookingsBtn = new Button(LanguageManager.getString("workorders.seeBookings"));
-        seeBookingsBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
+        Button seeBookingsBtn = new Button(LanguageManager.getString("workorders.seeVehicles"));
+        seeBookingsBtn.setOnAction(e -> ViewManager.getInstance().showVehicles());
 
         BorderPane header = new BorderPane();
         header.setCenter(title);

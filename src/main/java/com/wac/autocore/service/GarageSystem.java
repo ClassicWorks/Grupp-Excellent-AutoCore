@@ -632,12 +632,11 @@ public class GarageSystem {
         return workOrderRepo.update(workOrder);
     }
 
-    public void confirmWorkOrder (int workOrderId) {
+    public void confirmWorkOrder (int workOrderId) throws IllegalArgumentException{
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
-            System.out.println("Work order with ID " + workOrderId + " does not exist.");
-            return;
+            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
         }
 
         WorkOrder workOrder = optionalWorkOrder.get();
@@ -657,24 +656,22 @@ public class GarageSystem {
     }
     public WorkOrder updateWorkOrderServices(int workOrderId,
                                              List<Integer> serviceItemIdsToAdd,
-                                             List<Integer> itemIdsToRemove) {
+                                             List<Integer> itemIdsToRemove)
+    throws IllegalArgumentException{
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
-            System.out.println("Work order with ID " + workOrderId + " does not exist.");
-            return null;
+            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
         if (!workOrder.getStatus().canEditServices()) {
-            System.out.println("Services can only be changed before the work order is started.");
-            return null;
+            throw new IllegalArgumentException("Services can only be changed before the work order is started.");
         }
 
         for (Integer itemId : itemIdsToRemove) {
             if (!workOrder.removeItem(itemId)) {
-                System.out.println("Item with ID " + itemId + " is not on the work order.");
-                return null;
+                throw new IllegalArgumentException("Item with ID " + itemId + " is not on the work order.");
             }
         }
 
@@ -682,13 +679,12 @@ public class GarageSystem {
             Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
 
             if (!optionalServiceItem.isPresent()) {
-                System.out.println("Service item with ID " + serviceItemId + " does not exist.");
-                return null;
+                throw new IllegalArgumentException("Service item with ID " + serviceItemId + " does not exist.");
             }
 
             if (workOrder.hasService(serviceItemId)) {
-                System.out.println("Service is already on the work order.");
-                return null;
+                throw new IllegalArgumentException("Service is already on the work order.");
+
             }
 
             ServiceItem serviceItem = optionalServiceItem.get();
@@ -696,8 +692,7 @@ public class GarageSystem {
         }
 
         if (workOrder.getItems().isEmpty()) {
-            System.out.println("A work order must have at least one service.");
-            return null;
+            throw new IllegalArgumentException("A work order must have at least one service.");
         }
 
         return workOrderRepo.update(workOrder);
@@ -707,14 +702,12 @@ public class GarageSystem {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
-            System.out.println("Work order with ID " + workOrderId + " does not exist.");
-            return;
+            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
         if (workOrder.getStatus() != WorkOrderStatus.CONFIRMED) {
-            System.out.println("Only confirmed work orders can be started.");
-            return;
+            throw new IllegalArgumentException("Only confirmed work orders can be started.");
         }
 
         Mechanic mechanic = workOrder.getMechanic();
@@ -745,14 +738,13 @@ public class GarageSystem {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
-            System.out.println("Work order with ID " + workOrderId + " does not exist.");
-            return;
+            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
         if (workOrder.getStatus() != WorkOrderStatus.IN_PROGRESS) {
-            System.out.println("Only work orders in progress can be completed.");
-            return;
+            throw new IllegalArgumentException("Only work orders in progress can be completed.");
+
         }
 
         Mechanic mechanic = workOrder.getMechanic();
@@ -776,15 +768,13 @@ public class GarageSystem {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
-            System.out.println("Work order with ID " + workOrderId + " does not exist.");
-            return;
+            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
         }
 
         WorkOrder workOrder = optionalWorkOrder.get();
 
         if (!workOrder.getStatus().canBeCancelled()) {
-            System.out.println("Work order cannot be cancelled.");
-            return;
+            throw new IllegalArgumentException("Work order cannot be cancelled.");
         }
 
         Mechanic mechanic = workOrder.getMechanic();
@@ -808,14 +798,12 @@ public class GarageSystem {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
-            System.out.println("Work order with ID " + workOrderId + " does not exist.");
-            return null;
+            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
         if (workOrder.getStatus() != WorkOrderStatus.COMPLETED) {
-            System.out.println("Invoice can only be created for a completed work order.");
-            return null;
+            throw new IllegalArgumentException("Invoice can only be created for a completed work order.");
         }
 
         double amount = 0.0;

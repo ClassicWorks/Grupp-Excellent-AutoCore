@@ -18,19 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SideNav {
-    /*customer
-     * Vehicles
-     * Bookings
-     * Mechanics
-     * Services
-     * work orders
-     * invoices
-     * Payments
-     * Exit*/
 
     public static final String CUSTOMERS = "customers";
     public static final String VEHICLES = "vehicles";
-    public static final String BOOKINGS = "bookings";
     public static final String MECHANICS = "mechanics";
     public static final String SERVICES = "services";
     public static final String WORK_ORDERS = "workorders";
@@ -59,7 +49,6 @@ public class SideNav {
         //Create all nav buttons
         Button customerBtn = new Button(LanguageManager.getString("nav.customers"));
         Button vehicleBtn = new Button(LanguageManager.getString("nav.vehicles"));
-        Button bookingBtn = new Button(LanguageManager.getString("nav.bookings"));
         Button mechanicsBtn = new Button(LanguageManager.getString("nav.mechanics"));
         Button serviceBtn = new Button(LanguageManager.getString("nav.services"));
         Button workOrderBtn = new Button(LanguageManager.getString("nav.workorders"));
@@ -71,7 +60,6 @@ public class SideNav {
 
         customerBtn.getStyleClass().addAll("menu-btn", "customer");
         vehicleBtn.getStyleClass().addAll("menu-btn", "vehicle");
-        bookingBtn.getStyleClass().addAll("menu-btn", "booking");
         mechanicsBtn.getStyleClass().addAll("menu-btn", "mechanics");
         serviceBtn.getStyleClass().addAll("menu-btn", "services");
         workOrderBtn.getStyleClass().addAll("menu-btn", "work-order");
@@ -82,7 +70,6 @@ public class SideNav {
 
         navButtons.put(CUSTOMERS, customerBtn);
         navButtons.put(VEHICLES, vehicleBtn);
-        navButtons.put(BOOKINGS, bookingBtn);
         navButtons.put(MECHANICS, mechanicsBtn);
         navButtons.put(SERVICES, serviceBtn);
         navButtons.put(WORK_ORDERS, workOrderBtn);
@@ -92,7 +79,6 @@ public class SideNav {
 
         customerBtn.setOnAction(e -> ViewManager.getInstance().showCustomers());
         vehicleBtn.setOnAction(e -> ViewManager.getInstance().showVehicles());
-        bookingBtn.setOnAction(e -> ViewManager.getInstance().showBookings());
         mechanicsBtn.setOnAction(e -> ViewManager.getInstance().showMechanics());
         serviceBtn.setOnAction(e -> ViewManager.getInstance().showServices());
         workOrderBtn.setOnAction(e -> ViewManager.getInstance().showWorkOrders());
@@ -112,7 +98,6 @@ public class SideNav {
         navBox = new VBox(
                 customerBtn,
                 vehicleBtn,
-                bookingBtn,
                 mechanicsBtn,
                 serviceBtn,
                 workOrderBtn,

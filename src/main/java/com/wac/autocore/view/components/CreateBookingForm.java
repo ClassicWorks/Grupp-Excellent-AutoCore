@@ -50,14 +50,14 @@ public class CreateBookingForm {
      * User chooses customer and vehicle and services
      */
     public Parent show(){
-        return createForm(-1, new ArrayList<>());
+        return show(-1, new ArrayList<>());
     }
 
     /**
      * Vehicle is already chosen, no services chosen
      */
     public Parent show(int vehicleId) {
-        return createForm(vehicleId, new ArrayList<>());
+        return show(vehicleId, new ArrayList<>());
     }
 
     /**
@@ -67,22 +67,18 @@ public class CreateBookingForm {
      * @return
      */
     public Parent show(int vehicleId, List<Integer> preselectedServiceIds){
-        return createForm(vehicleId, preselectedServiceIds);
-    }
-
-    /**
-     * creates the form
-     * @param vehicleId
-     * @param preselectedServiceIds
-     * @return
-     */
-    public Parent createForm(int vehicleId, List<Integer> preselectedServiceIds) {
         VBox layout = new VBox();
 
         VBox vehicleContainer;
         //If vehicleId is greater than 0, get the vehicle card for selected vehicle (Shows error if no vehicle with selected Id exists)
         if(vehicleId > 0){
-            vehicleContainer = new VBox(getVehicleCard(vehicleId));
+            VehicleCard vehicleCard = getVehicleCard(vehicleId);
+            if(vehicleCard == null){
+                popupStage.close();
+                return null;
+            }
+            vehicleContainer = new VBox(vehicleCard);
+
         } else {
             //Else search for customer and vehicle
             CustomerSelection customerSelection = new CustomerSelection(
@@ -122,8 +118,12 @@ public class CreateBookingForm {
 
         //If some services has been removed, show this error message
         if(!missingId.isEmpty()){
-            errorLabel.setText("Some service items could not be found in database. Missing ids: "
-                    + missingId.stream().map(String::valueOf).collect(Collectors.joining(", ")));
+            errorLabel.setText(String.format(
+                    LanguageManager.getString("booking.form.error.missingServiceItems"),
+                    missingId.stream()
+                            .map(String::valueOf)
+                            .collect(Collectors.joining(", "))
+            ));
         }
 
         ServiceItemSelection serviceItemSelection = new ServiceItemSelection(
@@ -163,8 +163,6 @@ public class CreateBookingForm {
             AppDialog.showError(String.format(LanguageManager.getString("booking.error.noVehicle"), vehicleId),
                     String.format(LanguageManager.getString("booking.error.noVehicle"), vehicleId),
                     String.format(LanguageManager.getString("booking.error.noVehicle"), vehicleId));
-
-            popupStage.close();
             return null;
         }
         Vehicle vehicle = optionalVehicle.get();
@@ -175,7 +173,6 @@ public class CreateBookingForm {
             AppDialog.showError(LanguageManager.getString("booking.error.noCustomer"),
                     LanguageManager.getString("booking.error.noCustomer"),
                     LanguageManager.getString("booking.error.noCustomer"));
-            popupStage.close();
             return null;
         }
 
@@ -250,16 +247,6 @@ public class CreateBookingForm {
         return mechanicBox;
     }
 
-    private VBox getDescriptionBox() {
-        Label descriptionLabel = new Label((LanguageManager.getString("booking.form.description")));
-        descriptionLabel.getStyleClass().add("form-field-label");
-
-        descriptionField.setPrefRowCount(3);
-        VBox descriptionBox = new VBox(descriptionLabel, descriptionField);
-        descriptionBox.getStyleClass().add("form-field-container");
-        return descriptionBox;
-    }
-
     private ComboBox<Mechanic> createMechanicComboBox() {
         ObservableList<Mechanic> mechanics =
                 FXCollections.observableArrayList(garageSystem.getAvailableMechanics());
@@ -270,6 +257,16 @@ public class CreateBookingForm {
         comboBox.setConverter(ComboBoxLabels.mechanic());
 
         return comboBox;
+    }
+
+    private VBox getDescriptionBox() {
+        Label descriptionLabel = new Label((LanguageManager.getString("booking.form.description")));
+        descriptionLabel.getStyleClass().add("form-field-label");
+
+        descriptionField.setPrefRowCount(3);
+        VBox descriptionBox = new VBox(descriptionLabel, descriptionField);
+        descriptionBox.getStyleClass().add("form-field-container");
+        return descriptionBox;
     }
 
     // =========================================================
@@ -339,10 +336,18 @@ public class CreateBookingForm {
         };
 
         task.setOnFailed(e -> {
+            if (root != null) {
+                root.setDisable(false);
+            }
+
             Throwable exception = task.getException();
-            AppDialog.showError("Unable to create work order",
-                    "Could not create work order",
-                    exception.getMessage());
+            AppDialog.showError(
+                    LanguageManager.getString("booking.form.workOrder.error.title"),
+                    LanguageManager.getString("booking.form.workOrder.error.header"),
+                    exception != null
+                            ? exception.getMessage()
+                            : LanguageManager.getString("booking.form.workOrder.error.message")
+            );
             //TODO should delete booking?
         });
 

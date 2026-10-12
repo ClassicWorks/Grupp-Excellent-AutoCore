@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.function.Consumer;
 
+@Deprecated
 public class BookingDetails extends BorderPane {
     Consumer<Booking> onSave;
     Consumer<Booking> onDelete;

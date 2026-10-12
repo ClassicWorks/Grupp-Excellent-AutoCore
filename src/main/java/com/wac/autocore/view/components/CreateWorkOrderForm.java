@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Deprecated
 public class CreateWorkOrderForm {
     private final GarageSystem garageSystem;
     private final Stage popupStage;

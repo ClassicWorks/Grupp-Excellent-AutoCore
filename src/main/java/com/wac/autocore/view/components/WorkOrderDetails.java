@@ -12,6 +12,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class WorkOrderDetails extends VBox {
@@ -136,21 +138,39 @@ public class WorkOrderDetails extends VBox {
 
         if (status == WorkOrderStatus.DRAFT) {
             buttons.getChildren().add(createButton("workorder.confirm", "confirm-btn", () -> {
-                garageSystem.confirmWorkOrder(workOrder.getId());
+                try {
+                    garageSystem.confirmWorkOrder(workOrder.getId());
+                } catch (IllegalArgumentException e) {
+                    AppDialog.showError("Could not continue",
+                            "Something went wrong",
+                            e.getMessage());
+                }
                 onChanged.run();
             }));
         }
 
         if (status == WorkOrderStatus.CONFIRMED) {
             buttons.getChildren().add(createButton("workorder.start", "confirm-btn", () -> {
-                garageSystem.startWorkOrder(workOrder.getId());
+                try {
+                    garageSystem.startWorkOrder(workOrder.getId());
+                } catch (IllegalArgumentException e) {
+                    AppDialog.showError("Could not continue",
+                            "Something went wrong",
+                            e.getMessage());
+                }
                 onChanged.run();
             }));
         }
 
         if (status == WorkOrderStatus.IN_PROGRESS) {
             buttons.getChildren().add(createButton("workorder.complete", "confirm-btn", () -> {
-                garageSystem.completeWorkOrder(workOrder.getId());
+                try {
+                    garageSystem.completeWorkOrder(workOrder.getId());
+                } catch (IllegalArgumentException e) {
+                    AppDialog.showError(LanguageManager.getString("workorder.dialog.error.title"),
+                            LanguageManager.getString("workorder.dialog.error.header"),
+                            e.getMessage());
+                }
                 onChanged.run();
             }));
         }
@@ -191,21 +211,54 @@ public class WorkOrderDetails extends VBox {
     }
 
     private void rebook() {
+        //Möjlighet för dto? Då kan felhantering ske i GarageSystem
         Booking booking = workOrder.getBooking();
         if (booking == null) {
+            AppDialog.showError(
+                    LanguageManager.getString("workorder.rebook.error.bookingNotFound.title"),
+                    LanguageManager.getString("workorder.rebook.error.bookingNotFound.header"),
+                    String.format(
+                            LanguageManager.getString("workorder.rebook.error.bookingNotFound.message"),
+                            workOrder.getId()
+                    )
+            );
+            return;
+        }
+        if(booking.getVehicle() == null){
+            AppDialog.showError(
+                    LanguageManager.getString("workorder.rebook.error.vehicleNotFound.title"),
+                    LanguageManager.getString("workorder.rebook.error.vehicleNotFound.header"),
+                    String.format(
+                            LanguageManager.getString("workorder.rebook.error.vehicleNotFound.message"),
+                            workOrder.getId()
+                    )
+            );
             return;
         }
 
+        AtomicInteger numOfMissingItems = new AtomicInteger();
+
         List<Integer> serviceIds = workOrder.getItems().stream()
-                .filter(item -> item.getServiceItem() != null)
+                .peek(item -> {
+                    if (item == null) {
+                        numOfMissingItems.getAndIncrement();
+                    }
+                }).filter(Objects::nonNull)
                 .map(item -> item.getServiceItem().getId())
                 .collect(Collectors.toList());
 
-        Booking newBooking = garageSystem.createBookingFrom(booking.getId());
-        if (newBooking == null) {
-            return;
+        //If some services has been removed, show this error message
+        if(numOfMissingItems.get() > 0){
+            AppDialog.showWarning(
+                    LanguageManager.getString("workorder.rebook.warning.itemsNotFound.title"),
+                    LanguageManager.getString("workorder.rebook.warning.itemsNotFound.header"),
+                    String.format(
+                            LanguageManager.getString("workorder.rebook.warning.itemsNotFound.message"),
+                            numOfMissingItems.get()
+                    )
+            );
         }
 
-        ViewManager.getInstance().showCreateWorkOrderPopup(newBooking.getId(), serviceIds);
+        ViewManager.getInstance().showCreateBooking(booking.getVehicle().getId(), serviceIds);
     }
 }
