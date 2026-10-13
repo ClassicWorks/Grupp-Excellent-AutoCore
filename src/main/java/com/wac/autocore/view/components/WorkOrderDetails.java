@@ -36,7 +36,7 @@ public class WorkOrderDetails extends BorderPane {
     private HBox createHeader() {
         Label titleLabel = new Label(String.format(
                 LanguageManager.getString("workorder.card.title"), workOrder.getId()));
-        titleLabel.getStyleClass().add("form-title");
+        titleLabel.getStyleClass().add("details-title");
 
         Label statusLabel = new Label(ValueLabels.workOrderStatus(workOrder.getStatus()));
         statusLabel.getStyleClass().addAll(
