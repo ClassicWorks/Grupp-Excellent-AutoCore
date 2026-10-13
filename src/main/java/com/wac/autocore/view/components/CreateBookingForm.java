@@ -1,8 +1,6 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.model.Customer;
-import com.wac.autocore.model.Mechanic;
-import com.wac.autocore.model.Vehicle;
+import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.util.ComboBoxLabels;
@@ -20,7 +18,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class CreateBookingForm {
     private final GarageSystem garageSystem;
@@ -28,6 +30,8 @@ public class CreateBookingForm {
 
     private final ObjectProperty<Vehicle> selectedVehicle =
             new SimpleObjectProperty<>();
+    private ObservableList<ServiceItem> selectedItems;
+
 
     private final VBox vehicleResults = new VBox();
     private final VBox bookingInformation = new VBox();
@@ -39,33 +43,108 @@ public class CreateBookingForm {
     public CreateBookingForm(Stage popupStage, GarageSystem garageSystem) {
         this.popupStage = popupStage;
         this.garageSystem = garageSystem;
+        selectedItems = FXCollections.observableArrayList();
     }
 
     /**
-     * User chooses customer and vehicle
+     * User chooses customer and vehicle and services
      */
-    public Parent show() {
+    public Parent show(){
+        return show(-1, new ArrayList<>());
+    }
+
+    /**
+     * Vehicle is already chosen, no services chosen
+     */
+    public Parent show(int vehicleId) {
+        return show(vehicleId, new ArrayList<>());
+    }
+
+    /**
+     * Rebooking with vehicle and selected services.
+     * @param vehicleId
+     * @param preselectedServiceIds
+     * @return
+     */
+    public Parent show(int vehicleId, List<Integer> preselectedServiceIds){
         VBox layout = new VBox();
 
-        CustomerSelection customerSelection = new CustomerSelection(
-                garageSystem.getCustomers(),
-                this::showVehiclesOfCustomer);
-        customerSelection.getStyleClass().addAll("form-field-container");
+        VBox vehicleContainer;
+        //If vehicleId is greater than 0, get the vehicle card for selected vehicle (Shows error if no vehicle with selected Id exists)
+        if(vehicleId > 0){
+            VehicleCard vehicleCard = getVehicleCard(vehicleId);
+            if(vehicleCard == null){
+                popupStage.close();
+                return null;
+            }
+            vehicleContainer = new VBox(vehicleCard);
 
-        Label selectVehicleLabel = new Label(LanguageManager.getString("booking.form.selectVehicle"));
-        selectVehicleLabel.getStyleClass().add("form-field-label");
-        vehicleResults.getStyleClass().addAll("card-container", "compact");
-        VBox selectVehicleBox = new VBox(selectVehicleLabel, vehicleResults);
-        selectVehicleBox.getStyleClass().add("form-field-container");
+        } else {
+            //Else search for customer and vehicle
+            CustomerSelection customerSelection = new CustomerSelection(
+                    garageSystem.getCustomers(),
+                    this::showVehiclesOfCustomer);
+            customerSelection.getStyleClass().addAll("form-field-container");
+
+            Label selectVehicleLabel = new Label(LanguageManager.getString("booking.form.selectVehicle"));
+            selectVehicleLabel.getStyleClass().add("form-field-label");
+            vehicleResults.getStyleClass().addAll("card-container", "compact");
+            VBox vehicleSelection = new VBox(selectVehicleLabel, vehicleResults);
+            vehicleSelection.getStyleClass().add("form-field-container");
+
+            vehicleContainer = new VBox(customerSelection, vehicleSelection);
+        }
+
+        VBox mechanicBox = getMechanicBox();
+
+        //Show service items
+        List<Integer> missingId = new ArrayList<>();
+        Label errorLabel = new Label();
+        errorLabel.getStyleClass().add("error-label");
+
+        selectedItems.addAll(
+                preselectedServiceIds.stream()
+                .map(id -> {
+                    Optional<ServiceItem> item = garageSystem.getServiceItem(id);
+                    if(!item.isPresent()){
+                        missingId.add(id);
+                    }
+                    return item;
+                })
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList())
+        );
+
+        //If some services has been removed, show this error message
+        if(!missingId.isEmpty()){
+            errorLabel.setText(String.format(
+                    LanguageManager.getString("booking.form.error.missingServiceItems"),
+                    missingId.stream()
+                            .map(String::valueOf)
+                            .collect(Collectors.joining(", "))
+            ));
+        }
+
+        ServiceItemSelection serviceItemSelection = new ServiceItemSelection(
+                selectedItems,
+                garageSystem.getServiceItems(),
+                selectedItems::add,
+                selectedItems::remove,
+                error -> errorLabel.setText(errorLabel.getText() + error));
+
+
 
         HBox actionButtons = createActionButtons();
         actionButtons.getStyleClass().add("btn-container");
 
         layout.getChildren().addAll(
                 createTitle(),
-                customerSelection,
-                selectVehicleBox,
+                vehicleContainer,
                 getDescriptionBox(),
+                mechanicBox,
+                serviceItemSelection,
+                errorLabel,
                 actionButtons
         );
 
@@ -77,19 +156,13 @@ public class CreateBookingForm {
         return scrollPane;
     }
 
-
-    /**
-     * Vehicle is already chosen
-     */
-    public Parent show(int vehicleId) {
+    private VehicleCard getVehicleCard(int vehicleId) {
         Optional<Vehicle> optionalVehicle = garageSystem.getVehicle(vehicleId);
 
         if (!optionalVehicle.isPresent()) {
-            AppDialog.showError(String.format(LanguageManager.getString("booking.error.noVehicle"),vehicleId),
-                    String.format(LanguageManager.getString("booking.error.noVehicle"),vehicleId),
-                    String.format(LanguageManager.getString("booking.error.noVehicle"),vehicleId));
-
-            popupStage.close();
+            AppDialog.showError(String.format(LanguageManager.getString("booking.error.noVehicle"), vehicleId),
+                    String.format(LanguageManager.getString("booking.error.noVehicle"), vehicleId),
+                    String.format(LanguageManager.getString("booking.error.noVehicle"), vehicleId));
             return null;
         }
         Vehicle vehicle = optionalVehicle.get();
@@ -100,33 +173,13 @@ public class CreateBookingForm {
             AppDialog.showError(LanguageManager.getString("booking.error.noCustomer"),
                     LanguageManager.getString("booking.error.noCustomer"),
                     LanguageManager.getString("booking.error.noCustomer"));
-            popupStage.close();
             return null;
         }
 
         VehicleCard vehicleCard = new VehicleCard(vehicle, customer);
         vehicleCard.getStyleClass().add("compact");
-
-        HBox actionButtons = createActionButtons();
-
-        VBox layout = new VBox();
-
-        layout.getChildren().addAll(
-                createTitle(),
-                vehicleCard,
-                getDescriptionBox(),
-                getMechanicBox(),
-                actionButtons
-        );
-
         selectedVehicle.set(vehicle);
-
-        layout.getStyleClass().add("form-container");
-
-        ScrollPane scrollPane = new ScrollPane(layout);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-        return scrollPane;
+        return vehicleCard;
     }
 
     private Label createTitle() {
@@ -194,17 +247,6 @@ public class CreateBookingForm {
         return mechanicBox;
     }
 
-    private VBox getDescriptionBox() {
-        Label descriptionLabel = new Label((LanguageManager.getString("booking.form.description")));
-        descriptionLabel.getStyleClass().add("form-field-label");
-
-        descriptionField.setPrefRowCount(3);
-        VBox descriptionBox = new VBox(descriptionLabel, descriptionField);
-        descriptionBox.getStyleClass().add("form-field-container");
-        return descriptionBox;
-    }
-
-    //Behåller då den kan användas för
     private ComboBox<Mechanic> createMechanicComboBox() {
         ObservableList<Mechanic> mechanics =
                 FXCollections.observableArrayList(garageSystem.getAvailableMechanics());
@@ -215,6 +257,16 @@ public class CreateBookingForm {
         comboBox.setConverter(ComboBoxLabels.mechanic());
 
         return comboBox;
+    }
+
+    private VBox getDescriptionBox() {
+        Label descriptionLabel = new Label((LanguageManager.getString("booking.form.description")));
+        descriptionLabel.getStyleClass().add("form-field-label");
+
+        descriptionField.setPrefRowCount(3);
+        VBox descriptionBox = new VBox(descriptionLabel, descriptionField);
+        descriptionBox.getStyleClass().add("form-field-container");
+        return descriptionBox;
     }
 
     // =========================================================
@@ -241,7 +293,10 @@ public class CreateBookingForm {
         );
 
         createButton.setOnAction(
-                e -> createBooking()
+                e ->
+                        createBooking(
+                            booking -> createWorkOrderDraft(booking)
+                        )
         );
 
         cancelButton.setOnAction(
@@ -251,8 +306,69 @@ public class CreateBookingForm {
         return btnBox;
     }
 
+    private void createWorkOrderDraft(Booking booking) {
+        Mechanic selectedMechanic = mechanicComboBox.getValue();
 
-    private void createBooking() {
+        int mechanicId = selectedMechanic == null
+                ? 0
+                : selectedMechanic.getId();
+
+        int[] selectedServiceItemIds = selectedItems.stream()
+                .mapToInt(ServiceItem::getId)
+                .toArray();
+
+        Node root = popupStage.getScene() != null
+                ? popupStage.getScene().getRoot()
+                : null;
+        if (root != null) {
+            root.setDisable(true);
+        }
+
+        Task<WorkOrder> task = new Task<WorkOrder>() {
+            @Override
+            protected WorkOrder call() {
+                return garageSystem.createWorkOrder(
+                        booking.getId(),
+                        mechanicId,
+                        selectedServiceItemIds
+                );
+            }
+        };
+
+        task.setOnFailed(e -> {
+            if (root != null) {
+                root.setDisable(false);
+            }
+
+            Throwable exception = task.getException();
+            AppDialog.showError(
+                    LanguageManager.getString("booking.form.workOrder.error.title"),
+                    LanguageManager.getString("booking.form.workOrder.error.header"),
+                    exception != null
+                            ? exception.getMessage()
+                            : LanguageManager.getString("booking.form.workOrder.error.message")
+            );
+            //TODO should delete booking?
+        });
+
+        task.setOnSucceeded(e -> {
+            WorkOrder createdWorkOrder = task.getValue();
+            AppDialog.showInformation(
+                            LanguageManager.getString("workorder.form.dialog.workorderCreated.title"),
+                            LanguageManager.getString("workorder.form.dialog.workorderCreated.header"),
+                            String.format(LanguageManager.getString("workorder.form.dialog.workorderCreated.message"),
+                                    createdWorkOrder.getId())
+                    );
+            popupStage.close();
+
+        });
+
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private void createBooking(Consumer<Booking> onCreated) {
         Vehicle vehicle = selectedVehicle.get();
 
         if (vehicle == null) {
@@ -270,21 +386,31 @@ public class CreateBookingForm {
             root.setDisable(true);
         }
 
-        Task<Void> task = new Task<Void>() {
+        Task<Booking> task = new Task<Booking>() {
             @Override
-            protected Void call() {
-                garageSystem.createBookingWithTranslation(
+            protected Booking call() {
+                return garageSystem.createBookingWithTranslation(
                         vehicleId,
                         LocalDate.now(),
                         description,
                         language
                 );
-                return null;
             }
         };
 
-        task.setOnSucceeded(e -> popupStage.close());
+        task.setOnSucceeded(e -> {
+            Booking savedBooking = task.getValue();
+            onCreated.accept(savedBooking);
+        });
         task.setOnFailed(e -> {
+            Throwable exception = task.getException();
+
+            AppDialog.showError(
+                    LanguageManager.getString("booking.form.error.title"),
+                    LanguageManager.getString("booking.form.error.header"),
+                    exception != null ? exception.getMessage() : ""
+            );
+
             if (root != null) {
                 root.setDisable(false);
             }
@@ -294,4 +420,6 @@ public class CreateBookingForm {
         thread.setDaemon(true);
         thread.start();
     }
+
+
 }

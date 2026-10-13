@@ -7,17 +7,6 @@ import java.util.List;
 @Entity
 @Table(name = "service_packs")
 public class ServicePack {
-    //*När en Service tas bort från databas ska varning komma upp för att godkänna att man
-    // då tar bort den från kopplade Servicepaket, så man får en varning ifall man vill
-    // redigera ServicePaketet innan. (Glöm inte implementera detta i
-    // garageSystem.removeServiceItem())
-    //*När man skapar och redigerar ServicePack sparas en temporär lista med ServiceItems,
-    // när man sedan sparar .setServiceItems(list)
-    //*Vid CreateWorkOrderForm kan man välja ett servicepaket, då hamnar alla serviceItems
-    // som servicepaketet innehåller i den temporära listan ovanför (samma utseende som
-    // EditWorkOrderForm) med alla valda ServiceItems, man kan fortsatt ta bort ServiceItems
-    // från listan då detta är helt separerat från ServicePack. När WorkOrder sedan skapas
-    // så hämtar man listan av ServiceItems från den temporära listan.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

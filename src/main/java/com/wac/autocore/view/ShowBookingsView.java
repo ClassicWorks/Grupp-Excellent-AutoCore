@@ -15,6 +15,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+@Deprecated
 public class ShowBookingsView {
     private final GarageSystem garageSystem;
 
