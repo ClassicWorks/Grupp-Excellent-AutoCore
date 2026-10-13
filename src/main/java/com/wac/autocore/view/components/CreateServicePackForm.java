@@ -132,7 +132,8 @@ public class CreateServicePackForm {
     private Node createItemRow(ServiceItem item, boolean isLastItem) {
         Label nameLabel = new Label(ValueLabels.serviceName(item.getName()));
         Label priceLabel = new Label(String.format(LanguageManager.getString("service.priceAndTime"),
-                item.getPrice())
+                item.getPrice(),
+                item.getEstimatedMinutes())
         );
 
         Button removeBtn = new Button(LanguageManager.getString("workorder.edit.remove"));
