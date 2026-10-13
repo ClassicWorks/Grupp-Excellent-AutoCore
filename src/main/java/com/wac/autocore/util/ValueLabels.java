@@ -16,6 +16,10 @@ public class ValueLabels {
         return lookup("data.service.description.", name, description);
     }
 
+    public static String servicePackName(String name) {
+        return lookup("data.servicepack.name.", name, name);
+    }
+
     public static String specialization(String value) {
         return lookup("data.specialization.", value, value);
     }
