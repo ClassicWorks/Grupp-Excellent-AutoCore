@@ -40,7 +40,7 @@ public class ServicePackDetails extends BorderPane{
         errorLabel = new Label("");
         errorLabel.getStyleClass().add("error-label");
 
-        Label title = createTitle(servicePack.getName());
+        Label title = createTitle(ValueLabels.servicePackName(servicePack.getName()));
 
         Label idLabel = new Label(String.format("ID: %d", servicePack.getId()));
 

@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ServicePackCard extends VBox {
     public ServicePackCard(ServicePack servicePack){
-        Label nameLabel = new Label(servicePack.getName());
+        Label nameLabel = new Label(ValueLabels.servicePackName(servicePack.getName()));
         nameLabel.getStyleClass().add("card-title");
 
         VBox serviceItemBox = new VBox();
