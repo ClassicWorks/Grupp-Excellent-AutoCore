@@ -116,11 +116,7 @@ public class AppDialog {
     private static void style(Alert alert) {
         DialogPane pane = alert.getDialogPane();
 
-        pane.getStylesheets().add(
-                AppDialog.class
-                        .getResource("/style/stylesheet.css")
-                        .toExternalForm()
-        );
+        pane.getStylesheets().add("/style/stylesheet.css");
 
         pane.getStyleClass().add("app-dialog");
     }

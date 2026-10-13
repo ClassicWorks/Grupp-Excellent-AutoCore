@@ -203,8 +203,7 @@ public class CreateVehicleForm {
                 )
         );
         if(createBooking){
-            System.out.println("Should call on ViewManager.createBooking or createWorkOrder");
-            //ViewManager.getInstance().show
+            ViewManager.getInstance().showCreateBooking(vehicle.getId());
         }
 
         return true;
