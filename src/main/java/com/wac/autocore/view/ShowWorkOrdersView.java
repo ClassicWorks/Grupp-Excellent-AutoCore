@@ -71,6 +71,7 @@ public class ShowWorkOrdersView {
 
         ScrollPane cardScroll = new ScrollPane(cardList);
         cardScroll.setFitToWidth(true);
+        cardScroll.setFitToHeight(true);
 
         KanbanGrid grid = new KanbanGrid(2);
         grid.add(cardScroll, 0, 0);
@@ -81,7 +82,9 @@ public class ShowWorkOrdersView {
         String tabTitle = String.format("%s (%d)",
                 ValueLabels.workOrderStatus(status), workOrders.size());
 
-        return new Tab (tabTitle, grid);
+        Tab tab = new Tab(tabTitle, grid);
+        tab.getStyleClass().addAll(status.name().toLowerCase().replace("_", "-"));
+        return tab;
     }
 
     private BorderPane getHeader() {
