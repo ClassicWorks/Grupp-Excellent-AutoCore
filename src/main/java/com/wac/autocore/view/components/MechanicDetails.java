@@ -22,6 +22,7 @@ public class MechanicDetails extends BorderPane {
         this.mechanic = mechanic;
 
         Label idLabel = new Label(String.format(LanguageManager.getString("mechanic.id"), mechanic.getId()));
+        idLabel.getStyleClass().addAll("details-title");
 
         Label nameLabel = new Label(LanguageManager.getString("mechanic.name"));
         nameLabel.getStyleClass().add("form-field-label");
@@ -51,10 +52,8 @@ public class MechanicDetails extends BorderPane {
                 mechanic.isAvailable()
                         ? LanguageManager.getString("mechanic.status.available")
                         : LanguageManager.getString("mechanic.status.busy")));
-        availabilityLabel.getStyleClass().add("status-label");
-        //TODO add styling and logic for status-label
-
-        errorLabel.setStyle("-fx-text-fill: red;");
+        availabilityLabel.getStyleClass().addAll("status-label",
+                mechanic.isAvailable() ? "completed" : "in-progress");
 
         errorLabel.getStyleClass().add("error-label");
 
@@ -66,7 +65,7 @@ public class MechanicDetails extends BorderPane {
                 availabilityLabel,
                 errorLabel
         );
-
+        fields.getStyleClass().add("details-container");
 
         HBox actionableButtons = new HBox(createSaveBtn());
         actionableButtons.getStyleClass().add("btn-container");
@@ -74,8 +73,6 @@ public class MechanicDetails extends BorderPane {
         setTop(idLabel);
         setCenter(fields);
         setBottom(actionableButtons);
-
-        getStyleClass().add("details-container");
     }
 
     private Button createSaveBtn() {

@@ -18,7 +18,10 @@ public class WorkOrderCard extends VBox {
         titleLabel.getStyleClass().add("card-title");
 
         Label statusLabel = new Label(ValueLabels.workOrderStatus(workOrder.getStatus()));
-        statusLabel.getStyleClass().add("status-label");
+        statusLabel.getStyleClass().addAll(
+                "status-label",
+                workOrder.getStatus().name().toLowerCase().replace('_', '-')
+        );
 
         HBox header = new HBox(10, titleLabel, statusLabel);
 

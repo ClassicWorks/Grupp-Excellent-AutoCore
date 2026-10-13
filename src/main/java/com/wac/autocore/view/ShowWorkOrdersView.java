@@ -66,11 +66,17 @@ public class ShowWorkOrdersView {
 
         for (WorkOrder workOrder : workOrders) {
             cardList.getChildren().add(new WorkOrderCard(workOrder, wo ->
-                    detailPanel.getChildren().setAll(new WorkOrderDetails(wo, this::refreshTabs))));
+            {
+                WorkOrderDetails workOrderDetails = new WorkOrderDetails(wo, this::refreshTabs);
+                detailPanel.getChildren().setAll(workOrderDetails);
+                VBox.setVgrow(workOrderDetails, Priority.ALWAYS);
+            }
+            ));
         }
 
         ScrollPane cardScroll = new ScrollPane(cardList);
         cardScroll.setFitToWidth(true);
+        cardScroll.setFitToHeight(true);
 
         KanbanGrid grid = new KanbanGrid(2);
         grid.add(cardScroll, 0, 0);
@@ -81,7 +87,9 @@ public class ShowWorkOrdersView {
         String tabTitle = String.format("%s (%d)",
                 ValueLabels.workOrderStatus(status), workOrders.size());
 
-        return new Tab (tabTitle, grid);
+        Tab tab = new Tab(tabTitle, grid);
+        tab.getStyleClass().addAll(status.name().toLowerCase().replace("_", "-"));
+        return tab;
     }
 
     private BorderPane getHeader() {

@@ -19,8 +19,8 @@ public class PaymentCard extends VBox {
         Label statusLabel = new Label(payment.isSuccessful()
                 ? LanguageManager.getString("payment.status.successful")
                 : LanguageManager.getString("payment.status.failed"));
-        statusLabel.getStyleClass().addAll("status-label");
-        //TODO add logic and styling to status-label
+        statusLabel.getStyleClass().addAll("status-label",
+                payment.isSuccessful() ? "completed" : "unhandled");
 
         paymentCard.getChildren().addAll(invoiceLabel, amountLabel, typeLabel, dateLabel, statusLabel);
         paymentCard.getStyleClass().addAll("card-info-box");
