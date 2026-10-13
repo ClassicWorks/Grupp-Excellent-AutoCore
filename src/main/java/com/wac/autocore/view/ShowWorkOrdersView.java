@@ -66,7 +66,12 @@ public class ShowWorkOrdersView {
 
         for (WorkOrder workOrder : workOrders) {
             cardList.getChildren().add(new WorkOrderCard(workOrder, wo ->
-                    detailPanel.getChildren().setAll(new WorkOrderDetails(wo, this::refreshTabs))));
+            {
+                WorkOrderDetails workOrderDetails = new WorkOrderDetails(wo, this::refreshTabs);
+                detailPanel.getChildren().setAll(workOrderDetails);
+                VBox.setVgrow(workOrderDetails, Priority.ALWAYS);
+            }
+            ));
         }
 
         ScrollPane cardScroll = new ScrollPane(cardList);

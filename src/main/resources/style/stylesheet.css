@@ -29,9 +29,9 @@
     -fx-status-in-progress-background-color: #F7EDDC;
     -fx-status-in-progress-darker-background-color: #e4dbcc;
     -fx-status-in-progress-ink: #986c1a;
-    -fx-status-draft-background-color: #f7e9dd;
-    -fx-status-draft-darker-background-color: #dfd3c9;
-    -fx-status-draft-ink: #8f4f27;
+    -fx-status-draft-background-color: #e6e6e6;
+    -fx-status-draft-darker-background-color: #cdcdcd;
+    -fx-status-draft-ink: #434343;
     -fx-status-confirmed-background-color: #E7EEEF;
     -fx-status-confirmed-darker-background-color: #d4e3e4;
     -fx-status-confirmed-ink: #4F6B78;
@@ -117,6 +117,39 @@ HyperLink{
 .alt-label{
     -fx-text-fill: -fx-muted-ink;
     -fx-font-style: italic;
+}
+
+.status-label{
+    -fx-text-fill: -fx-muted-ink;
+    -fx-background-color: -fx-default-color;
+    -fx-background-radius: 15px;
+    -fx-padding: 5px 7px;
+}
+
+.status-label.draft{
+    -fx-text-fill: -fx-status-draft-ink;
+    -fx-background-color: -fx-status-draft-background-color;
+}
+
+.status-label.confirmed{
+    -fx-text-fill: -fx-status-confirmed-ink;
+    -fx-background-color: -fx-status-confirmed-background-color;
+}
+
+.status-label.in-progress{
+    -fx-text-fill: -fx-status-in-progress-ink;
+    -fx-background-color: -fx-status-in-progress-background-color;
+}
+
+.status-label.completed{
+    -fx-text-fill: -fx-status-completed-ink;
+    -fx-background-color: -fx-status-completed-background-color;
+}
+
+.status-label.unhandled,
+.status-label.cancelled{
+    -fx-text-fill: -fx-status-unhandled-ink;
+    -fx-background-color: -fx-status-unhandled-background-color;
 }
 
 /*-------------
