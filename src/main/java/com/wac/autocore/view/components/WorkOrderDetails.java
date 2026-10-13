@@ -7,16 +7,18 @@ import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class WorkOrderDetails extends VBox {
+public class WorkOrderDetails extends BorderPane {
 
     private final GarageSystem garageSystem = new GarageSystem();
     private final WorkOrder workOrder;
@@ -26,12 +28,9 @@ public class WorkOrderDetails extends VBox {
         this.workOrder = workOrder;
         this.onChanged = onChanged;
 
-        this.getChildren().addAll(
-                createHeader(),
-                createInfoSection(),
-                createServiceSection(),
-                createActionButtons());
-        this.getStyleClass().add("details-container");
+        this.setTop(createHeader());
+        this.setCenter(createInfoSection());
+        this.setBottom(createActionButtons());
     }
 
     private HBox createHeader() {
@@ -67,27 +66,36 @@ public class WorkOrderDetails extends VBox {
                 ? mechanic.getName()
                 : LanguageManager.getString("mechanic.none.assigned"));
 
+
         VBox info = new VBox(
-                createFieldLabel("workorder.details.vehicle"), vehicleLabel,
-                createFieldLabel("workorder.details.customer"), customerLabel,
-                createFieldLabel("workorder.details.mechanic"), mechanicLabel);
+                createFormFieldContainer("workorder.details.vehicle", vehicleLabel),
+                createFormFieldContainer("workorder.details.customer", customerLabel),
+                createFormFieldContainer("workorder.details.mechanic", mechanicLabel)
+        );
 
         if (booking != null) {
-            Label dateLabel = new Label(String.format(
-                    LanguageManager.getString("booking.date"), booking.getDate()));
+            Label dateLabel = new Label(booking.getDate().toString());
 
             Label descriptionLabel = new Label(
                     booking.getDescriptionFor(LanguageManager.getCurrentLanguage()));
             descriptionLabel.setWrapText(true);
 
             info.getChildren().addAll(
-                    dateLabel,
-                    createFieldLabel("workorder.details.description"),
-                    descriptionLabel);
+                    createFormFieldContainer("booking.date", dateLabel),
+                    createFormFieldContainer("workorder.details.description", descriptionLabel)
+            );
         }
 
-        info.getStyleClass().add("card-info-box");
+        info.getChildren().addAll(createServiceSection());
+
+        info.getStyleClass().add("details-container");
         return info;
+    }
+
+    private VBox createFormFieldContainer(String key, Label vehicleLabel) {
+        VBox vehicleInfo = new VBox(createFieldLabel(key), vehicleLabel);
+        vehicleInfo.getStyleClass().add("form-field-container");
+        return vehicleInfo;
     }
 
     private Label createFieldLabel(String key) {
@@ -116,10 +124,22 @@ public class WorkOrderDetails extends VBox {
             row++;
         }
 
-        grid.add(new Label(LanguageManager.getString("workorder.details.total")), 0, row);
-        grid.add(new Label(String.format(
-                LanguageManager.getString("service.minutes"), totalMinutes)), 1, row);
-        grid.add(new Label(formatAmount(workOrder.getTotalPrice())), 2, row);
+        Label totalLabel = new Label(
+                LanguageManager.getString("workorder.details.total"));
+        Label totalMinutesLabel = new Label(String.format(
+                LanguageManager.getString("service.minutes"),
+                totalMinutes));
+        Label totalPriceLabel = new Label(formatAmount(workOrder.getTotalPrice()));
+
+        for (Label label : Arrays.asList(
+                totalLabel, totalMinutesLabel, totalPriceLabel)) {
+            label.getStyleClass().addAll("row-final");
+        }
+
+        grid.add(totalLabel, 0, row);
+        grid.add(totalMinutesLabel, 1, row);
+        grid.add(totalPriceLabel, 2, row);
+
 
         return new VBox(createFieldLabel("workorder.serviceItems"), grid);
     }

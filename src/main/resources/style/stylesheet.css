@@ -395,7 +395,7 @@ Button.smaller{
     -fx-spacing: 16px;
 }
 
-.row-final Label{
+.row-final{
     -fx-font-weight: 700;
 }
 

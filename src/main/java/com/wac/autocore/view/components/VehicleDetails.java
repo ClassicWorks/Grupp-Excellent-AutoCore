@@ -36,8 +36,7 @@ public class VehicleDetails extends BorderPane {
         this.vehicle = vehicle;
         this.vehicleOwner = vehicleOwner;
 
-        getCustomerSection();
-        customerSection.getStyleClass().add("form-field-container");
+        updateCustomerSection();
 
         errorLabel.getStyleClass().add("error-label");
 
@@ -63,7 +62,7 @@ public class VehicleDetails extends BorderPane {
         this.setBottom(actionableButtons);
     }
 
-    private void getCustomerSection() {
+    private void updateCustomerSection() {
         ImageViewWithAltText customerIcon = new ImageViewWithAltText(
                 "/imgs/user-solid.png", 20, 20,
                 LanguageManager.getString("image.user-solid")
@@ -111,7 +110,7 @@ public class VehicleDetails extends BorderPane {
         }
 
         customerSection.getChildren().setAll(customerLabel, customerEditableBox);
-
+        customerSection.getStyleClass().add("form-field-container");
     }
 
     private void showCustomerSelection(){
@@ -129,7 +128,7 @@ public class VehicleDetails extends BorderPane {
                     changeCustomerBtn)
         );
 
-        changeCustomerBtn.setOnAction(e -> getCustomerSection());
+        changeCustomerBtn.setOnAction(e -> updateCustomerSection());
     }
 
     private HBox createVehicleEditForm() {
