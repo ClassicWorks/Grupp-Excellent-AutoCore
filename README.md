@@ -1,6 +1,6 @@
 ## LibreTranslate
 
-För att felbeskrivningen på bokningar ska översättas behöver LibreTranslate köras i Docker. Kör detta en gång i Git Bash:
+För att textfält på bokningar ska översättas behöver LibreTranslate köras i Docker. Kör detta en gång i Git Bash:
 
 ```
 docker run -d --name libretranslate -p 5000:5000 libretranslate/libretranslate --load-only en,sv
