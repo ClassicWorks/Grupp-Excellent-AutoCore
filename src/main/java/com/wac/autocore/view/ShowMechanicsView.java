@@ -20,6 +20,8 @@ import java.util.List;
 
 public class ShowMechanicsView {
     private final GarageSystem garageSystem;
+    private final VBox detailPanel = new VBox();
+    private final VBox mechanicsBox = new VBox();
 
     public ShowMechanicsView() {
         garageSystem = new GarageSystem();
@@ -35,28 +37,9 @@ public class ShowMechanicsView {
         //Split view, list to the left, details to the right
         GridPane mainContent = new KanbanGrid(2);
 
-        VBox detailPanel = new VBox();
-
-        VBox mechanicsBox = new VBox();
         mechanicsBox.getStyleClass().add("card-container");
 
-        List<Mechanic> mechanics = garageSystem.getMechanics();
-
-        if (mechanics.isEmpty()) {
-            Label errorLabel = new Label(LanguageManager.getString("mechanics.empty"));
-            errorLabel.getStyleClass().add("error-label");
-            mechanicsBox.getChildren().add(errorLabel);
-        }
-
-        for (Mechanic mechanic : mechanics) {
-            MechanicCard card = new MechanicCard(mechanic, m -> {
-                MechanicDetails mechanicDetails = new MechanicDetails(m);
-                detailPanel.getChildren().setAll(mechanicDetails);
-                VBox.setVgrow(mechanicDetails, Priority.ALWAYS);
-            }
-                    );
-            mechanicsBox.getChildren().add(card);
-        }
+        fillMechanics();
 
         ScrollPane mechanicsColumn = new ScrollPane(mechanicsBox);
         mechanicsColumn.setFitToWidth(true);
@@ -70,6 +53,27 @@ public class ShowMechanicsView {
 
         layout.setCenter(mainContent);
         return layout;
+    }
+
+    private void fillMechanics() {
+        mechanicsBox.getChildren().clear();
+
+        List<Mechanic> mechanics = garageSystem.getMechanics();
+
+        if (mechanics.isEmpty()) {
+            Label errorLabel = new Label(LanguageManager.getString("mechanics.empty"));
+            errorLabel.getStyleClass().add("error-label");
+            mechanicsBox.getChildren().add(errorLabel);
+        }
+
+        for (Mechanic mechanic : mechanics) {
+            MechanicCard card = new MechanicCard(mechanic, m -> {
+                MechanicDetails mechanicDetails = new MechanicDetails(m, this::fillMechanics);
+                detailPanel.getChildren().setAll(mechanicDetails);
+                VBox.setVgrow(mechanicDetails, Priority.ALWAYS);
+            });
+            mechanicsBox.getChildren().add(card);
+        }
     }
 
     private Node getHeader() {

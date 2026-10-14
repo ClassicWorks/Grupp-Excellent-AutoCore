@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Mechanic;
+import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,14 +13,17 @@ import javafx.scene.layout.VBox;
 public class MechanicDetails extends BorderPane {
 
     private final Mechanic mechanic;
+    private final Runnable onSaved;
+    private final GarageSystem garageSystem = new GarageSystem();
 
     private final TextField nameField = new TextField();
     private final TextField phoneField = new TextField();
     private final TextField specializationField = new TextField();
     private final Label errorLabel = new Label();
 
-    public MechanicDetails(Mechanic mechanic) {
+    public MechanicDetails(Mechanic mechanic, Runnable onSaved) {
         this.mechanic = mechanic;
+        this.onSaved = onSaved;
 
         Label idLabel = new Label(String.format(LanguageManager.getString("mechanic.id"), mechanic.getId()));
         idLabel.getStyleClass().addAll("details-title");
@@ -83,17 +87,27 @@ public class MechanicDetails extends BorderPane {
 
         saveBtn.setOnAction(e -> {
             errorLabel.setText("");
+            errorLabel.setStyle("");
 
             if (nameField.getText().trim().isEmpty()) {
                 errorLabel.setText(LanguageManager.getString("mechanic.error.nameEmpty"));
                 return;
             }
 
-            System.out.printf("Should call garageSystem.updateMechanic(%d, %s, %s, %s)%n",
+            Mechanic updated = garageSystem.updateMechanic(
                     mechanic.getId(),
                     nameField.getText().trim(),
                     phoneField.getText().trim(),
                     specializationField.getText().trim());
+
+            if (updated == null) {
+                errorLabel.setText(LanguageManager.getString("mechanic.error.saveFailed"));
+                return;
+            }
+
+            errorLabel.setStyle("-fx-text-fill: green;");
+            errorLabel.setText(LanguageManager.getString("mechanic.saved"));
+            onSaved.run();
         });
         return saveBtn;
     }

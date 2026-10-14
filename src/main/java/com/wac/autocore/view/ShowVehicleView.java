@@ -16,6 +16,8 @@ import javafx.scene.layout.*;
 
 public class ShowVehicleView {
     private final GarageSystem garageSystem;
+    private final VBox vehiclesBox = new VBox();
+    private final VBox detailsContainer = new VBox();
 
     public ShowVehicleView() {
         garageSystem = new GarageSystem();
@@ -42,28 +44,9 @@ public class ShowVehicleView {
         HBox filterBox = new HBox(sortingComboBox, searchBar);*/
 
         //List all cards for vehicles
-        VBox vehiclesBox = new VBox();
         vehiclesBox.getStyleClass().add("card-container");
 
-        VBox detailsContainer = new VBox();
-
-        //Show details of car
-        for (Vehicle vehicle : garageSystem.getVehicles()){
-            Customer customer = vehicle.getCustomer();
-            VehicleCard vehicleCard = new VehicleCard(vehicle, customer,
-                    v -> ViewManager.getInstance().showCreateBooking(v.getId())
-            );
-
-            vehicleCard.setOnMouseClicked(e-> {
-                VehicleDetails vehicleDetails = new VehicleDetails(vehicle, customer);
-                detailsContainer.getChildren().setAll(vehicleDetails);
-                VBox.setVgrow(vehicleDetails, Priority.ALWAYS);
-
-                StylingUtil.setSelected(vehicleCard, "card");
-            });
-            vehicleCard.getStyleClass().add("clickable");
-            vehiclesBox.getChildren().add(vehicleCard);
-        }
+        fillVehicles();
 
         ScrollPane vehiclesScroll = new ScrollPane(vehiclesBox);
         vehiclesScroll.setFitToWidth(true);
@@ -81,6 +64,28 @@ public class ShowVehicleView {
 
         layout.setCenter(mainContent);
         return layout;
+    }
+
+    private void fillVehicles() {
+        vehiclesBox.getChildren().clear();
+
+        //Show details of car
+        for (Vehicle vehicle : garageSystem.getVehicles()){
+            Customer customer = vehicle.getCustomer();
+            VehicleCard vehicleCard = new VehicleCard(vehicle, customer,
+                    v -> ViewManager.getInstance().showCreateBooking(v.getId())
+            );
+
+            vehicleCard.setOnMouseClicked(e-> {
+                VehicleDetails vehicleDetails = new VehicleDetails(vehicle, customer, this::fillVehicles);
+                detailsContainer.getChildren().setAll(vehicleDetails);
+                VBox.setVgrow(vehicleDetails, Priority.ALWAYS);
+
+                StylingUtil.setSelected(vehicleCard, "card");
+            });
+            vehicleCard.getStyleClass().add("clickable");
+            vehiclesBox.getChildren().add(vehicleCard);
+        }
     }
 
     private Node getHeader(){

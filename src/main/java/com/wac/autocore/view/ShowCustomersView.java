@@ -21,6 +21,8 @@ import javafx.scene.layout.VBox;
 
 public class ShowCustomersView {
     private final GarageSystem garageSystem;
+    private final VBox customersBox = new VBox();
+    private GridPane mainContent;
 
     public ShowCustomersView() {
         garageSystem = new GarageSystem();
@@ -32,17 +34,36 @@ public class ShowCustomersView {
         header.getStyleClass().add("content-header-container");
         layout.setTop(header);
 
-        GridPane mainContent = new KanbanGrid(2);
+        mainContent = new KanbanGrid(2);
 
-        VBox customersBox = new VBox();
         customersBox.getStyleClass().add("card-container");
+
+        fillCustomers();
+
+        ScrollPane customersScroll = new ScrollPane(customersBox);
+        customersScroll.setFitToWidth(true);
+        customersScroll.setFitToHeight(true);
+
+        GridPane.setVgrow(customersScroll, Priority.ALWAYS);
+        VBox.setVgrow(mainContent, Priority.ALWAYS);
+
+        mainContent.add(
+                customersScroll,
+                0, 0);
+
+        layout.setCenter(mainContent);
+        return layout;
+    }
+
+    private void fillCustomers() {
+        customersBox.getChildren().clear();
 
         for (Customer customer : garageSystem.getCustomers()) {
             CustomerCard customerCard = new CustomerCard(customer);
             customerCard.getStyleClass().add("clickable");
             customerCard.setOnMouseClicked(e -> {
 
-                CustomerDetails customerDetails = new CustomerDetails(customer);
+                CustomerDetails customerDetails = new CustomerDetails(customer, this::fillCustomers);
                 customerDetails.setMaxHeight(Double.MAX_VALUE);
 
                 mainContent.getChildren().removeIf(node ->
@@ -60,20 +81,6 @@ public class ShowCustomersView {
             });
             customersBox.getChildren().add(customerCard);
         }
-
-        ScrollPane customersScroll = new ScrollPane(customersBox);
-        customersScroll.setFitToWidth(true);
-        customersScroll.setFitToHeight(true);
-
-        GridPane.setVgrow(customersScroll, Priority.ALWAYS);
-        VBox.setVgrow(mainContent, Priority.ALWAYS);
-
-        mainContent.add(
-                customersScroll,
-                0, 0);
-
-        layout.setCenter(mainContent);
-        return layout;
     }
 
     private Node getHeader(){
