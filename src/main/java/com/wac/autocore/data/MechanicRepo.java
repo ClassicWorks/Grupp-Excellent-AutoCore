@@ -11,4 +11,6 @@ public interface MechanicRepo {
     List<Mechanic> getAll();
     List<Mechanic> getAllAvailable();
     Optional<Mechanic> get(int id);
+
+    void delete(int id);
 }

@@ -44,4 +44,16 @@ public class VehicleRepoImpl implements VehicleRepo{
                     .uniqueResultOptional();
         }
     }
+
+    @Override
+    public void delete(int id) {
+        try (Session s = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction transaction = s.beginTransaction();
+            Vehicle v = s.get(Vehicle.class, id);
+            if (v != null) {
+                s.delete(v);
+            }
+            transaction.commit();
+        }
+    }
 }

@@ -47,4 +47,16 @@ public class CustomerRepoImpl implements CustomerRepo{
                     .uniqueResultOptional();
         }
     }
+
+    @Override
+    public void delete(int id) {
+        try (Session s = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction transaction = s.beginTransaction();
+            Customer c = s.get(Customer.class, id);
+            if (c != null) {
+                s.delete(c);
+            }
+            transaction.commit();
+        }
+    }
 }

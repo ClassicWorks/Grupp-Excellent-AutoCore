@@ -53,4 +53,16 @@ public class MechanicRepoImpl implements MechanicRepo {
                     .uniqueResultOptional();
         }
     }
+
+    @Override
+    public void delete(int id) {
+        try (Session s = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction transaction = s.beginTransaction();
+            Mechanic m = s.get(Mechanic.class, id);
+            if (m != null) {
+                s.delete(m);
+            }
+            transaction.commit();
+        }
+    }
 }
