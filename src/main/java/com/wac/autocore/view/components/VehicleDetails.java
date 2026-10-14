@@ -14,8 +14,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.function.Consumer;
+
 public class VehicleDetails extends BorderPane {
     private final GarageSystem garageSystem = new GarageSystem();
+    private final Runnable onSaved;
 
     private Vehicle vehicle;
     private Customer vehicleOwner;
@@ -32,9 +35,10 @@ public class VehicleDetails extends BorderPane {
     private Label errorLabel = new Label();
 
 
-    public VehicleDetails(Vehicle vehicle, Customer vehicleOwner) {
+    public VehicleDetails(Vehicle vehicle, Customer vehicleOwner, Runnable onSaved, Consumer<Integer> onDelete) {
         this.vehicle = vehicle;
         this.vehicleOwner = vehicleOwner;
+        this.onSaved = onSaved;
 
         updateCustomerSection();
 
@@ -53,7 +57,7 @@ public class VehicleDetails extends BorderPane {
         );
         confirmingButtons.getStyleClass().add("btn-container");
 
-        HBox destructiveButtons = new HBox(createDeleteBtn());
+        HBox destructiveButtons = new HBox(createDeleteBtn(onDelete));
         destructiveButtons.getStyleClass().add("btn-container");
 
         BorderPane actionableButtons = new BorderPane(null, null, destructiveButtons, null, confirmingButtons);
@@ -99,7 +103,7 @@ public class VehicleDetails extends BorderPane {
                     vehicleOwner.getPhone()
             ));
 
-            if(vehicleOwner.getId() != vehicle.getCustomer().getId()){
+            if (vehicle.getCustomer() == null || vehicleOwner.getId() != vehicle.getCustomer().getId()) {
                 notificationLabel.setText(LanguageManager.getString("vehicle.ownerChangedNotice"));
             }
         } else {
@@ -124,8 +128,8 @@ public class VehicleDetails extends BorderPane {
 
         customerEditableBox.getChildren().setAll(
                 new VBox(
-                    customerSelection,
-                    changeCustomerBtn)
+                        customerSelection,
+                        changeCustomerBtn)
         );
 
         changeCustomerBtn.setOnAction(e -> updateCustomerSection());
@@ -215,35 +219,44 @@ public class VehicleDetails extends BorderPane {
                         .or(yearField.textProperty().isEmpty())
         );
 
-        //TODO savefunction
         saveBtn.setOnAction(e -> {
-            if(!isInteger(yearField.getText())){
+            errorLabel.setText("");
+            errorLabel.setStyle("");
+
+            if (!isInteger(yearField.getText().trim())) {
                 errorLabel.setText(LanguageManager.getString("vehicle.error.yearNumber"));
                 return;
             }
-            //TODO check fields
-            Vehicle newVehicle = new Vehicle(
-                    vehicle.getId(),
-                    registrationNumber.getText(),
-                    brandField.getText(),
-                    modelField.getText(),
-                    Integer.parseInt(yearField.getText()),
-                    vehicleOwner
-            );
-            System.out.printf("Should call ViewManager.getInstance.saveVehicle(%d, %s)", vehicle.getId(), newVehicle);
 
+            Vehicle updated = garageSystem.updateVehicle(
+                    vehicle.getId(),
+                    registrationNumber.getText().trim(),
+                    brandField.getText().trim(),
+                    modelField.getText().trim(),
+                    Integer.parseInt(yearField.getText().trim()),
+                    vehicleOwner == null ? null : vehicleOwner.getId()
+            );
+
+            if (updated == null) {
+                errorLabel.setText(LanguageManager.getString("vehicle.error.saveFailed"));
+                return;
+            }
+
+            vehicle = updated;
+            updateCustomerSection();
+
+            errorLabel.setStyle("-fx-text-fill: green;");
+            errorLabel.setText(LanguageManager.getString("vehicle.saved"));
+            onSaved.run();
         });
 
         return saveBtn;
     }
 
-    private Button createDeleteBtn() {
+    private Button createDeleteBtn(Consumer<Integer> onDelete) {
         Button deleteBtn = new Button(LanguageManager.getString("vehicle.delete"));
         deleteBtn.getStyleClass().add("destroy-btn");
-        deleteBtn.setOnAction(e ->
-                System.out.printf("Should call ViewManager.getInstance.confirmDelete(vehicle, garagesystem.deleteVehicle(%d)",
-                        vehicle.getId())
-        );
+        deleteBtn.setOnAction(e -> onDelete.accept(vehicle.getId()));
         return deleteBtn;
     }
 

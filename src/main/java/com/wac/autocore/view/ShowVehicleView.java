@@ -5,6 +5,7 @@ import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.StylingUtil;
+import com.wac.autocore.view.components.AppDialog;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.VehicleCard;
@@ -16,6 +17,8 @@ import javafx.scene.layout.*;
 
 public class ShowVehicleView {
     private final GarageSystem garageSystem;
+    private final VBox vehiclesBox = new VBox();
+    private final VBox detailsContainer = new VBox();
 
     public ShowVehicleView() {
         garageSystem = new GarageSystem();
@@ -42,28 +45,9 @@ public class ShowVehicleView {
         HBox filterBox = new HBox(sortingComboBox, searchBar);*/
 
         //List all cards for vehicles
-        VBox vehiclesBox = new VBox();
         vehiclesBox.getStyleClass().add("card-container");
 
-        VBox detailsContainer = new VBox();
-
-        //Show details of car
-        for (Vehicle vehicle : garageSystem.getVehicles()){
-            Customer customer = vehicle.getCustomer();
-            VehicleCard vehicleCard = new VehicleCard(vehicle, customer,
-                    v -> ViewManager.getInstance().showCreateBooking(v.getId())
-            );
-
-            vehicleCard.setOnMouseClicked(e-> {
-                VehicleDetails vehicleDetails = new VehicleDetails(vehicle, customer);
-                detailsContainer.getChildren().setAll(vehicleDetails);
-                VBox.setVgrow(vehicleDetails, Priority.ALWAYS);
-
-                StylingUtil.setSelected(vehicleCard, "card");
-            });
-            vehicleCard.getStyleClass().add("clickable");
-            vehiclesBox.getChildren().add(vehicleCard);
-        }
+        fillVehicles();
 
         ScrollPane vehiclesScroll = new ScrollPane(vehiclesBox);
         vehiclesScroll.setFitToWidth(true);
@@ -81,6 +65,68 @@ public class ShowVehicleView {
 
         layout.setCenter(mainContent);
         return layout;
+    }
+
+    private void fillVehicles() {
+        vehiclesBox.getChildren().clear();
+
+        //Show details of car
+        for (Vehicle vehicle : garageSystem.getVehicles()){
+            Customer customer = vehicle.getCustomer();
+            VehicleCard vehicleCard = new VehicleCard(vehicle, customer,
+                    v -> ViewManager.getInstance().showCreateBooking(v.getId())
+            );
+
+            vehicleCard.setOnMouseClicked(e-> {
+                VehicleDetails vehicleDetails = new VehicleDetails(
+                        vehicle,
+                        customer,
+                        this::fillVehicles,
+                        this::deleteVehicle);
+                detailsContainer.getChildren().setAll(vehicleDetails);
+                VBox.setVgrow(vehicleDetails, Priority.ALWAYS);
+
+                StylingUtil.setSelected(vehicleCard, "card");
+            });
+            vehicleCard.getStyleClass().add("clickable");
+            vehiclesBox.getChildren().add(vehicleCard);
+        }
+    }
+
+    private void deleteVehicle(int vehicleId) {
+        if (garageSystem.vehicleHasBookings(vehicleId)) {
+            AppDialog.showError(
+                    LanguageManager.getString("vehicle.delete.title"),
+                    LanguageManager.getString("vehicle.delete.blocked.title"),
+                    LanguageManager.getString("vehicle.delete.blocked.message")
+            );
+            return;
+        }
+
+        boolean deleteConfirmed = AppDialog.showConfirm(
+                LanguageManager.getString("vehicle.delete.title"),
+                String.format(
+                        LanguageManager.getString("vehicle.delete.message"),
+                        vehicleId
+                ),
+                LanguageManager.getString("vehicle.delete.warning")
+        );
+
+        if (!deleteConfirmed) {
+            return;
+        }
+
+        if (!garageSystem.deleteVehicle(vehicleId)) {
+            AppDialog.showError(
+                    LanguageManager.getString("vehicle.delete.title"),
+                    LanguageManager.getString("vehicle.delete.failed"),
+                    ""
+            );
+            return;
+        }
+
+        detailsContainer.getChildren().clear();
+        fillVehicles();
     }
 
     private Node getHeader(){

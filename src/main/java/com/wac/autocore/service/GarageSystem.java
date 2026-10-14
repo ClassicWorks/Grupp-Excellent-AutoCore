@@ -279,7 +279,7 @@ public class GarageSystem {
     }
 
     public boolean deleteCustomer(int customerId) {
-        if (customerRepo.get(customerId).isPresent()) {
+        if (!customerRepo.get(customerId).isPresent()) {
             System.out.println("Customer not found.");
             return false;
         }
@@ -292,7 +292,7 @@ public class GarageSystem {
     }
 
     public boolean deleteVehicle(int vehicleId) {
-        if (vehicleRepo.get(vehicleId).isPresent()) {
+        if (!vehicleRepo.get(vehicleId).isPresent()) {
             System.out.println("Vehicle not found.");
             return false;
         }
@@ -305,7 +305,7 @@ public class GarageSystem {
     }
 
     public boolean deleteMechanic(int mechanicId) {
-        if (mechanicRepo.get(mechanicId).isPresent()) {
+        if (!mechanicRepo.get(mechanicId).isPresent()) {
             System.out.println("Mechanic not found.");
             return false;
         }

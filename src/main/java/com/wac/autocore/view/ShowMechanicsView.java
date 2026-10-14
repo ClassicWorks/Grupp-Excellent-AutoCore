@@ -3,6 +3,7 @@ package com.wac.autocore.view;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.view.components.AppDialog;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.view.components.MechanicCard;
 import com.wac.autocore.view.components.MechanicDetails;
@@ -20,6 +21,8 @@ import java.util.List;
 
 public class ShowMechanicsView {
     private final GarageSystem garageSystem;
+    private final VBox detailPanel = new VBox();
+    private final VBox mechanicsBox = new VBox();
 
     public ShowMechanicsView() {
         garageSystem = new GarageSystem();
@@ -35,28 +38,9 @@ public class ShowMechanicsView {
         //Split view, list to the left, details to the right
         GridPane mainContent = new KanbanGrid(2);
 
-        VBox detailPanel = new VBox();
-
-        VBox mechanicsBox = new VBox();
         mechanicsBox.getStyleClass().add("card-container");
 
-        List<Mechanic> mechanics = garageSystem.getMechanics();
-
-        if (mechanics.isEmpty()) {
-            Label errorLabel = new Label(LanguageManager.getString("mechanics.empty"));
-            errorLabel.getStyleClass().add("error-label");
-            mechanicsBox.getChildren().add(errorLabel);
-        }
-
-        for (Mechanic mechanic : mechanics) {
-            MechanicCard card = new MechanicCard(mechanic, m -> {
-                MechanicDetails mechanicDetails = new MechanicDetails(m);
-                detailPanel.getChildren().setAll(mechanicDetails);
-                VBox.setVgrow(mechanicDetails, Priority.ALWAYS);
-            }
-                    );
-            mechanicsBox.getChildren().add(card);
-        }
+        fillMechanics();
 
         ScrollPane mechanicsColumn = new ScrollPane(mechanicsBox);
         mechanicsColumn.setFitToWidth(true);
@@ -70,6 +54,66 @@ public class ShowMechanicsView {
 
         layout.setCenter(mainContent);
         return layout;
+    }
+
+    private void fillMechanics() {
+        mechanicsBox.getChildren().clear();
+
+        List<Mechanic> mechanics = garageSystem.getMechanics();
+
+        if (mechanics.isEmpty()) {
+            Label errorLabel = new Label(LanguageManager.getString("mechanics.empty"));
+            errorLabel.getStyleClass().add("error-label");
+            mechanicsBox.getChildren().add(errorLabel);
+        }
+
+        for (Mechanic mechanic : mechanics) {
+            MechanicCard card = new MechanicCard(mechanic, m -> {
+                MechanicDetails mechanicDetails = new MechanicDetails(
+                        m,
+                        this::fillMechanics,
+                        this::deleteMechanic);
+                detailPanel.getChildren().setAll(mechanicDetails);
+                VBox.setVgrow(mechanicDetails, Priority.ALWAYS);
+            });
+            mechanicsBox.getChildren().add(card);
+        }
+    }
+
+    private void deleteMechanic(int mechanicId) {
+        if (garageSystem.mechanicHasWorkOrders(mechanicId)) {
+            AppDialog.showError(
+                    LanguageManager.getString("mechanic.delete.title"),
+                    LanguageManager.getString("mechanic.delete.blocked.title"),
+                    LanguageManager.getString("mechanic.delete.blocked.message")
+            );
+            return;
+        }
+
+        boolean deleteConfirmed = AppDialog.showConfirm(
+                LanguageManager.getString("mechanic.delete.title"),
+                String.format(
+                        LanguageManager.getString("mechanic.delete.message"),
+                        mechanicId
+                ),
+                LanguageManager.getString("mechanic.delete.warning")
+        );
+
+        if (!deleteConfirmed) {
+            return;
+        }
+
+        if (!garageSystem.deleteMechanic(mechanicId)) {
+            AppDialog.showError(
+                    LanguageManager.getString("mechanic.delete.title"),
+                    LanguageManager.getString("mechanic.delete.failed"),
+                    ""
+            );
+            return;
+        }
+
+        detailPanel.getChildren().clear();
+        fillMechanics();
     }
 
     private Node getHeader() {

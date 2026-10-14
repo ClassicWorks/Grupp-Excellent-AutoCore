@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Customer;
+import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -9,17 +10,22 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.function.Consumer;
+
 public class CustomerDetails extends BorderPane {
 
     private final Customer customer;
+    private final Runnable onSaved;
+    private final GarageSystem garageSystem = new GarageSystem();
 
     private final TextField nameField = new TextField();
     private final TextField phoneField = new TextField();
     private final TextField emailField = new TextField();
     private final Label errorLabel = new Label();
 
-    public CustomerDetails(Customer customer) {
+    public CustomerDetails(Customer customer, Runnable onSaved, Consumer<Integer> onDelete) {
         this.customer = customer;
+        this.onSaved = onSaved;
 
         Label idLabel = new Label(String.format(LanguageManager.getString("customer.id"), customer.getId()));
 
@@ -74,8 +80,13 @@ public class CustomerDetails extends BorderPane {
                 errorLabel
         );
 
-        HBox actionableButtons = new HBox(createSaveBtn());
-        actionableButtons.getStyleClass().add("btn-container");
+        HBox confirmingButtons = new HBox(createSaveBtn());
+        confirmingButtons.getStyleClass().add("btn-container");
+
+        HBox destructiveButtons = new HBox(createDeleteBtn(onDelete));
+        destructiveButtons.getStyleClass().add("btn-container");
+
+        BorderPane actionableButtons = new BorderPane(null, null, destructiveButtons, null, confirmingButtons);
 
         this.getStyleClass().add("details-container");
         this.setTop(idLabel);
@@ -91,18 +102,35 @@ public class CustomerDetails extends BorderPane {
 
         saveBtn.setOnAction(e -> {
             errorLabel.setText("");
+            errorLabel.setStyle("");
 
             if (nameField.getText().trim().isEmpty()) {
                 errorLabel.setText(LanguageManager.getString("customer.error.nameEmpty"));
                 return;
             }
 
-            System.out.printf("Should call garageSystem.updateCustomer(%d, %s, %s, %s)%n",
+            Customer updated = garageSystem.updateCustomer(
                     customer.getId(),
                     nameField.getText().trim(),
                     phoneField.getText().trim(),
                     emailField.getText().trim());
+
+            if (updated == null) {
+                errorLabel.setText(LanguageManager.getString("customer.error.saveFailed"));
+                return;
+            }
+
+            errorLabel.setStyle("-fx-text-fill: green;");
+            errorLabel.setText(LanguageManager.getString("customer.saved"));
+            onSaved.run();
         });
         return saveBtn;
+    }
+
+    private Button createDeleteBtn(Consumer<Integer> onDelete) {
+        Button deleteBtn = new Button(LanguageManager.getString("customer.delete"));
+        deleteBtn.getStyleClass().add("destroy-btn");
+        deleteBtn.setOnAction(e -> onDelete.accept(customer.getId()));
+        return deleteBtn;
     }
 }

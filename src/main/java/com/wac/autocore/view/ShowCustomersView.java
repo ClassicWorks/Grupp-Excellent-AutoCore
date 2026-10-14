@@ -5,6 +5,7 @@ import com.wac.autocore.model.Customer;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
+import com.wac.autocore.view.components.AppDialog;
 import com.wac.autocore.view.components.CustomerCard;
 import com.wac.autocore.view.components.CustomerDetails;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
@@ -21,6 +22,8 @@ import javafx.scene.layout.VBox;
 
 public class ShowCustomersView {
     private final GarageSystem garageSystem;
+    private final VBox customersBox = new VBox();
+    private GridPane mainContent;
 
     public ShowCustomersView() {
         garageSystem = new GarageSystem();
@@ -32,34 +35,11 @@ public class ShowCustomersView {
         header.getStyleClass().add("content-header-container");
         layout.setTop(header);
 
-        GridPane mainContent = new KanbanGrid(2);
+        mainContent = new KanbanGrid(2);
 
-        VBox customersBox = new VBox();
         customersBox.getStyleClass().add("card-container");
 
-        for (Customer customer : garageSystem.getCustomers()) {
-            CustomerCard customerCard = new CustomerCard(customer);
-            customerCard.getStyleClass().add("clickable");
-            customerCard.setOnMouseClicked(e -> {
-
-                CustomerDetails customerDetails = new CustomerDetails(customer);
-                customerDetails.setMaxHeight(Double.MAX_VALUE);
-
-                mainContent.getChildren().removeIf(node ->
-                        GridPane.getColumnIndex(node) != null
-                                && GridPane.getColumnIndex(node) == 1);
-
-                mainContent.add(
-                        customerDetails,
-                        1, 0
-                );
-
-                StylingUtil.setSelected(customerCard, "card");
-
-                GridPane.setVgrow(customerDetails, Priority.ALWAYS);
-            });
-            customersBox.getChildren().add(customerCard);
-        }
+        fillCustomers();
 
         ScrollPane customersScroll = new ScrollPane(customersBox);
         customersScroll.setFitToWidth(true);
@@ -74,6 +54,77 @@ public class ShowCustomersView {
 
         layout.setCenter(mainContent);
         return layout;
+    }
+
+    private void fillCustomers() {
+        customersBox.getChildren().clear();
+
+        for (Customer customer : garageSystem.getCustomers()) {
+            CustomerCard customerCard = new CustomerCard(customer);
+            customerCard.getStyleClass().add("clickable");
+            customerCard.setOnMouseClicked(e -> {
+
+                CustomerDetails customerDetails = new CustomerDetails(
+                        customer,
+                        this::fillCustomers,
+                        this::deleteCustomer);
+                customerDetails.setMaxHeight(Double.MAX_VALUE);
+
+                removeDetails();
+
+                mainContent.add(
+                        customerDetails,
+                        1, 0
+                );
+
+                StylingUtil.setSelected(customerCard, "card");
+
+                GridPane.setVgrow(customerDetails, Priority.ALWAYS);
+            });
+            customersBox.getChildren().add(customerCard);
+        }
+    }
+
+    private void removeDetails() {
+        mainContent.getChildren().removeIf(node ->
+                GridPane.getColumnIndex(node) != null
+                        && GridPane.getColumnIndex(node) == 1);
+    }
+
+    private void deleteCustomer(int customerId) {
+        if (garageSystem.customerHasVehicles(customerId)) {
+            AppDialog.showError(
+                    LanguageManager.getString("customer.delete.title"),
+                    LanguageManager.getString("customer.delete.blocked.title"),
+                    LanguageManager.getString("customer.delete.blocked.message")
+            );
+            return;
+        }
+
+        boolean deleteConfirmed = AppDialog.showConfirm(
+                LanguageManager.getString("customer.delete.title"),
+                String.format(
+                        LanguageManager.getString("customer.delete.message"),
+                        customerId
+                ),
+                LanguageManager.getString("customer.delete.warning")
+        );
+
+        if (!deleteConfirmed) {
+            return;
+        }
+
+        if (!garageSystem.deleteCustomer(customerId)) {
+            AppDialog.showError(
+                    LanguageManager.getString("customer.delete.title"),
+                    LanguageManager.getString("customer.delete.failed"),
+                    ""
+            );
+            return;
+        }
+
+        removeDetails();
+        fillCustomers();
     }
 
     private Node getHeader(){
