@@ -10,4 +10,6 @@ public interface CustomerRepo {
     Customer update(Customer customer);
     List<Customer> getAll();
     Optional<Customer> get(int id);
+
+    void delete(int id);
 }

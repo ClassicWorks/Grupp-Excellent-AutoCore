@@ -10,4 +10,6 @@ public interface VehicleRepo {
     Vehicle update(Vehicle v);
     List<Vehicle> getAll();
     Optional<Vehicle> get(int id);
+
+    void delete(int id);
 }

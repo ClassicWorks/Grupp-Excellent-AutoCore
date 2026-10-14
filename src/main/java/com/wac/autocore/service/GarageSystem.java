@@ -173,6 +173,150 @@ public class GarageSystem {
         return savedServiceItem;
     }
 
+    public Customer updateCustomer(int customerId, String name, String phone, String email) {
+        if (name == null || name.trim().isEmpty()) {
+            System.out.println("Customer name cannot be empty.");
+            return null;
+        }
+
+        Optional<Customer> optionalCustomer = getCustomer(customerId);
+
+        if (!optionalCustomer.isPresent()) {
+            System.out.println("Customer with ID " + customerId + " does not exist.");
+            return null;
+        }
+
+        Customer customer = optionalCustomer.get();
+        customer.setName(name.trim());
+        customer.setPhone(phone);
+        customer.setEmail(email);
+
+        return customerRepo.update(customer);
+    }
+
+    public Mechanic updateMechanic(int mechanicId, String name, String phone, String specialization) {
+        if (name == null || name.trim().isEmpty()) {
+            System.out.println("Mechanic name cannot be empty.");
+            return null;
+        }
+
+        Optional<Mechanic> optionalMechanic = getMechanic(mechanicId);
+
+        if (!optionalMechanic.isPresent()) {
+            System.out.println("Mechanic with ID " + mechanicId + " does not exist.");
+            return null;
+        }
+
+        Mechanic mechanic = optionalMechanic.get();
+        mechanic.setName(name.trim());
+        mechanic.setPhone(phone);
+        mechanic.setSpecialization(specialization);
+
+        return mechanicRepo.update(mechanic);
+    }
+
+    public Vehicle updateVehicle(int vehicleId, String registrationNumber, String brand,
+                                 String model, int year, Integer customerId) {
+        if (registrationNumber == null || registrationNumber.trim().isEmpty()
+                || model == null || model.trim().isEmpty()) {
+            System.out.println("Registration number and model cannot be empty.");
+            return null;
+        }
+
+        Optional<Vehicle> optionalVehicle = getVehicle(vehicleId);
+
+        if (!optionalVehicle.isPresent()) {
+            System.out.println("Vehicle with ID " + vehicleId + " does not exist.");
+            return null;
+        }
+
+        Customer customer = null;
+        if (customerId != null) {
+            Optional<Customer> optionalCustomer = getCustomer(customerId);
+
+            if (!optionalCustomer.isPresent()) {
+                System.out.println("Customer with ID " + customerId + " does not exist.");
+                return null;
+            }
+            customer = optionalCustomer.get();
+        }
+
+        Vehicle vehicle = optionalVehicle.get();
+        vehicle.setRegistrationNumber(registrationNumber.trim());
+        vehicle.setBrand(brand == null ? "" : brand.trim());
+        vehicle.setModel(model.trim());
+        vehicle.setYear(year);
+        vehicle.setCustomer(customer);
+
+        return vehicleRepo.update(vehicle);
+    }
+
+    public boolean customerHasVehicles(int customerId) {
+        for (Vehicle v : vehicleRepo.getAll()) {
+            if (v.getCustomer() != null && v.getCustomer().getId() == customerId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean vehicleHasBookings(int vehicleId) {
+        for (Booking b : bookingRepo.getAll()) {
+            if (b.getVehicle() != null && b.getVehicle().getId() == vehicleId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean mechanicHasWorkOrders(int mechanicId) {
+        for (WorkOrder w : workOrderRepo.getAll()) {
+            if (w.getMechanic() != null && w.getMechanic().getId() == mechanicId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean deleteCustomer(int customerId) {
+        if (customerRepo.get(customerId).isPresent()) {
+            System.out.println("Customer not found.");
+            return false;
+        }
+        if (customerHasVehicles(customerId)) {
+            System.out.println("Customer has vehicles and cannot be deleted.");
+            return false;
+        }
+        customerRepo.delete(customerId);
+        return true;
+    }
+
+    public boolean deleteVehicle(int vehicleId) {
+        if (vehicleRepo.get(vehicleId).isPresent()) {
+            System.out.println("Vehicle not found.");
+            return false;
+        }
+        if (vehicleHasBookings(vehicleId)) {
+            System.out.println("Vehicle has bookings and cannot be deleted.");
+            return false;
+        }
+        vehicleRepo.delete(vehicleId);
+        return true;
+    }
+
+    public boolean deleteMechanic(int mechanicId) {
+        if (mechanicRepo.get(mechanicId).isPresent()) {
+            System.out.println("Mechanic not found.");
+            return false;
+        }
+        if (mechanicHasWorkOrders(mechanicId)) {
+            System.out.println("Mechanic has work orders and cannot be deleted.");
+            return false;
+        }
+        mechanicRepo.delete(mechanicId);
+        return true;
+    }
+
     public void showServicePacks() {
         System.out.println();
         System.out.println("=== SERVICE PACKS ===");
