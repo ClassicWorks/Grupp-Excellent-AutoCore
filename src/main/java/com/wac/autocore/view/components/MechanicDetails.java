@@ -10,6 +10,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.function.Consumer;
+
 public class MechanicDetails extends BorderPane {
 
     private final Mechanic mechanic;
@@ -21,7 +23,7 @@ public class MechanicDetails extends BorderPane {
     private final TextField specializationField = new TextField();
     private final Label errorLabel = new Label();
 
-    public MechanicDetails(Mechanic mechanic, Runnable onSaved) {
+    public MechanicDetails(Mechanic mechanic, Runnable onSaved, Consumer<Integer> onDelete) {
         this.mechanic = mechanic;
         this.onSaved = onSaved;
 
@@ -71,8 +73,13 @@ public class MechanicDetails extends BorderPane {
         );
         fields.getStyleClass().add("details-container");
 
-        HBox actionableButtons = new HBox(createSaveBtn());
-        actionableButtons.getStyleClass().add("btn-container");
+        HBox confirmingButtons = new HBox(createSaveBtn());
+        confirmingButtons.getStyleClass().add("btn-container");
+
+        HBox destructiveButtons = new HBox(createDeleteBtn(onDelete));
+        destructiveButtons.getStyleClass().add("btn-container");
+
+        BorderPane actionableButtons = new BorderPane(null, null, destructiveButtons, null, confirmingButtons);
 
         setTop(idLabel);
         setCenter(fields);
@@ -110,5 +117,12 @@ public class MechanicDetails extends BorderPane {
             onSaved.run();
         });
         return saveBtn;
+    }
+
+    private Button createDeleteBtn(Consumer<Integer> onDelete) {
+        Button deleteBtn = new Button(LanguageManager.getString("mechanic.delete"));
+        deleteBtn.getStyleClass().add("destroy-btn");
+        deleteBtn.setOnAction(e -> onDelete.accept(mechanic.getId()));
+        return deleteBtn;
     }
 }

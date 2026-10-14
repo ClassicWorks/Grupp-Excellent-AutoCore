@@ -5,6 +5,7 @@ import com.wac.autocore.model.Customer;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
+import com.wac.autocore.view.components.AppDialog;
 import com.wac.autocore.view.components.CustomerCard;
 import com.wac.autocore.view.components.CustomerDetails;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
@@ -63,12 +64,13 @@ public class ShowCustomersView {
             customerCard.getStyleClass().add("clickable");
             customerCard.setOnMouseClicked(e -> {
 
-                CustomerDetails customerDetails = new CustomerDetails(customer, this::fillCustomers);
+                CustomerDetails customerDetails = new CustomerDetails(
+                        customer,
+                        this::fillCustomers,
+                        this::deleteCustomer);
                 customerDetails.setMaxHeight(Double.MAX_VALUE);
 
-                mainContent.getChildren().removeIf(node ->
-                        GridPane.getColumnIndex(node) != null
-                                && GridPane.getColumnIndex(node) == 1);
+                removeDetails();
 
                 mainContent.add(
                         customerDetails,
@@ -81,6 +83,48 @@ public class ShowCustomersView {
             });
             customersBox.getChildren().add(customerCard);
         }
+    }
+
+    private void removeDetails() {
+        mainContent.getChildren().removeIf(node ->
+                GridPane.getColumnIndex(node) != null
+                        && GridPane.getColumnIndex(node) == 1);
+    }
+
+    private void deleteCustomer(int customerId) {
+        if (garageSystem.customerHasVehicles(customerId)) {
+            AppDialog.showError(
+                    LanguageManager.getString("customer.delete.title"),
+                    LanguageManager.getString("customer.delete.blocked.title"),
+                    LanguageManager.getString("customer.delete.blocked.message")
+            );
+            return;
+        }
+
+        boolean deleteConfirmed = AppDialog.showConfirm(
+                LanguageManager.getString("customer.delete.title"),
+                String.format(
+                        LanguageManager.getString("customer.delete.message"),
+                        customerId
+                ),
+                LanguageManager.getString("customer.delete.warning")
+        );
+
+        if (!deleteConfirmed) {
+            return;
+        }
+
+        if (!garageSystem.deleteCustomer(customerId)) {
+            AppDialog.showError(
+                    LanguageManager.getString("customer.delete.title"),
+                    LanguageManager.getString("customer.delete.failed"),
+                    ""
+            );
+            return;
+        }
+
+        removeDetails();
+        fillCustomers();
     }
 
     private Node getHeader(){

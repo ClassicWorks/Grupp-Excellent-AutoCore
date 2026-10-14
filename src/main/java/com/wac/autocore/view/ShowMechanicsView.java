@@ -3,6 +3,7 @@ package com.wac.autocore.view;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.view.components.AppDialog;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.view.components.MechanicCard;
 import com.wac.autocore.view.components.MechanicDetails;
@@ -68,12 +69,51 @@ public class ShowMechanicsView {
 
         for (Mechanic mechanic : mechanics) {
             MechanicCard card = new MechanicCard(mechanic, m -> {
-                MechanicDetails mechanicDetails = new MechanicDetails(m, this::fillMechanics);
+                MechanicDetails mechanicDetails = new MechanicDetails(
+                        m,
+                        this::fillMechanics,
+                        this::deleteMechanic);
                 detailPanel.getChildren().setAll(mechanicDetails);
                 VBox.setVgrow(mechanicDetails, Priority.ALWAYS);
             });
             mechanicsBox.getChildren().add(card);
         }
+    }
+
+    private void deleteMechanic(int mechanicId) {
+        if (garageSystem.mechanicHasWorkOrders(mechanicId)) {
+            AppDialog.showError(
+                    LanguageManager.getString("mechanic.delete.title"),
+                    LanguageManager.getString("mechanic.delete.blocked.title"),
+                    LanguageManager.getString("mechanic.delete.blocked.message")
+            );
+            return;
+        }
+
+        boolean deleteConfirmed = AppDialog.showConfirm(
+                LanguageManager.getString("mechanic.delete.title"),
+                String.format(
+                        LanguageManager.getString("mechanic.delete.message"),
+                        mechanicId
+                ),
+                LanguageManager.getString("mechanic.delete.warning")
+        );
+
+        if (!deleteConfirmed) {
+            return;
+        }
+
+        if (!garageSystem.deleteMechanic(mechanicId)) {
+            AppDialog.showError(
+                    LanguageManager.getString("mechanic.delete.title"),
+                    LanguageManager.getString("mechanic.delete.failed"),
+                    ""
+            );
+            return;
+        }
+
+        detailPanel.getChildren().clear();
+        fillMechanics();
     }
 
     private Node getHeader() {

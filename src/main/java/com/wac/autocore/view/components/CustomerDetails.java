@@ -10,6 +10,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.function.Consumer;
+
 public class CustomerDetails extends BorderPane {
 
     private final Customer customer;
@@ -21,7 +23,7 @@ public class CustomerDetails extends BorderPane {
     private final TextField emailField = new TextField();
     private final Label errorLabel = new Label();
 
-    public CustomerDetails(Customer customer, Runnable onSaved) {
+    public CustomerDetails(Customer customer, Runnable onSaved, Consumer<Integer> onDelete) {
         this.customer = customer;
         this.onSaved = onSaved;
 
@@ -78,8 +80,13 @@ public class CustomerDetails extends BorderPane {
                 errorLabel
         );
 
-        HBox actionableButtons = new HBox(createSaveBtn());
-        actionableButtons.getStyleClass().add("btn-container");
+        HBox confirmingButtons = new HBox(createSaveBtn());
+        confirmingButtons.getStyleClass().add("btn-container");
+
+        HBox destructiveButtons = new HBox(createDeleteBtn(onDelete));
+        destructiveButtons.getStyleClass().add("btn-container");
+
+        BorderPane actionableButtons = new BorderPane(null, null, destructiveButtons, null, confirmingButtons);
 
         this.getStyleClass().add("details-container");
         this.setTop(idLabel);
@@ -118,5 +125,12 @@ public class CustomerDetails extends BorderPane {
             onSaved.run();
         });
         return saveBtn;
+    }
+
+    private Button createDeleteBtn(Consumer<Integer> onDelete) {
+        Button deleteBtn = new Button(LanguageManager.getString("customer.delete"));
+        deleteBtn.getStyleClass().add("destroy-btn");
+        deleteBtn.setOnAction(e -> onDelete.accept(customer.getId()));
+        return deleteBtn;
     }
 }

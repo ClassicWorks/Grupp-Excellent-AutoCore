@@ -14,6 +14,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.function.Consumer;
+
 public class VehicleDetails extends BorderPane {
     private final GarageSystem garageSystem = new GarageSystem();
     private final Runnable onSaved;
@@ -33,7 +35,7 @@ public class VehicleDetails extends BorderPane {
     private Label errorLabel = new Label();
 
 
-    public VehicleDetails(Vehicle vehicle, Customer vehicleOwner, Runnable onSaved) {
+    public VehicleDetails(Vehicle vehicle, Customer vehicleOwner, Runnable onSaved, Consumer<Integer> onDelete) {
         this.vehicle = vehicle;
         this.vehicleOwner = vehicleOwner;
         this.onSaved = onSaved;
@@ -55,7 +57,7 @@ public class VehicleDetails extends BorderPane {
         );
         confirmingButtons.getStyleClass().add("btn-container");
 
-        HBox destructiveButtons = new HBox(createDeleteBtn());
+        HBox destructiveButtons = new HBox(createDeleteBtn(onDelete));
         destructiveButtons.getStyleClass().add("btn-container");
 
         BorderPane actionableButtons = new BorderPane(null, null, destructiveButtons, null, confirmingButtons);
@@ -251,13 +253,10 @@ public class VehicleDetails extends BorderPane {
         return saveBtn;
     }
 
-    private Button createDeleteBtn() {
+    private Button createDeleteBtn(Consumer<Integer> onDelete) {
         Button deleteBtn = new Button(LanguageManager.getString("vehicle.delete"));
         deleteBtn.getStyleClass().add("destroy-btn");
-        deleteBtn.setOnAction(e ->
-                System.out.printf("Should call ViewManager.getInstance.confirmDelete(vehicle, garagesystem.deleteVehicle(%d)",
-                        vehicle.getId())
-        );
+        deleteBtn.setOnAction(e -> onDelete.accept(vehicle.getId()));
         return deleteBtn;
     }
 

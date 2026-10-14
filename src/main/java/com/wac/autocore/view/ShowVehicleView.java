@@ -5,6 +5,7 @@ import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.StylingUtil;
+import com.wac.autocore.view.components.AppDialog;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.VehicleCard;
@@ -77,7 +78,11 @@ public class ShowVehicleView {
             );
 
             vehicleCard.setOnMouseClicked(e-> {
-                VehicleDetails vehicleDetails = new VehicleDetails(vehicle, customer, this::fillVehicles);
+                VehicleDetails vehicleDetails = new VehicleDetails(
+                        vehicle,
+                        customer,
+                        this::fillVehicles,
+                        this::deleteVehicle);
                 detailsContainer.getChildren().setAll(vehicleDetails);
                 VBox.setVgrow(vehicleDetails, Priority.ALWAYS);
 
@@ -86,6 +91,42 @@ public class ShowVehicleView {
             vehicleCard.getStyleClass().add("clickable");
             vehiclesBox.getChildren().add(vehicleCard);
         }
+    }
+
+    private void deleteVehicle(int vehicleId) {
+        if (garageSystem.vehicleHasBookings(vehicleId)) {
+            AppDialog.showError(
+                    LanguageManager.getString("vehicle.delete.title"),
+                    LanguageManager.getString("vehicle.delete.blocked.title"),
+                    LanguageManager.getString("vehicle.delete.blocked.message")
+            );
+            return;
+        }
+
+        boolean deleteConfirmed = AppDialog.showConfirm(
+                LanguageManager.getString("vehicle.delete.title"),
+                String.format(
+                        LanguageManager.getString("vehicle.delete.message"),
+                        vehicleId
+                ),
+                LanguageManager.getString("vehicle.delete.warning")
+        );
+
+        if (!deleteConfirmed) {
+            return;
+        }
+
+        if (!garageSystem.deleteVehicle(vehicleId)) {
+            AppDialog.showError(
+                    LanguageManager.getString("vehicle.delete.title"),
+                    LanguageManager.getString("vehicle.delete.failed"),
+                    ""
+            );
+            return;
+        }
+
+        detailsContainer.getChildren().clear();
+        fillVehicles();
     }
 
     private Node getHeader(){
