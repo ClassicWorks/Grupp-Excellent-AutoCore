@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.ServiceItem;
+import com.wac.autocore.model.ServicePack;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
@@ -14,6 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class ServiceItemSelection extends VBox{
     private List<ServiceItem> chosenItems;
     private List<ServiceItem> allServiceItems;
+    private List<ServicePack> allServicePacks;
     Consumer<ServiceItem> onAddServiceItem;
     Consumer<ServiceItem> onRemoveServiceItem;
     Consumer<String> onError;
@@ -31,8 +34,17 @@ public class ServiceItemSelection extends VBox{
     public ServiceItemSelection(List<ServiceItem> chosenItems, List<ServiceItem> allServiceItems,
                                 Consumer<ServiceItem> onAddServiceItem, Consumer<ServiceItem> onRemoveServiceItem,
                                 Consumer<String> onError) {
+        this(chosenItems, allServiceItems, new ArrayList<>(),
+                onAddServiceItem, onRemoveServiceItem, onError);
+    }
+
+    public ServiceItemSelection(List<ServiceItem> chosenItems, List<ServiceItem> allServiceItems,
+                                List<ServicePack> allServicePacks,
+                                Consumer<ServiceItem> onAddServiceItem, Consumer<ServiceItem> onRemoveServiceItem,
+                                Consumer<String> onError) {
         this.chosenItems = chosenItems;
         this.allServiceItems = allServiceItems;
+        this.allServicePacks = allServicePacks;
         this.onAddServiceItem = onAddServiceItem;
         this.onRemoveServiceItem = onRemoveServiceItem;
         this.onError = onError;
@@ -51,6 +63,9 @@ public class ServiceItemSelection extends VBox{
         refreshServiceItems();
 
         this.getChildren().addAll(currentServicesContainer, addServiceSection);
+        if (!allServicePacks.isEmpty()) {
+            this.getChildren().add(createAddPackSection());
+        }
         this.getStyleClass().addAll("form-field-container");
     }
 
@@ -87,11 +102,16 @@ public class ServiceItemSelection extends VBox{
 
         //Update combobox
         List<ServiceItem> availableServices = allServiceItems.stream()
-                .filter(serviceItem -> !chosenItems.contains(serviceItem))
+                .filter(serviceItem -> !isChosen(serviceItem))
                 .collect(Collectors.toList());
 
         serviceComboBox.getItems().setAll(FXCollections.observableArrayList(availableServices));
         serviceComboBox.setValue(null);
+    }
+
+    private boolean isChosen(ServiceItem serviceItem) {
+        return chosenItems.stream()
+                .anyMatch(chosen -> chosen.getId() == serviceItem.getId());
     }
 
     private Node createItemRow(ServiceItem item, boolean isLastItem) {
@@ -147,6 +167,38 @@ public class ServiceItemSelection extends VBox{
         VBox container = new VBox(addLabel, comboBoxContainer);
         container.getStyleClass().add("form-field-container");
 
+        return container;
+    }
+
+    private VBox createAddPackSection() {
+        ComboBox<ServicePack> packComboBox =
+                new ComboBox<>(FXCollections.observableArrayList(allServicePacks));
+        packComboBox.setPromptText(LanguageManager.getString("workorder.pack.prompt"));
+        packComboBox.setConverter(ComboBoxLabels.servicePack());
+
+        Button addPackBtn = new Button(LanguageManager.getString("workorder.pack.add"));
+        addPackBtn.getStyleClass().add("confirm-btn");
+        addPackBtn.disableProperty().bind(packComboBox.valueProperty().isNull());
+
+        addPackBtn.setOnAction(e -> {
+            ServicePack selected = packComboBox.getValue();
+            for (ServiceItem item : selected.getServiceItems()) {
+                if (!isChosen(item)) {
+                    onAddServiceItem.accept(item);
+                }
+            }
+            packComboBox.setValue(null);
+            refreshServiceItems();
+        });
+
+        Label addPackLabel = new Label(LanguageManager.getString("workorder.pack.label"));
+        addPackLabel.getStyleClass().add("form-field-label");
+
+        HBox comboBoxContainer = new HBox(packComboBox, addPackBtn);
+        comboBoxContainer.getStyleClass().add("row");
+
+        VBox container = new VBox(addPackLabel, comboBoxContainer);
+        container.getStyleClass().add("form-field-container");
         return container;
     }
 }
