@@ -5,6 +5,7 @@ import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -58,19 +59,14 @@ public class WorkOrderDetails extends BorderPane {
                 vehicle.getBrand(), vehicle.getModel(), vehicle.getYear())
                 : LanguageManager.getString("workorders.error.vehicleNotFound"));
 
-        Label customerLabel = new Label(customer != null
-                ? customer.getName()
-                : LanguageManager.getString("customer.none.connected"));
-
-        Label mechanicLabel = new Label(mechanic != null
-                ? mechanic.getName()
-                : LanguageManager.getString("mechanic.none.assigned"));
+        CustomerHyperLink customerLink = new CustomerHyperLink(customer);
+        MechanicHyperLink mechanicLink = new MechanicHyperLink(mechanic);
 
 
         VBox info = new VBox(
                 createFormFieldContainer("workorder.details.vehicle", vehicleLabel),
-                createFormFieldContainer("workorder.details.customer", customerLabel),
-                createFormFieldContainer("workorder.details.mechanic", mechanicLabel)
+                createFormFieldContainer("workorder.details.customer", customerLink),
+                createFormFieldContainer("workorder.details.mechanic", mechanicLink)
         );
 
         if (booking != null) {
@@ -92,8 +88,8 @@ public class WorkOrderDetails extends BorderPane {
         return info;
     }
 
-    private VBox createFormFieldContainer(String key, Label vehicleLabel) {
-        VBox vehicleInfo = new VBox(createFieldLabel(key), vehicleLabel);
+    private VBox createFormFieldContainer(String key, Node content) {
+        VBox vehicleInfo = new VBox(createFieldLabel(key), content);
         vehicleInfo.getStyleClass().add("form-field-container");
         return vehicleInfo;
     }
