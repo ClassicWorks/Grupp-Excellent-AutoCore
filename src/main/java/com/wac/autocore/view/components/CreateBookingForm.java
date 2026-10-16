@@ -129,6 +129,7 @@ public class CreateBookingForm {
         ServiceItemSelection serviceItemSelection = new ServiceItemSelection(
                 selectedItems,
                 garageSystem.getServiceItems(),
+                garageSystem.getServicePacks(),
                 selectedItems::add,
                 selectedItems::remove,
                 error -> errorLabel.setText(errorLabel.getText() + error));

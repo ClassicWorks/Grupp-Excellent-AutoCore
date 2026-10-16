@@ -96,4 +96,14 @@ public class ComboBoxLabels {
     public static StringConverter<ServiceItem> serviceItem() {
         return converter(ComboBoxLabels::serviceItemLabel);
     }
+
+    public static StringConverter<ServicePack> servicePack() {
+        return converter(ComboBoxLabels::servicePackLabel);
+    }
+
+    private static String servicePackLabel(ServicePack servicePack) {
+        return String.format("%s (%d)",
+                ValueLabels.servicePackName(servicePack.getName()),
+                servicePack.getServiceItems().size());
+    }
 }

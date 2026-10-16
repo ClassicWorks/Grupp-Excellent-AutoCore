@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.ServiceItem;
+import com.wac.autocore.model.ServicePack;
 import com.wac.autocore.model.WorkOrder;
 import com.wac.autocore.model.WorkOrderItem;
 import com.wac.autocore.service.GarageSystem;
@@ -37,6 +38,7 @@ public class EditWorkOrderItemsForm {
     private WorkOrder workOrder;
     private final List<ServiceItem> addedServices = new ArrayList<>();
     private final List<Integer> removedItemIds = new ArrayList<>();
+    private List<ServicePack> servicePacks = new ArrayList<>();
 
     public EditWorkOrderItemsForm(Stage popupStage, int workOrderId, GarageSystem garageSystem) {
         this.popupStage = popupStage;
@@ -48,6 +50,7 @@ public class EditWorkOrderItemsForm {
     public Parent show() {
         content.getStyleClass().add("form-container");
         workOrder = garageSystem.getWorkOrderWithItems(workOrderId).orElse(null);
+        servicePacks = garageSystem.getServicePacks();
         refresh();
 
         ScrollPane scrollPane = new ScrollPane(content);
@@ -109,10 +112,11 @@ public class EditWorkOrderItemsForm {
         content.getChildren().add(new Label(String.format(
                 LanguageManager.getString("workorder.edit.total"), total)));
 
-        content.getChildren().addAll(
-                createAddServiceSection(keptItems),
-                errorLabel,
-                createButtonRow());
+        content.getChildren().add(createAddServiceSection(keptItems));
+        if (!servicePacks.isEmpty()) {
+            content.getChildren().add(createAddPackSection());
+        }
+        content.getChildren().addAll(errorLabel, createButtonRow());
     }
 
     private Node createItemRow(WorkOrderItem item, boolean isLastItem) {
@@ -166,16 +170,7 @@ public class EditWorkOrderItemsForm {
         addBtn.getStyleClass().add("confirm-btn");
         addBtn.disableProperty().bind(serviceComboBox.valueProperty().isNull());
         addBtn.setOnAction(e -> {
-            ServiceItem selected = serviceComboBox.getValue();
-            Optional<WorkOrderItem> removedOriginal = workOrder.getItems().stream()
-                    .filter(item -> removedItemIds.contains(item.getId()))
-                    .filter(item -> item.getServiceItem().getId() == selected.getId())
-                    .findFirst();
-            if (removedOriginal.isPresent()) {
-                removedItemIds.remove(Integer.valueOf(removedOriginal.get().getId()));
-            } else {
-                addedServices.add(selected);
-            }
+            addService(serviceComboBox.getValue());
             refresh();
         });
 
@@ -186,6 +181,54 @@ public class EditWorkOrderItemsForm {
         VBox container = new VBox(addLabel, comboBoxContainer);
         container.getStyleClass().add("form-field-container");
         return container;
+    }
+
+    private Node createAddPackSection() {
+        ComboBox<ServicePack> packComboBox =
+                new ComboBox<>(FXCollections.observableArrayList(servicePacks));
+        packComboBox.setPromptText(LanguageManager.getString("workorder.pack.prompt"));
+        packComboBox.setConverter(ComboBoxLabels.servicePack());
+
+        Button addPackBtn = new Button(LanguageManager.getString("workorder.pack.add"));
+        addPackBtn.getStyleClass().add("confirm-btn");
+        addPackBtn.disableProperty().bind(packComboBox.valueProperty().isNull());
+        addPackBtn.setOnAction(e -> {
+            for (ServiceItem item : packComboBox.getValue().getServiceItems()) {
+                addService(item);
+            }
+            refresh();
+        });
+
+        Label addPackLabel = new Label(LanguageManager.getString("workorder.pack.label"));
+        addPackLabel.getStyleClass().add("form-field-label");
+
+        HBox comboBoxContainer = new HBox(10, packComboBox, addPackBtn);
+        VBox container = new VBox(addPackLabel, comboBoxContainer);
+        container.getStyleClass().add("form-field-container");
+        return container;
+    }
+
+    private void addService(ServiceItem serviceItem) {
+        boolean alreadyOnOrder = workOrder.getItems().stream()
+                .filter(item -> !removedItemIds.contains(item.getId()))
+                .anyMatch(item -> item.getServiceItem().getId() == serviceItem.getId());
+        boolean alreadyAdded = addedServices.stream()
+                .anyMatch(added -> added.getId() == serviceItem.getId());
+
+        if (alreadyOnOrder || alreadyAdded) {
+            return;
+        }
+
+        Optional<WorkOrderItem> removedOriginal = workOrder.getItems().stream()
+                .filter(item -> removedItemIds.contains(item.getId()))
+                .filter(item -> item.getServiceItem().getId() == serviceItem.getId())
+                .findFirst();
+
+        if (removedOriginal.isPresent()) {
+            removedItemIds.remove(Integer.valueOf(removedOriginal.get().getId()));
+        } else {
+            addedServices.add(serviceItem);
+        }
     }
 
     private Node createButtonRow() {
