@@ -2,6 +2,8 @@ package com.wac.autocore.service;
 
 import com.wac.autocore.data.*;
 import com.wac.autocore.model.*;
+import com.wac.autocore.service.payment.PaymentMethod;
+import com.wac.autocore.service.payment.PaymentMethodFactory;
 import com.wac.autocore.util.TranslationService;
 
 import java.time.LocalDate;
@@ -971,25 +973,11 @@ public class GarageSystem {
 
         boolean successful = false;
 
-        if (paymentType.equalsIgnoreCase("CARD")) {
+        Optional<PaymentMethod> paymentMethod = PaymentMethodFactory.create(paymentType);
 
-            System.out.println("Connecting directly to SuperCardPayment...");
-            System.out.println("Card payment approved.");
-            successful = true;
-
-        } else if (paymentType.equalsIgnoreCase("SWISH")) {
-
-            System.out.println("Calling Swish payment service...");
-            System.out.println("Swish payment approved.");
-            successful = true;
-
-        } else if (paymentType.equalsIgnoreCase("CASH")) {
-
-            System.out.println("Registering cash payment...");
-            successful = true;
-
+        if (paymentMethod.isPresent()) {
+            successful = paymentMethod.get().pay(invoice.getTotalAmount());
         } else {
-
             System.out.println("Unknown payment type.");
         }
 
