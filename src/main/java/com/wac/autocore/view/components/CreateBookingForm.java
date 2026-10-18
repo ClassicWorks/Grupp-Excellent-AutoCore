@@ -82,7 +82,7 @@ public class CreateBookingForm {
         } else {
             //Else search for customer and vehicle
             CustomerSelection customerSelection = new CustomerSelection(
-                    garageSystem.getCustomers(),
+                    garageSystem,
                     this::showVehiclesOfCustomer);
             customerSelection.getStyleClass().addAll("form-field-container");
 
@@ -97,24 +97,12 @@ public class CreateBookingForm {
 
         VBox mechanicBox = getMechanicBox();
 
-        //Show service items
-        List<Integer> missingId = new ArrayList<>();
         Label errorLabel = new Label();
         errorLabel.getStyleClass().add("error-label");
 
-        selectedItems.addAll(
-                preselectedServiceIds.stream()
-                .map(id -> {
-                    Optional<ServiceItem> item = garageSystem.getServiceItem(id);
-                    if(!item.isPresent()){
-                        missingId.add(id);
-                    }
-                    return item;
-                })
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList())
-        );
+        //Show service items
+        selectedItems.addAll(garageSystem.getServiceItemsByIds(preselectedServiceIds));
+        List<Integer> missingId = garageSystem.getMissingIds(preselectedServiceIds, selectedItems);
 
         //If some services has been removed, show this error message
         if(!missingId.isEmpty()){
@@ -130,8 +118,6 @@ public class CreateBookingForm {
                 selectedItems,
                 garageSystem.getServiceItems(),
                 garageSystem.getServicePacks(),
-                selectedItems::add,
-                selectedItems::remove,
                 error -> errorLabel.setText(errorLabel.getText() + error));
 
 
@@ -208,7 +194,7 @@ public class CreateBookingForm {
         Node vehicleCard = new VehicleCard(vehicle);
 
         vehicleCard.setOnMouseClicked(e -> {
-            selectVehicle(vehicleCard, vehicle);
+            selectedVehicle.set(vehicle);
             StylingUtil.setSelected(vehicleCard, "card");
         });
 
@@ -217,21 +203,6 @@ public class CreateBookingForm {
         return vehicleCard;
     }
 
-
-    private void selectVehicle(Node selectedCard, Vehicle vehicle) {
-        selectedVehicle.set(vehicle);
-
-        Parent parent = selectedCard.getParent();
-
-        if (parent != null) {
-            parent.getChildrenUnmodifiable().forEach(node -> {
-                if (node.getStyleClass().contains("card")) {
-                    node.getStyleClass().remove("is-selected");
-                }
-            });
-        }
-        selectedCard.getStyleClass().add("is-selected");
-    }
 
     // =========================================================
     // BOOKING INFORMATION
@@ -295,6 +266,8 @@ public class CreateBookingForm {
 
         createButton.setOnAction(
                 e ->
+                        //TODO validate to garageSystem
+                        //TODO garageSystem.createBookingAndWorkOrder som gör en unit of work
                         createBooking(
                             booking -> createWorkOrderDraft(booking)
                         )
@@ -349,7 +322,6 @@ public class CreateBookingForm {
                             ? exception.getMessage()
                             : LanguageManager.getString("booking.form.workOrder.error.message")
             );
-            //TODO should delete booking?
         });
 
         task.setOnSucceeded(e -> {

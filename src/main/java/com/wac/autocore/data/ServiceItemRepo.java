@@ -10,4 +10,6 @@ public interface ServiceItemRepo {
     ServiceItem update(ServiceItem si);
     List<ServiceItem> getAll();
     Optional<ServiceItem> get(int id);
+    List<ServiceItem> getByIds(List<Integer> ids);
+    List<ServiceItem> getAllExcludingIds(List<Integer> idsToExclude);
 }

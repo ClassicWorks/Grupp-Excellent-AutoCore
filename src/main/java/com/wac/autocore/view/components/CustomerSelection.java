@@ -1,26 +1,26 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Customer;
+import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
-import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import org.hibernate.boot.jaxb.internal.stax.HbmEventReader;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class CustomerSelection extends VBox {
-    private final List<Customer> customers;
+    private final GarageSystem garageSystem;
     private final Consumer<Customer> onCustomerSelected;
     private final VBox customerResults = new VBox();
-    private final Label selectedCustomer = new Label();
+    private final Label selectedCustomerLabel = new Label();
 
-    public CustomerSelection(List<Customer> customers, Consumer<Customer> onCustomerSelected) {
-        this.customers = customers;
+    public CustomerSelection(GarageSystem garageSystem, Consumer<Customer> onCustomerSelected) {
+        this.garageSystem = garageSystem;
         this.onCustomerSelected = onCustomerSelected;
 
         this.getStyleClass().addAll("form-field-container");
@@ -32,29 +32,31 @@ public class CustomerSelection extends VBox {
         Label label = new Label(LanguageManager.getString("customer.select.choose"));
         label.getStyleClass().add("form-field-label");
         TextField searchField = new TextField("");
-        searchField.setPromptText(LanguageManager.getString("customer.select.search"));
+        searchField.setPromptText(LanguageManager.getString("customer.select.searchPrompt"));
 
-        selectedCustomer.setStyle(selectedCustomer.getStyle() + " -fx-font-weight: 700;");
+        selectedCustomerLabel.setStyle(selectedCustomerLabel.getStyle() + " -fx-font-weight: 700;");
 
-        searchField.textProperty().addListener(
-                (observable, oldValue, newValue) ->
-                        updateCustomerResults(newValue)
+        searchField.setOnAction(event ->
+                updateCustomerResults(searchField.getText())
         );
 
-        this.getChildren().addAll(label, searchField, customerResults, selectedCustomer);
+        ImageViewWithAltText searchIcon = new ImageViewWithAltText("imgs/magnifying-glass-solid.png", 15,15,LanguageManager.getString("image.magnifying-glass-solid"));
+        Button searchBtn = new Button("", searchIcon);
+        searchBtn.setOnAction(event ->
+                updateCustomerResults(searchField.getText())
+        );
+        HBox searchBox = new HBox(searchField, searchBtn);
+        searchBox.getStyleClass().add("form-field-container");
+        HBox.setHgrow(searchField, Priority.ALWAYS);
+
+        this.getChildren().addAll(label, searchBox, customerResults, selectedCustomerLabel);
     }
 
 
     private void updateCustomerResults(String query) {
         customerResults.getChildren().clear();
 
-        List<Customer> customerMatch = customers.stream()
-                .filter(customer ->
-                        customer.getName()
-                                .toLowerCase()
-                                .contains(query.toLowerCase())
-                )
-                .collect(Collectors.toList());
+        List<Customer> customerMatch = garageSystem.getCustomerMatching(query);
 
         //Add different styling to even and uneven customers
         for(int i = 0; i < customerMatch.size(); i++){
@@ -82,7 +84,7 @@ public class CustomerSelection extends VBox {
         row.getStyleClass().addAll("clickable");
 
         row.setOnMouseClicked(e -> {
-            selectedCustomer.setText(String.format(LanguageManager.getString("customer.select.selected"),
+            selectedCustomerLabel.setText(String.format(LanguageManager.getString("customer.select.selected"),
                     customer.getId(),
                     customer.getName())
             );

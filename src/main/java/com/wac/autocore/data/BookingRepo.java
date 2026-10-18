@@ -11,4 +11,5 @@ public interface BookingRepo {
     Booking update(Booking b);
     List<Booking> getAll();
     Optional<Booking> get(int id);
+    boolean vehicleHasBooking(int vehicleId);
 }

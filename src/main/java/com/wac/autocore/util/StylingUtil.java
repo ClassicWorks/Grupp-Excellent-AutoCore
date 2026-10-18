@@ -4,6 +4,8 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 
 public class StylingUtil {
+    //TODO bygg om till en controller som kan hantera att endast ett objekt är valt på en sida. controller har en
+    // referens till senaste valda objektet och tar bort styling när man trycker på ett annat objekt
     /**
      * Removes the is-selected classname from each sibling node with the given styleClass. The sibling nodes
      * need to be in the same parent as selectedNode. Then the selected node gets the styleClass is-selected.

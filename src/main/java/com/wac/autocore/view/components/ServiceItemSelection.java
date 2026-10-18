@@ -24,32 +24,31 @@ public class ServiceItemSelection extends VBox{
     private List<ServiceItem> chosenItems;
     private List<ServiceItem> allServiceItems;
     private List<ServicePack> allServicePacks;
-    Consumer<ServiceItem> onAddServiceItem;
-    Consumer<ServiceItem> onRemoveServiceItem;
-    Consumer<String> onError;
+    private Consumer<String> onError;
 
     private VBox chosenServicesRows;
     private ComboBox<ServiceItem> serviceComboBox;
 
-    public ServiceItemSelection(List<ServiceItem> chosenItems, List<ServiceItem> allServiceItems,
-                                Consumer<ServiceItem> onAddServiceItem, Consumer<ServiceItem> onRemoveServiceItem,
+    //TODO make it able to handle serviceItems and WorkOrderItems -> seperate into two components: ItemRow and ServiceSelection and let parent build
+    public ServiceItemSelection(List<ServiceItem> chosenItems,
+                                List<ServiceItem> allServiceItems,
                                 Consumer<String> onError) {
-        this(chosenItems, allServiceItems, new ArrayList<>(),
-                onAddServiceItem, onRemoveServiceItem, onError);
+        this(chosenItems,
+                allServiceItems,
+                new ArrayList<>(),
+                onError);
     }
 
-    public ServiceItemSelection(List<ServiceItem> chosenItems, List<ServiceItem> allServiceItems,
+    public ServiceItemSelection(List<ServiceItem> chosenItems,
+                                List<ServiceItem> allServiceItems,
                                 List<ServicePack> allServicePacks,
-                                Consumer<ServiceItem> onAddServiceItem, Consumer<ServiceItem> onRemoveServiceItem,
                                 Consumer<String> onError) {
         this.chosenItems = chosenItems;
         this.allServiceItems = allServiceItems;
         this.allServicePacks = allServicePacks;
-        this.onAddServiceItem = onAddServiceItem;
-        this.onRemoveServiceItem = onRemoveServiceItem;
         this.onError = onError;
 
-        // Show current services in pack
+        // Show current chosen services
         Label chosenServicesLabel = new Label(LanguageManager.getString("servicePack.details.services.label"));
         chosenServicesLabel.getStyleClass().add("form-field-label");
 
@@ -82,7 +81,8 @@ public class ServiceItemSelection extends VBox{
             chosenServicesRows.getChildren().add(createItemRow(item, isLastItem));
         }
 
-        //Show total price and time for ServicePack
+        //TODO Make ServiceItem and ServicePack be part of Composite pattern?
+        //Show total price and time
         double totalPrice = chosenItems.stream()
                 .mapToDouble(ServiceItem::getPrice)
                 .sum();
@@ -100,9 +100,14 @@ public class ServiceItemSelection extends VBox{
         finalRow.setAlignment(Pos.CENTER_RIGHT);
         chosenServicesRows.getChildren().add(finalRow);
 
+
         //Update combobox
+        List<Integer> chosenIds = chosenItems.stream()
+                .map(ServiceItem::getId)
+                .collect(Collectors.toList());
+
         List<ServiceItem> availableServices = allServiceItems.stream()
-                .filter(serviceItem -> !isChosen(serviceItem))
+                .filter(item -> !chosenIds.contains(item.getId()))
                 .collect(Collectors.toList());
 
         serviceComboBox.getItems().setAll(FXCollections.observableArrayList(availableServices));
@@ -124,7 +129,7 @@ public class ServiceItemSelection extends VBox{
         removeBtn.setDisable(isLastItem);
         removeBtn.getStyleClass().addAll("destroy-btn", "smaller");
         removeBtn.setOnAction(e -> {
-            onRemoveServiceItem.accept(item);
+            chosenItems.remove(item);
 
             refreshServiceItems();
         });
@@ -151,7 +156,7 @@ public class ServiceItemSelection extends VBox{
 
         addBtn.setOnAction(e -> {
             ServiceItem selected = serviceComboBox.getValue();
-            onAddServiceItem.accept(selected);
+            chosenItems.add(selected);
 
             refreshServiceItems();
         });
@@ -184,7 +189,7 @@ public class ServiceItemSelection extends VBox{
             ServicePack selected = packComboBox.getValue();
             for (ServiceItem item : selected.getServiceItems()) {
                 if (!isChosen(item)) {
-                    onAddServiceItem.accept(item);
+                    chosenItems.add(item);
                 }
             }
             packComboBox.setValue(null);

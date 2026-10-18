@@ -7,7 +7,6 @@ import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -17,7 +16,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ProcessPaymentForm {
 
@@ -35,9 +33,7 @@ public class ProcessPaymentForm {
         Label title = new Label(LanguageManager.getString("payment.form.title"));
         title.getStyleClass().add("form-title");
 
-        List<Invoice> unpaidInvoices = garageSystem.getInvoices().stream()
-                .filter(invoice -> !invoice.isPaid())
-                .collect(Collectors.toList());
+        List<Invoice> unpaidInvoices = garageSystem.getUnpaidInvoices();
 
         ObservableList<Invoice> invoiceItems = FXCollections.observableArrayList(unpaidInvoices);
 
