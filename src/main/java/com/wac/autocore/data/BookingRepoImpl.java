@@ -34,7 +34,8 @@ public class BookingRepoImpl implements BookingRepo{
         try(Session s = HibernateUtil.getSessionFactory().openSession()){
             return s.createQuery("from Booking ", Booking.class)
                     .list();
-        }    }
+        }
+    }
 
     @Override
     public Optional<Booking> get(int id) {
@@ -43,5 +44,20 @@ public class BookingRepoImpl implements BookingRepo{
                             "from Booking b where b.id = :id" , Booking.class)
                     .setParameter("id", id)
                     .uniqueResultOptional();
-        }    }
+        }
+    }
+
+    @Override
+    public boolean vehicleHasBooking(int vehicleId) {
+        try(Session s = HibernateUtil.getSessionFactory().openSession()) {
+            Long numOfBookings = s.createQuery(
+                            "select count(b) from Booking b " +
+                                    "where b.vehicle.id = :vehicleId",
+                            Long.class)
+                    .setParameter("vehicleId", vehicleId)
+                    .uniqueResult();
+
+            return numOfBookings > 0;
+        }
+    }
 }

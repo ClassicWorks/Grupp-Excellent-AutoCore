@@ -97,8 +97,7 @@ public class CreateWorkOrderForm {
         ServiceItemSelection serviceItemSelection = new ServiceItemSelection(
                 selectedItems,
                 garageSystem.getServiceItems(),
-                selectedItems::add,
-                selectedItems::remove,
+                garageSystem.getServicePacks(),
                 error -> preselectedError.setText(preselectedError.getText() + error));
 
 

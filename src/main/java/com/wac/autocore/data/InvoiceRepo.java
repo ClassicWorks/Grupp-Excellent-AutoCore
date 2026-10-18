@@ -9,5 +9,6 @@ public interface InvoiceRepo {
     Invoice save(Invoice i);
     Invoice update(Invoice i);
     List<Invoice> getAll();
+    List<Invoice> getWherePayedIs(boolean isPayed);
     Optional<Invoice> get(int id);
 }

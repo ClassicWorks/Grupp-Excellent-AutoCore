@@ -1,6 +1,5 @@
 package com.wac.autocore.data;
 
-import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.util.HibernateUtil;
 import org.hibernate.Session;
@@ -42,6 +41,30 @@ public class VehicleRepoImpl implements VehicleRepo{
                     "from Vehicle v where v.id = :id" ,Vehicle.class)
                     .setParameter("id", id)
                     .uniqueResultOptional();
+        }
+    }
+
+    @Override
+    public List<Vehicle> getVehicleByCustomerId(int customerId) {
+        try(Session s = HibernateUtil.getSessionFactory().openSession()) {
+            return s.createQuery(
+                            "from Vehicle v where v.customer.id = :customerId" ,Vehicle.class)
+                    .setParameter("customerId", customerId)
+                    .list();
+        }
+    }
+
+    @Override
+    public boolean customerHasVehicle(int customerId) {
+        try(Session s = HibernateUtil.getSessionFactory().openSession()) {
+            Long numOfVehicles = s.createQuery(
+                            "select count(v) from Vehicle v " +
+                                    "where v.customer.id = :customerId",
+                            Long.class)
+                    .setParameter("customerId", customerId)
+                    .uniqueResult();
+
+            return numOfVehicles > 0;
         }
     }
 

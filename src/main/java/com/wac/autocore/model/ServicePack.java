@@ -6,7 +6,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "service_packs")
-public class ServicePack {
+public class ServicePack implements ServiceComponent{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -31,8 +31,23 @@ public class ServicePack {
         return id;
     }
 
+    @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public int getEstimatedMinutes() {
+        return this.serviceItems.stream()
+                .mapToInt(ServiceItem::getEstimatedMinutes)
+                .sum();
+    }
+
+    @Override
+    public double getPrice() {
+        return serviceItems.stream()
+                .mapToDouble(ServiceItem::getPrice)
+                .sum();
     }
 
     public void setName(String name) {

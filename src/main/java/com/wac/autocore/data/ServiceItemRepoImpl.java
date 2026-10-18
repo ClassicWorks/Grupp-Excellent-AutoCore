@@ -5,6 +5,7 @@ import com.wac.autocore.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,9 +41,39 @@ public class ServiceItemRepoImpl implements ServiceItemRepo {
     public Optional<ServiceItem> get(int id) {
         try(Session s = HibernateUtil.getSessionFactory().openSession()) {
             return s.createQuery(
-                            "from ServiceItem si where si.id = :id" ,ServiceItem.class)
+                            "from ServiceItem si where si.id = :id", ServiceItem.class)
                     .setParameter("id", id)
                     .uniqueResultOptional();
+        }
+    }
+
+    @Override
+    public List<ServiceItem> getByIds(List<Integer> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        try (Session s = HibernateUtil.getSessionFactory().openSession()) {
+            return s.createQuery(
+                            "from ServiceItem si where si.id in (:ids)",
+                            ServiceItem.class)
+                    .setParameterList("ids", ids)
+                    .list();
+        }
+    }
+
+    @Override
+    public List<ServiceItem> getAllExcludingIds(List<Integer> idsToExclude) {
+        if (idsToExclude == null || idsToExclude.isEmpty()) {
+            return getAll();
+        }
+
+        try (Session s = HibernateUtil.getSessionFactory().openSession()) {
+            return s.createQuery(
+                            "from ServiceItem si where si.id not in (:ids)",
+                            ServiceItem.class)
+                    .setParameterList("ids", idsToExclude)
+                    .list();
         }
     }
 }

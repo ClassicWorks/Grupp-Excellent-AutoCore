@@ -2,13 +2,11 @@ package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.WorkOrder;
-import com.wac.autocore.model.WorkOrderStatus;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -19,7 +17,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CreateInvoiceForm {
 
@@ -37,14 +34,7 @@ public class CreateInvoiceForm {
         Label title = new Label(LanguageManager.getString("invoice.form.title"));
         title.getStyleClass().add("form-title");
 
-        List<Integer> invoicedWorkOrderIds = garageSystem.getInvoices().stream()
-                .map(invoice -> invoice.getWorkOrder().getId())
-                .collect(Collectors.toList());
-
-        List<WorkOrder> availableWorkOrders = garageSystem.getWorkOrders().stream()
-                .filter(workOrder -> workOrder.getStatus() == WorkOrderStatus.COMPLETED)
-                .filter(workOrder -> !invoicedWorkOrderIds.contains(workOrder.getId()))
-                .collect(Collectors.toList());
+        List<WorkOrder> availableWorkOrders = garageSystem.getCompletedWorkOrdersWithoutInvoices();
 
         ObservableList<WorkOrder> workOrderItems = FXCollections.observableArrayList(availableWorkOrders);
 

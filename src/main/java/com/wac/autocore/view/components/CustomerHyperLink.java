@@ -4,7 +4,6 @@ import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.image.ImageView;
 
 public class CustomerHyperLink extends Hyperlink {
     private Customer customer;
@@ -12,11 +11,9 @@ public class CustomerHyperLink extends Hyperlink {
     public CustomerHyperLink(Customer customer){
         this.customer = customer;
 
-        //TODO change to component
-        ImageView imageView = new ImageView("/imgs/user-solid.png");
-        imageView.setFitHeight(20);
-        imageView.setFitWidth(20);
-        this.setGraphic(imageView);
+        ImageViewWithAltText userIcon = new ImageViewWithAltText("/imgs/user-solid.png", 20, 20,
+                LanguageManager.getString("image.user-solid"));
+        this.setGraphic(userIcon);
 
         if (customer == null){
             setText(LanguageManager.getString("customer.none.assigned"));
@@ -26,11 +23,6 @@ public class CustomerHyperLink extends Hyperlink {
             setOnAction(e ->
                     ViewManager.getInstance().showCustomers());
         }
-    }
-
-    public CustomerHyperLink(){
-        setText(LanguageManager.getString("customer.none.assigned"));
-        setDisable(true);
     }
 
     public void setCustomer(Customer customer){

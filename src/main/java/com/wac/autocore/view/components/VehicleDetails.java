@@ -119,7 +119,7 @@ public class VehicleDetails extends BorderPane {
 
     private void showCustomerSelection(){
         CustomerSelection customerSelection = new CustomerSelection(
-                garageSystem.getCustomers(),
+                garageSystem,
                 customer -> vehicleOwner = customer
         );
 

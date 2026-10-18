@@ -49,6 +49,17 @@ public class CustomerRepoImpl implements CustomerRepo{
     }
 
     @Override
+    public List<Customer> getMatchingName(String query) {
+        try(Session s = HibernateUtil.getSessionFactory().openSession()){
+            return s.createQuery("from Customer c where c.name " +
+                                    "like :query",
+                            Customer.class)
+                    .setParameter("query", "%" + query + "%")
+                    .getResultList();
+        }
+    }
+
+    @Override
     public void delete(int id) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()) {
             Transaction transaction = s.beginTransaction();

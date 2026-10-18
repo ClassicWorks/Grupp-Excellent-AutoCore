@@ -5,9 +5,9 @@ import com.wac.autocore.model.*;
 import com.wac.autocore.util.TranslationService;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class GarageSystem {
@@ -50,7 +50,6 @@ public class GarageSystem {
     public List<Customer> getCustomers() {
         if (customerRepo.getAll().isEmpty()) {
             System.out.println("No customers found.");
-            return new ArrayList<>();
         }
 
         return customerRepo.getAll();
@@ -58,6 +57,11 @@ public class GarageSystem {
 
     public Optional<Customer> getCustomer(int id){
         return customerRepo.get(id);
+    }
+
+
+    public List<Customer> getCustomerMatching(String query) {
+        return customerRepo.getMatchingName(query);
     }
 
     public void showVehicles() {
@@ -77,7 +81,6 @@ public class GarageSystem {
     public List<Vehicle> getVehicles() {
         if (vehicleRepo.getAll().isEmpty()) {
             System.out.println("No vehicles found.");
-            return new ArrayList<>();
         }
 
         return vehicleRepo.getAll();
@@ -88,9 +91,7 @@ public class GarageSystem {
     }
 
     public List<Vehicle> getCustomersVehicle(int customerId){
-        return getVehicles().stream()
-                .filter(v -> customerId == v.getCustomer().getId())
-                .collect(Collectors.toList());
+        return vehicleRepo.getVehicleByCustomerId(customerId);
     }
 
     public void showBookings() {
@@ -108,11 +109,9 @@ public class GarageSystem {
     }
 
     public List<Booking> getBookings() {
-
         List<Booking> bookings = bookingRepo.getAll();
         if (bookings.isEmpty()) {
             System.out.println("No bookings found.");
-            return new ArrayList<>();
         }
 
         return bookings;
@@ -140,10 +139,29 @@ public class GarageSystem {
         List<ServiceItem> serviceItems = serviceItemRepo.getAll();
         if (serviceItems.isEmpty()) {
             System.out.println("No services found.");
-            return new ArrayList<>();
         }
 
         return serviceItems;
+    }
+
+    public List<ServiceItem> getServiceItemsByIds(List<Integer> serviceIds) {
+        List<ServiceItem> serviceItems = serviceItemRepo.getByIds(serviceIds);
+        if (serviceItems.isEmpty()) {
+            System.out.println("No services found.");
+        }
+
+        return serviceItems;
+    }
+
+
+    public List<Integer> getMissingIds(List<Integer> lookingForIds, List<ServiceItem> serviceList) {
+        Set<Integer> foundIds = serviceList.stream()
+                .map(ServiceItem::getId)
+                .collect(Collectors.toSet());
+
+        return lookingForIds.stream()
+                .filter(id -> !foundIds.contains(id))
+                .collect(Collectors.toList());
     }
 
     public Optional<ServiceItem> getServiceItem(int id){
@@ -252,30 +270,15 @@ public class GarageSystem {
     }
 
     public boolean customerHasVehicles(int customerId) {
-        for (Vehicle v : vehicleRepo.getAll()) {
-            if (v.getCustomer() != null && v.getCustomer().getId() == customerId) {
-                return true;
-            }
-        }
-        return false;
+        return vehicleRepo.customerHasVehicle(customerId);
     }
 
     public boolean vehicleHasBookings(int vehicleId) {
-        for (Booking b : bookingRepo.getAll()) {
-            if (b.getVehicle() != null && b.getVehicle().getId() == vehicleId) {
-                return true;
-            }
-        }
-        return false;
+        return bookingRepo.vehicleHasBooking(vehicleId);
     }
 
-    public boolean mechanicHasWorkOrders(int mechanicId) {
-        for (WorkOrder w : workOrderRepo.getAll()) {
-            if (w.getMechanic() != null && w.getMechanic().getId() == mechanicId) {
-                return true;
-            }
-        }
-        return false;
+    public boolean mechanicHasUncompletedWorkOrders(int mechanicId) {
+        return workOrderRepo.mechanicHasUncompletedWorkOrders(mechanicId);
     }
 
     public boolean deleteCustomer(int customerId) {
@@ -291,6 +294,7 @@ public class GarageSystem {
         return true;
     }
 
+    //TODO om alla bokningar är klar/avbrutna, koppla lös dem
     public boolean deleteVehicle(int vehicleId) {
         if (!vehicleRepo.get(vehicleId).isPresent()) {
             System.out.println("Vehicle not found.");
@@ -304,15 +308,24 @@ public class GarageSystem {
         return true;
     }
 
+    //TODO implementera UnitOfWork då när man tar bort en mekaniker ska den koppla bort den från existerande workOrders (som ej är klar/avbrutna)
     public boolean deleteMechanic(int mechanicId) {
         if (!mechanicRepo.get(mechanicId).isPresent()) {
             System.out.println("Mechanic not found.");
             return false;
         }
-        if (mechanicHasWorkOrders(mechanicId)) {
+        //If mechanic has work assigned they cannot be deleted. Connected WorkOrders need to be removed before
+        if (mechanicHasUncompletedWorkOrders(mechanicId)) {
             System.out.println("Mechanic has work orders and cannot be deleted.");
             return false;
         }
+        //All workOrders connected gets disconnected
+        List<WorkOrder> mechanicsWorkOrders = workOrderRepo.getWorkOrdersByMechanic(mechanicId);
+        for(WorkOrder workOrder : mechanicsWorkOrders){
+            workOrder.setMechanic(null);
+            workOrderRepo.update(workOrder);
+        }
+
         mechanicRepo.delete(mechanicId);
         return true;
     }
@@ -337,6 +350,7 @@ public class GarageSystem {
         return servicePackRepo.getById(id);
     }
 
+    //TODO get values and Garagesystem check
     public ServicePack updateServicePack(int servicePackId, ServicePack updatedServicePack){
         Optional<ServicePack> optionalServicePack = getServicePack(servicePackId);
         if(!optionalServicePack.isPresent()){
@@ -380,7 +394,6 @@ public class GarageSystem {
         List<Mechanic> mechanics = mechanicRepo.getAll();
         if (mechanics.isEmpty()) {
             System.out.println("No mechanics found.");
-            return new ArrayList<>();
         }
 
         return mechanics;
@@ -390,7 +403,6 @@ public class GarageSystem {
         List<Mechanic> mechanics = mechanicRepo.getAllAvailable();
         if (mechanics.isEmpty()) {
             System.out.println("No available mechanics found.");
-            return new ArrayList<>();
         }
 
         return mechanics;
@@ -418,7 +430,6 @@ public class GarageSystem {
         List<WorkOrder> workOrders = workOrderRepo.getAll();
         if (workOrders.isEmpty()) {
             System.out.println("No work orders found.");
-            return new ArrayList<>();
         }
 
         return workOrders;
@@ -428,18 +439,25 @@ public class GarageSystem {
         List<WorkOrder> workOrders = workOrderRepo.getAllWithItems();
         if (workOrders.isEmpty()) {
             System.out.println("No work orders found.");
-            return new ArrayList<>();
         }
 
         return workOrders;
     }
 
-    public Optional<WorkOrder> getWorkOrder(int id){
-        return workOrderRepo.get(id);
+    public List<WorkOrder> getWorkOrdersWithItemsByStatus(WorkOrderStatus status){
+        return workOrderRepo.getWithStatus(status);
+    }
+
+    public List<WorkOrder> getCompletedWorkOrdersWithoutInvoices() {
+        return workOrderRepo.getCompletedWorkOrdersWithoutInvoices();
     }
 
     public Optional<WorkOrder> getWorkOrderWithItems(int workOrderId) {
         return workOrderRepo.getWithItems(workOrderId);
+    }
+
+    public Optional<WorkOrder> getWorkOrder(int id){
+        return workOrderRepo.get(id);
     }
 
     public void showInvoices() {
@@ -461,7 +479,6 @@ public class GarageSystem {
         List<Invoice> invoices = invoiceRepo.getAll();
         if (invoices.isEmpty()) {
             System.out.println("No invoices found.");
-            return new ArrayList<>();
         }
         return invoices;
     }
@@ -489,10 +506,17 @@ public class GarageSystem {
         List<Payment> payments = paymentRepo.getAll();
         if (payments.isEmpty()) {
             System.out.println("No payments found.");
-            return new ArrayList<>();
         }
 
         return payments;
+    }
+
+    public List<Invoice> getUnpaidInvoices(){
+        return invoiceRepo.getWherePayedIs(false);
+    }
+
+    public List<Invoice> getPaidInvoices(){
+        return invoiceRepo.getWherePayedIs(true);
     }
 
     public Optional<Payment> getPayment(int id){
@@ -500,6 +524,7 @@ public class GarageSystem {
     }
 
     public Customer createCustomer(String name, String phone, String email) {
+        //TODO check if values are correct and normalize, name not too long, email contains correct
         Customer customer = new Customer(name, phone, email);
 
         Customer savedCustomer = customerRepo.save(customer);
@@ -515,6 +540,7 @@ public class GarageSystem {
                                  String model,
                                  int year,
                                  int customerId) {
+        //TODO check if values are correct, brand and model not too long, year is possible, id > 0
 
         Optional<Customer> optionalCustomer = getCustomer(customerId);
 
@@ -544,7 +570,7 @@ public class GarageSystem {
     public Booking createBooking(int vehicleId,
                                  LocalDate date,
                                  String description) {
-
+        //TODO check if values are correct, id > 0, description is not too long
         Optional<Vehicle> optionalVehicle = getVehicle(vehicleId);
 
         if (!optionalVehicle.isPresent()) {
@@ -570,6 +596,7 @@ public class GarageSystem {
                                                 LocalDate date,
                                                 String description,
                                                 String descriptionLang) {
+        //TODO check if values are correct, id > 0, description is not too long, descriptionLang is correct
 
         Optional<Vehicle> optionalVehicle = getVehicle(vehicleId);
 
@@ -616,7 +643,7 @@ public class GarageSystem {
 
         return servicePackRepo.save(servicePack);
     }
-  
+
     public Booking createBookingFrom(int previousBookingId) {
         Optional<Booking> optionalPrevious = getBooking(previousBookingId);
 
@@ -645,20 +672,6 @@ public class GarageSystem {
         System.out.println(savedBooking);
 
         return savedBooking;
-    }
-
-    @Deprecated
-    public Booking createBooking(int vehicleId,
-                                 LocalDate date,
-                                 String description,
-                                 int mechanicId) {
-        Booking booking = createBooking(vehicleId, date, description);
-        //TODO should not be use
-        /*if (booking != null) {
-
-            booking.setMechanic(mechanicId);
-        }*/
-        return booking;
     }
 
     public WorkOrder createWorkOrder(int bookingId,
@@ -716,7 +729,6 @@ public class GarageSystem {
 
         return savedWorkOrder;
     }
-
     public void confirmWorkOrder (int workOrderId) throws IllegalArgumentException {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
@@ -739,6 +751,7 @@ public class GarageSystem {
 
         System.out.println("Work order " + workOrderId + " has been confirmed.");
     }
+
     public WorkOrder updateWorkOrderServices(int workOrderId,
                                              List<Integer> serviceItemIdsToAdd,
                                              List<Integer> itemIdsToRemove)

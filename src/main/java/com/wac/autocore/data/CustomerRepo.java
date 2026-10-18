@@ -10,6 +10,7 @@ public interface CustomerRepo {
     Customer update(Customer customer);
     List<Customer> getAll();
     Optional<Customer> get(int id);
+    List<Customer> getMatchingName(String query);
 
     void delete(int id);
 }
