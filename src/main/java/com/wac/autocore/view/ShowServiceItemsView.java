@@ -37,6 +37,12 @@ public class ShowServiceItemsView {
 
         GridPane mainContent = new KanbanGrid(2);
 
+        for (int i = 0; i < 2; i++) {
+            RowConstraints rowConstraints = new RowConstraints();
+            rowConstraints.setPercentHeight(50);
+            mainContent.getRowConstraints().add(rowConstraints);
+        }
+
         detailPanel = new VBox();
 
         serviceItemsBox = new VBox();
