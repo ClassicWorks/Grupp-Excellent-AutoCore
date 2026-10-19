@@ -43,7 +43,6 @@
 }
 
 /* TODO
-    status-label
     invoice-popup
 
 */
@@ -120,6 +119,7 @@ HyperLink{
 }
 
 .status-label{
+    -fx-font-family: "IBM Plex Mono", monospace;
     -fx-text-fill: -fx-muted-ink;
     -fx-background-color: -fx-default-color;
     -fx-background-radius: 15px;

@@ -1,6 +1,7 @@
 package com.wac.autocore.service;
 
 import com.wac.autocore.data.*;
+import com.wac.autocore.exceptions.*;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.payment.PaymentMethod;
 import com.wac.autocore.service.payment.PaymentMethodFactory;
@@ -81,11 +82,12 @@ public class GarageSystem {
     }
 
     public List<Vehicle> getVehicles() {
-        if (vehicleRepo.getAll().isEmpty()) {
+        List<Vehicle> vehicles = vehicleRepo.getAll();
+        if (vehicles.isEmpty()) {
             System.out.println("No vehicles found.");
         }
 
-        return vehicleRepo.getAll();
+        return vehicles;
     }
 
     public Optional<Vehicle> getVehicle(int id){
@@ -172,15 +174,13 @@ public class GarageSystem {
 
     public ServiceItem updateServiceItemPrice(int serviceItemId, double newPrice) {
         if (newPrice < 0) {
-            System.out.println("Price cannot be negative.");
-            return null;
+            throw new InputNotValidException("Price can not  be negative");
         }
 
         Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
 
         if (!optionalServiceItem.isPresent()) {
-            System.out.println("Service item with ID " + serviceItemId + " does not exist.");
-            return null;
+            throw new ServiceItemNotFoundException(serviceItemId);
         }
 
         ServiceItem serviceItem = optionalServiceItem.get();
@@ -195,15 +195,13 @@ public class GarageSystem {
 
     public Customer updateCustomer(int customerId, String name, String phone, String email) {
         if (name == null || name.trim().isEmpty()) {
-            System.out.println("Customer name cannot be empty.");
-            return null;
+            throw new InputNotValidException("Customer name cannot be empty.");
         }
 
         Optional<Customer> optionalCustomer = getCustomer(customerId);
 
         if (!optionalCustomer.isPresent()) {
-            System.out.println("Customer with ID " + customerId + " does not exist.");
-            return null;
+            throw new CustomerNotFoundException(customerId);
         }
 
         Customer customer = optionalCustomer.get();
@@ -216,15 +214,13 @@ public class GarageSystem {
 
     public Mechanic updateMechanic(int mechanicId, String name, String phone, String specialization) {
         if (name == null || name.trim().isEmpty()) {
-            System.out.println("Mechanic name cannot be empty.");
-            return null;
+            throw new InputNotValidException("Mechanic name cannot be empty.");
         }
 
         Optional<Mechanic> optionalMechanic = getMechanic(mechanicId);
 
         if (!optionalMechanic.isPresent()) {
-            System.out.println("Mechanic with ID " + mechanicId + " does not exist.");
-            return null;
+            throw new MechanicNotFoundException(mechanicId);
         }
 
         Mechanic mechanic = optionalMechanic.get();
@@ -239,15 +235,13 @@ public class GarageSystem {
                                  String model, int year, Integer customerId) {
         if (registrationNumber == null || registrationNumber.trim().isEmpty()
                 || model == null || model.trim().isEmpty()) {
-            System.out.println("Registration number and model cannot be empty.");
-            return null;
+            throw new InputNotValidException("Registration number and model cannot be empty.");
         }
 
         Optional<Vehicle> optionalVehicle = getVehicle(vehicleId);
 
         if (!optionalVehicle.isPresent()) {
-            System.out.println("Vehicle with ID " + vehicleId + " does not exist.");
-            return null;
+            throw new VehicleNotFoundException(vehicleId);
         }
 
         Customer customer = null;
@@ -255,8 +249,7 @@ public class GarageSystem {
             Optional<Customer> optionalCustomer = getCustomer(customerId);
 
             if (!optionalCustomer.isPresent()) {
-                System.out.println("Customer with ID " + customerId + " does not exist.");
-                return null;
+                throw new CustomerNotFoundException(customerId);
             }
             customer = optionalCustomer.get();
         }
@@ -285,12 +278,10 @@ public class GarageSystem {
 
     public boolean deleteCustomer(int customerId) {
         if (!customerRepo.get(customerId).isPresent()) {
-            System.out.println("Customer not found.");
-            return false;
+            throw new CustomerNotFoundException(customerId);
         }
         if (customerHasVehicles(customerId)) {
-            System.out.println("Customer has vehicles and cannot be deleted.");
-            return false;
+            throw new DeletionNotAllowedException("Customer has vehicles and cannot be deleted.");
         }
         customerRepo.delete(customerId);
         return true;
@@ -299,12 +290,10 @@ public class GarageSystem {
     //TODO om alla bokningar är klar/avbrutna, koppla lös dem
     public boolean deleteVehicle(int vehicleId) {
         if (!vehicleRepo.get(vehicleId).isPresent()) {
-            System.out.println("Vehicle not found.");
-            return false;
+            throw new VehicleNotFoundException(vehicleId);
         }
         if (vehicleHasBookings(vehicleId)) {
-            System.out.println("Vehicle has bookings and cannot be deleted.");
-            return false;
+            throw new DeletionNotAllowedException("Vehicle has bookings and cannot be deleted.");
         }
         vehicleRepo.delete(vehicleId);
         return true;
@@ -313,13 +302,11 @@ public class GarageSystem {
     //TODO implementera UnitOfWork då när man tar bort en mekaniker ska den koppla bort den från existerande workOrders (som ej är klar/avbrutna)
     public boolean deleteMechanic(int mechanicId) {
         if (!mechanicRepo.get(mechanicId).isPresent()) {
-            System.out.println("Mechanic not found.");
-            return false;
+            throw new MechanicNotFoundException(mechanicId);
         }
         //If mechanic has work assigned they cannot be deleted. Connected WorkOrders need to be removed before
         if (mechanicHasUncompletedWorkOrders(mechanicId)) {
-            System.out.println("Mechanic has work orders and cannot be deleted.");
-            return false;
+            throw new DeletionNotAllowedException("Mechanic has work orders and cannot be deleted.");
         }
         //All workOrders connected gets disconnected
         List<WorkOrder> mechanicsWorkOrders = workOrderRepo.getWorkOrdersByMechanic(mechanicId);
@@ -356,14 +343,14 @@ public class GarageSystem {
     public ServicePack updateServicePack(int servicePackId, ServicePack updatedServicePack){
         Optional<ServicePack> optionalServicePack = getServicePack(servicePackId);
         if(!optionalServicePack.isPresent()){
-            throw new IllegalArgumentException("Service pack with ID " + servicePackId + " does not exist.");
+            throw new ServicePackNotFoundException("Service pack with ID " + servicePackId + " does not exist.");
         }
 
         //Om någon ServiceItem inte finns kasta exception
         updatedServicePack.getServiceItems().forEach(si -> {
             Optional<ServiceItem> optionalServiceItem = getServiceItem(si.getId());
             if(!optionalServiceItem.isPresent()) {
-                throw new  IllegalArgumentException("Service item with ID " + si.getId() + " does not exist.");
+                throw new ServiceItemNotFoundException("Service item with ID " + si.getId() + " does not exist.");
             }
         });
 
@@ -526,7 +513,9 @@ public class GarageSystem {
     }
 
     public Customer createCustomer(String name, String phone, String email) {
-        //TODO check if values are correct and normalize, name not too long, email contains correct
+        if(name == null || name.trim().isEmpty()){
+            throw new InputNotValidException("Customer name cannot be empty.");
+        }
         Customer customer = new Customer(name, phone, email);
 
         Customer savedCustomer = customerRepo.save(customer);
@@ -542,13 +531,26 @@ public class GarageSystem {
                                  String model,
                                  int year,
                                  int customerId) {
-        //TODO check if values are correct, brand and model not too long, year is possible, id > 0
+        if(registrationNumber == null || registrationNumber.trim().isEmpty()){
+            throw new InputNotValidException("Vehicle registration number cannot be empty.");
+        }
+        if(brand == null || brand.trim().isEmpty()){
+            throw new InputNotValidException("Vehicle brand cannot be empty.");
+        }
+        if(model == null || model.trim().isEmpty()){
+            throw new InputNotValidException("Vehicle model cannot be empty.");
+        }
+        if(year <= 1649 || year > LocalDate.now().getYear()){
+            throw new InputNotValidException("Vehicle year cannot be before 1649 or efter current year.");
+        }
+        if(customerId <= 0){
+            throw new InputNotValidException("Customer ID cannot be zero or negative.");
+        }
 
         Optional<Customer> optionalCustomer = getCustomer(customerId);
 
         if (!optionalCustomer.isPresent()) {
-            System.out.println("Customer with ID " + customerId + " does not exist.");
-            return null;
+            throw new CustomerNotFoundException("Customer with ID " + customerId + " does not exist.");
         }
         Customer customer = optionalCustomer.get();
 
@@ -572,12 +574,19 @@ public class GarageSystem {
     public Booking createBooking(int vehicleId,
                                  LocalDate date,
                                  String description) {
-        //TODO check if values are correct, id > 0, description is not too long
+        if(vehicleId <= 0){
+            throw new InputNotValidException("Vehicle ID cannot be zero or negative.");
+        }
+        if(date == null){
+            throw new InputNotValidException("Booking date cannot be empty.");
+        }
+        if(description == null || description.trim().isEmpty() || description.length() > 255){
+            throw new InputNotValidException("Booking description cannot be empty or more that 255 characters.");
+        }
         Optional<Vehicle> optionalVehicle = getVehicle(vehicleId);
 
         if (!optionalVehicle.isPresent()) {
-            System.out.println("Vehicle with ID " + vehicleId + " does not exist.");
-            return null;
+            throw new VehicleNotFoundException("Vehicle with ID " + vehicleId + " does not exist.");
         }
 
         Booking booking = new Booking(
@@ -599,12 +608,23 @@ public class GarageSystem {
                                                 String description,
                                                 String descriptionLang) {
         //TODO check if values are correct, id > 0, description is not too long, descriptionLang is correct
+        if(vehicleId <= 0){
+            throw new InputNotValidException("Vehicle ID cannot be zero or negative.");
+        }
+        if(date == null){
+            throw new InputNotValidException("Booking date cannot be empty.");
+        }
+        if(description == null || description.trim().isEmpty() || description.length() > 255){
+            throw new InputNotValidException("Booking description cannot be empty or more that 255 characters.");
+        }
+        if(descriptionLang == null || descriptionLang.trim().isEmpty() || descriptionLang.length() > 5){
+            throw new InputNotValidException("Description language can not be empty or more than 5 characters.");
+        }
 
         Optional<Vehicle> optionalVehicle = getVehicle(vehicleId);
 
         if (!optionalVehicle.isPresent()) {
-            System.out.println("Vehicle with ID " + vehicleId + " does not exist.");
-            return null;
+           throw new VehicleNotFoundException("Vehicle with ID " + vehicleId + " does not exist.");
         }
 
         String targetLang = "sv".equals(descriptionLang) ? "en" : "sv";
@@ -629,14 +649,14 @@ public class GarageSystem {
 
     public ServicePack createServicePack(String name, int... serviceItemIds) throws IllegalArgumentException {
         if(!servicePackRepo.nameAvailable(name)){
-            throw new IllegalArgumentException("Service pack with name \"" + name + "\" already exists.");
+            throw new InputNotValidException("Service pack with name \"" + name + "\" already exists.");
         }
         ServicePack servicePack = new ServicePack(name);
 
         for(int serviceItemId : serviceItemIds) {
             Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
             if(!optionalServiceItem.isPresent()) {
-                throw new  IllegalArgumentException("Service item with ID " + serviceItemId + " does not exist.");
+                throw new ServiceItemNotFoundException(serviceItemId);
             }
             ServiceItem serviceItem = optionalServiceItem.get();
 
@@ -650,14 +670,12 @@ public class GarageSystem {
         Optional<Booking> optionalPrevious = getBooking(previousBookingId);
 
         if (!optionalPrevious.isPresent()) {
-            System.out.println("Booking with ID " + previousBookingId + " does not exist.");
-            return null;
+            throw new BookingNotFoundException(previousBookingId);
         }
         Booking previous = optionalPrevious.get();
 
         if (previous.getVehicle() == null) {
-            System.out.println("Booking with ID " + previousBookingId + " has no vehicle.");
-            return null;
+            throw new VehicleNotFoundException("Booking with ID " + previousBookingId + " has no vehicle.");
         }
 
         Booking booking = new Booking(
@@ -684,8 +702,7 @@ public class GarageSystem {
         Optional<Booking> optionalBooking = getBooking(bookingId);
 
         if (!optionalBooking.isPresent()) {
-            System.out.println("Booking with ID " + bookingId + " does not exist.");
-            return null;
+            throw new BookingNotFoundException(bookingId);
         }
         Booking booking = optionalBooking.get();
 
@@ -696,12 +713,12 @@ public class GarageSystem {
             Optional<Mechanic> optionalMechanic = getMechanic(mechanicId);
 
             if (!optionalMechanic.isPresent()) {
-                throw new IllegalArgumentException(String.format("There is no mechanic with id %d", mechanicId));
+                throw new MechanicNotFoundException(mechanicId);
             }
             mechanic = optionalMechanic.get();
 
             if (!mechanic.isAvailable()) {
-                throw new IllegalArgumentException("Mechanic " + mechanic.getName() + " is not available.");
+                throw new MechanicNotAvailable("Mechanic " + mechanic.getName() + " is not available.");
             }
         }
 
@@ -713,9 +730,7 @@ public class GarageSystem {
         for (int serviceItemId : serviceItemIds) {
             Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
             if (!optionalServiceItem.isPresent()) {
-                throw new IllegalArgumentException(
-                        "Service item with ID " + serviceItemId + " does not exist."
-                );
+                throw new ServiceItemNotFoundException(serviceItemId);
             }
             ServiceItem serviceItem = optionalServiceItem.get();
             workOrder.addItem(serviceItem, serviceItem.getPrice());
@@ -731,21 +746,21 @@ public class GarageSystem {
 
         return savedWorkOrder;
     }
-    public void confirmWorkOrder (int workOrderId) throws IllegalArgumentException {
+    public void confirmWorkOrder (int workOrderId) {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
-            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
+            throw new WorkOrderNotFoundException(workOrderId);
         }
 
         WorkOrder workOrder = optionalWorkOrder.get();
 
         if (workOrder.getStatus() != WorkOrderStatus.DRAFT) {
-            throw new IllegalArgumentException("Wrong status on work order. Only draft work orders can be confirmed.");
+            throw new StatusNotValidException("Wrong status on work order. Only draft work orders can be confirmed.");
         }
 
         if(workOrder.getItems().isEmpty()){
-            throw new IllegalArgumentException("No service items. Work order must contains at least one service item");
+            throw new InputNotValidException("No service items. Work order must contains at least one service item");
         }
 
         workOrder.setStatus(WorkOrderStatus.CONFIRMED);
@@ -757,21 +772,21 @@ public class GarageSystem {
     public WorkOrder updateWorkOrderServices(int workOrderId,
                                              List<Integer> serviceItemIdsToAdd,
                                              List<Integer> itemIdsToRemove)
-    throws IllegalArgumentException{
+    throws WorkOrderNotFoundException, StatusNotValidException, NotInListException, ServiceItemNotFoundException {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
-            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
+            throw new WorkOrderNotFoundException(workOrderId);
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
         if (!workOrder.getStatus().canEditServices()) {
-            throw new IllegalArgumentException("Services can only be changed before the work order is started.");
+            throw new StatusNotValidException("Services can only be changed before the work order is started.");
         }
 
         for (Integer itemId : itemIdsToRemove) {
             if (!workOrder.removeItem(itemId)) {
-                throw new IllegalArgumentException("Item with ID " + itemId + " is not on the work order.");
+                throw new NotInListException("Item with ID " + itemId + " is not on the work order.");
             }
         }
 
@@ -779,20 +794,15 @@ public class GarageSystem {
             Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
 
             if (!optionalServiceItem.isPresent()) {
-                throw new IllegalArgumentException("Service item with ID " + serviceItemId + " does not exist.");
+                throw new ServiceItemNotFoundException("Service item with ID " + serviceItemId + " does not exist.");
             }
 
             if (workOrder.hasService(serviceItemId)) {
-                throw new IllegalArgumentException("Service is already on the work order.");
-
+                continue;
             }
 
             ServiceItem serviceItem = optionalServiceItem.get();
             workOrder.addItem(serviceItem, serviceItem.getPrice());
-        }
-
-        if (workOrder.getItems().isEmpty()) {
-            throw new IllegalArgumentException("A work order must have at least one service.");
         }
 
         return workOrderRepo.update(workOrder);
@@ -813,7 +823,7 @@ public class GarageSystem {
         Mechanic mechanic = workOrder.getMechanic();
 
         if(mechanic == null){
-            throw new IllegalArgumentException("No mechanic. Mechanic must be selected to confirm order");
+            throw new IllegalArgumentException("No mechanic. Mechanic must be selected to start order");
         }
 
         mechanic.setAvailable(false);
