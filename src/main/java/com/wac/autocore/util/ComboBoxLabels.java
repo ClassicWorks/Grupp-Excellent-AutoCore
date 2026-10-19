@@ -101,6 +101,10 @@ public class ComboBoxLabels {
         return converter(ComboBoxLabels::servicePackLabel);
     }
 
+    public static StringConverter<WorkOrderType> workOrderType() {
+        return converter(ValueLabels::workOrderType);
+    }
+
     private static String servicePackLabel(ServicePack servicePack) {
         return String.format("%s (%d)",
                 ValueLabels.servicePackName(servicePack.getName()),

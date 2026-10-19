@@ -145,6 +145,7 @@ public class CreateWorkOrderForm {
                     WorkOrder createdWorkOrder = garageSystem.createWorkOrder(
                             bookingId,
                             selectedMechanic.getId(),
+                            WorkOrderType.PLANNED,
                             selectedServiceItemIds);
                     //TODO dialog box if error occurs
 

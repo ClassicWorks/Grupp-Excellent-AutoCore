@@ -678,8 +678,13 @@ public class GarageSystem {
 
     public WorkOrder createWorkOrder(int bookingId,
                                      int mechanicId,
+                                     WorkOrderType type,
                                      int... serviceItemIds)
     throws IllegalArgumentException{
+
+        if (type == null) {
+            throw new IllegalArgumentException("A work order must have a type.");
+        }
 
         Optional<Booking> optionalBooking = getBooking(bookingId);
 
@@ -707,7 +712,8 @@ public class GarageSystem {
 
         WorkOrder workOrder = new WorkOrder(
                 booking,
-                mechanic
+                mechanic,
+                type
         );
 
         for (int serviceItemId : serviceItemIds) {
@@ -765,7 +771,7 @@ public class GarageSystem {
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (!workOrder.getStatus().canEditServices()) {
+        if (!workOrder.getStatus().canEdit()) {
             throw new IllegalArgumentException("Services can only be changed before the work order is started.");
         }
 
@@ -798,6 +804,27 @@ public class GarageSystem {
         return workOrderRepo.update(workOrder);
     }
 
+    public WorkOrder updateWorkOrderType(int workOrderId, WorkOrderType type)
+            throws IllegalArgumentException {
+        if (type == null) {
+            throw new IllegalArgumentException("A work order must have a type.");
+        }
+
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
+
+        if (!optionalWorkOrder.isPresent()) {
+            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
+        }
+        WorkOrder workOrder = optionalWorkOrder.get();
+
+        if (!workOrder.getStatus().canEdit()) {
+            throw new IllegalArgumentException("The type can only be changed before the work order is started.");
+        }
+
+        workOrder.setType(type);
+        return workOrderRepo.update(workOrder);
+    }
+
     public void startWorkOrder(int workOrderId) {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
@@ -816,11 +843,11 @@ public class GarageSystem {
             throw new IllegalArgumentException("No mechanic. Mechanic must be selected to confirm order");
         }
 
-        mechanic.setAvailable(false);
-
         if(workOrder.getItems().isEmpty()){
             throw new IllegalArgumentException("No service items. Work order must contains at least one service item");
         }
+
+        mechanic.setAvailable(false);
 
         Booking booking = workOrder.getBooking();
 
@@ -904,6 +931,16 @@ public class GarageSystem {
 
         if (workOrder.getStatus() != WorkOrderStatus.COMPLETED) {
             throw new IllegalArgumentException("Invoice can only be created for a completed work order.");
+        }
+
+        if (workOrder.getType() == WorkOrderType.WARRANTY) {
+            throw new IllegalArgumentException("Warranty work is not invoiced.");
+        }
+
+        boolean alreadyInvoiced = invoiceRepo.getAll().stream()
+                .anyMatch(invoice -> invoice.getWorkOrder().getId() == workOrderId);
+        if (alreadyInvoiced) {
+            throw new IllegalArgumentException("Work order " + workOrderId + " already has an invoice.");
         }
 
         double amount = 0.0;
