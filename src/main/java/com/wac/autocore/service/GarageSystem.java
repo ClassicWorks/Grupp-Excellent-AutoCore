@@ -451,7 +451,9 @@ public class GarageSystem {
     }
 
     public List<WorkOrder> getCompletedWorkOrdersWithoutInvoices() {
-        return workOrderRepo.getCompletedWorkOrdersWithoutInvoices();
+        return workOrderRepo.getCompletedWorkOrdersWithoutInvoices().stream()
+                .filter(workOrder -> workOrder.getType() != WorkOrderType.WARRANTY)
+                .collect(Collectors.toList());
     }
 
     public Optional<WorkOrder> getWorkOrderWithItems(int workOrderId) {
