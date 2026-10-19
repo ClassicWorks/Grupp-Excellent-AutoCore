@@ -37,6 +37,7 @@ public class CreateBookingForm {
     private final VBox bookingInformation = new VBox();
 
     private final TextArea descriptionField = new TextArea();
+    private final ComboBox<WorkOrderType> typeComboBox = new ComboBox<>();
     private ComboBox<Mechanic> mechanicComboBox;
 
 
@@ -143,6 +144,7 @@ public class CreateBookingForm {
                 createTitle(),
                 vehicleContainer,
                 getDescriptionBox(),
+                getTypeBox(),
                 mechanicBox,
                 serviceItemSelection,
                 errorLabel,
@@ -270,6 +272,19 @@ public class CreateBookingForm {
         return descriptionBox;
     }
 
+    private VBox getTypeBox() {
+        Label typeLabel = new Label(LanguageManager.getString("workorder.type.label"));
+        typeLabel.getStyleClass().add("form-field-label");
+
+        typeComboBox.getItems().setAll(WorkOrderType.values());
+        typeComboBox.setPromptText(LanguageManager.getString("workorder.type.prompt"));
+        typeComboBox.setConverter(ComboBoxLabels.workOrderType());
+
+        VBox typeBox = new VBox(typeLabel, typeComboBox);
+        typeBox.getStyleClass().add("form-field-container");
+        return typeBox;
+    }
+
     // =========================================================
     // ACTIONS
     // =========================================================
@@ -291,6 +306,7 @@ public class CreateBookingForm {
         createButton.disableProperty().bind(
                 selectedVehicle.isNull()
                         .or(descriptionField.textProperty().isEmpty())
+                        .or(typeComboBox.valueProperty().isNull())
         );
 
         createButton.setOnAction(
@@ -325,12 +341,15 @@ public class CreateBookingForm {
             root.setDisable(true);
         }
 
+        WorkOrderType type = typeComboBox.getValue();
+
         Task<WorkOrder> task = new Task<WorkOrder>() {
             @Override
             protected WorkOrder call() {
                 return garageSystem.createWorkOrder(
                         booking.getId(),
                         mechanicId,
+                        type,
                         selectedServiceItemIds
                 );
             }

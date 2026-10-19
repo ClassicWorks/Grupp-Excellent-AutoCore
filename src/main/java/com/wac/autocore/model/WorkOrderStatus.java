@@ -7,7 +7,7 @@ public enum WorkOrderStatus {
     COMPLETED,
     CANCELLED;
 
-    public boolean canEditServices () {
+    public boolean canEdit() {
         return this == DRAFT || this == CONFIRMED;
     }
 

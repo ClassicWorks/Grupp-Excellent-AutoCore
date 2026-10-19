@@ -3,10 +3,12 @@ package com.wac.autocore.view.components;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -66,7 +68,8 @@ public class WorkOrderDetails extends BorderPane {
         VBox info = new VBox(
                 createFormFieldContainer("workorder.details.vehicle", vehicleLabel),
                 createFormFieldContainer("workorder.details.customer", customerLink),
-                createFormFieldContainer("workorder.details.mechanic", mechanicLink)
+                createFormFieldContainer("workorder.details.mechanic", mechanicLink),
+                createFormFieldContainer("workorder.type.label", createTypeNode())
         );
 
         if (booking != null) {
@@ -77,7 +80,7 @@ public class WorkOrderDetails extends BorderPane {
             descriptionLabel.setWrapText(true);
 
             info.getChildren().addAll(
-                    createFormFieldContainer("booking.date", dateLabel),
+                    createFormFieldContainer("workorder.details.date", dateLabel),
                     createFormFieldContainer("workorder.details.description", descriptionLabel)
             );
         }
@@ -98,6 +101,37 @@ public class WorkOrderDetails extends BorderPane {
         Label label = new Label(LanguageManager.getString(key));
         label.getStyleClass().add("form-field-label");
         return label;
+    }
+
+    private Node createTypeNode() {
+        if (!workOrder.getStatus().canEdit()) {
+            return new Label(ValueLabels.workOrderType(workOrder.getType()));
+        }
+
+        ComboBox<WorkOrderType> typeComboBox = new ComboBox<>();
+        typeComboBox.getItems().setAll(WorkOrderType.values());
+        typeComboBox.setConverter(ComboBoxLabels.workOrderType());
+        typeComboBox.setPromptText(LanguageManager.getString("workorder.type.prompt"));
+        typeComboBox.setValue(workOrder.getType());
+
+        typeComboBox.setOnAction(e -> {
+            WorkOrderType selected = typeComboBox.getValue();
+            if (selected == null || selected == workOrder.getType()) {
+                return;
+            }
+            try {
+                garageSystem.updateWorkOrderType(workOrder.getId(), selected);
+            } catch (IllegalArgumentException ex) {
+                AppDialog.showError(
+                        LanguageManager.getString("workorder.dialog.error.title"),
+                        LanguageManager.getString("workorder.dialog.error.header"),
+                        ex.getMessage()
+                );
+            }
+            onChanged.run();
+        });
+
+        return typeComboBox;
     }
 
     private VBox createServiceSection() {
@@ -150,7 +184,7 @@ public class WorkOrderDetails extends BorderPane {
 
         WorkOrderStatus status = workOrder.getStatus();
 
-        if (status.canEditServices()) {
+        if (status.canEdit()) {
             buttons.getChildren().add(createButton("workorder.editServices", "confirm-btn",
                     () -> ViewManager.getInstance().showEditWorkOrderItemsPopUp(workOrder.getId(), onChanged)));
         }

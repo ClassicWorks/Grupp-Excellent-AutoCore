@@ -75,7 +75,7 @@ public class EditWorkOrderItemsForm {
         title.getStyleClass().add("form-title");
         content.getChildren().add(title);
 
-        if (!workOrder.getStatus().canEditServices()) {
+        if (!workOrder.getStatus().canEdit()) {
             content.getChildren().addAll(
                     new Label(LanguageManager.getString("workorder.edit.locked")),
                     createCloseBtn());
@@ -239,13 +239,12 @@ public class EditWorkOrderItemsForm {
             List<Integer> serviceItemIdsToAdd = addedServices.stream()
                     .map(ServiceItem::getId)
                     .collect(Collectors.toList());
-            WorkOrder updated = garageSystem.updateWorkOrderServices(
-                    workOrderId, serviceItemIdsToAdd, removedItemIds);
-            if (updated == null) {
-                errorLabel.setText(LanguageManager.getString("workorder.edit.error.save"));
-                return;
+            try {
+                garageSystem.updateWorkOrderServices(workOrderId, serviceItemIdsToAdd, removedItemIds);
+                popupStage.close();
+            } catch (IllegalArgumentException ex) {
+                errorLabel.setText(ex.getMessage());
             }
-            popupStage.close();
         });
 
         Button cancelBtn = new Button(LanguageManager.getString("workorder.edit.cancel"));
