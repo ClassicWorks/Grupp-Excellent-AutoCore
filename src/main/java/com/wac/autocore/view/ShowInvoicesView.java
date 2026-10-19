@@ -7,7 +7,6 @@ import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.InvoiceCard;
 import com.wac.autocore.view.components.kanban.KanbanColumn;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
-import com.wac.autocore.view.components.kanban.KanbanGridUtil;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -18,7 +17,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ShowInvoicesView {
     private final GarageSystem garageSystem;
@@ -52,9 +50,7 @@ public class ShowInvoicesView {
     }
 
     private Node getUnpaidList() {
-        List<Invoice> unpaidInvoices = garageSystem.getInvoices().stream()
-                .filter(invoice -> !invoice.isPaid())
-                .collect(Collectors.toList());
+        List<Invoice> unpaidInvoices = garageSystem.getUnpaidInvoices();
 
         if (unpaidInvoices.isEmpty()) {
             return new Label(LanguageManager.getString("invoices.empty.unpaid"));
@@ -63,9 +59,7 @@ public class ShowInvoicesView {
     }
 
     private Node getPaidList() {
-        List<Invoice> paidInvoices = garageSystem.getInvoices().stream()
-                .filter(Invoice::isPaid)
-                .collect(Collectors.toList());
+        List<Invoice> paidInvoices = garageSystem.getPaidInvoices();
 
         if (paidInvoices.isEmpty()) {
             return new Label(LanguageManager.getString("invoices.empty.paid"));

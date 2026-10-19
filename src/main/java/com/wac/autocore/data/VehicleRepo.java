@@ -10,6 +10,8 @@ public interface VehicleRepo {
     Vehicle update(Vehicle v);
     List<Vehicle> getAll();
     Optional<Vehicle> get(int id);
+    List<Vehicle> getVehicleByCustomerId(int customerId);
+    boolean customerHasVehicle(int customerId);
 
     void delete(int id);
 }

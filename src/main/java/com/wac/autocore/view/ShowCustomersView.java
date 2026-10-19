@@ -9,7 +9,6 @@ import com.wac.autocore.view.components.AppDialog;
 import com.wac.autocore.view.components.CustomerCard;
 import com.wac.autocore.view.components.CustomerDetails;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
-import com.wac.autocore.view.components.kanban.KanbanGridUtil;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -60,7 +59,9 @@ public class ShowCustomersView {
         customersBox.getChildren().clear();
 
         for (Customer customer : garageSystem.getCustomers()) {
-            CustomerCard customerCard = new CustomerCard(customer);
+            CustomerCard customerCard = new CustomerCard(customer,
+                    c -> ViewManager.getInstance().showCreateVehiclePopup(c.getId())
+            );
             customerCard.getStyleClass().add("clickable");
             customerCard.setOnMouseClicked(e -> {
 

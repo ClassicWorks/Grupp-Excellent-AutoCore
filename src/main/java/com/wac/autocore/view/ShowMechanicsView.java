@@ -81,7 +81,7 @@ public class ShowMechanicsView {
     }
 
     private void deleteMechanic(int mechanicId) {
-        if (garageSystem.mechanicHasWorkOrders(mechanicId)) {
+        if (garageSystem.mechanicHasUncompletedWorkOrders(mechanicId)) {
             AppDialog.showError(
                     LanguageManager.getString("mechanic.delete.title"),
                     LanguageManager.getString("mechanic.delete.blocked.title"),

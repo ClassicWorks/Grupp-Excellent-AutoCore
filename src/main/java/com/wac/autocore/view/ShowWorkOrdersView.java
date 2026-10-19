@@ -13,7 +13,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ShowWorkOrdersView {
 
@@ -38,13 +37,9 @@ public class ShowWorkOrdersView {
     public void refreshTabs() {
         int selectedIndex = tabPane.getSelectionModel().getSelectedIndex();
 
-        List<WorkOrder> allWorkOrders = garageSystem.getWorkOrdersWithItems();
-
         tabPane.getTabs().clear();
         for (WorkOrderStatus status : WorkOrderStatus.values()) {
-            List<WorkOrder> workOrders = allWorkOrders.stream()
-                    .filter(workOrder -> workOrder.getStatus() == status)
-                    .collect(Collectors.toList());
+            List<WorkOrder> workOrders = garageSystem.getWorkOrdersWithItemsByStatus(status);
 
             tabPane.getTabs().add(createTab(status, workOrders));
         }

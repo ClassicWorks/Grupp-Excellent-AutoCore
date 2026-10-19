@@ -4,7 +4,6 @@ import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.image.ImageView;
 
 public class MechanicHyperLink extends Hyperlink {
     private Mechanic mechanic;
@@ -26,24 +25,18 @@ public class MechanicHyperLink extends Hyperlink {
 
     public MechanicHyperLink(Mechanic mechanic) {
         this.mechanic = mechanic;
-        //TODO change to component
-        ImageView imageView = new ImageView("/imgs/wrench-solid.png");
-        imageView.setFitHeight(20);
-        imageView.setFitWidth(20);
-        this.setGraphic(imageView);
+        ImageViewWithAltText wrenchIcon = new ImageViewWithAltText("/imgs/wrench-solid.png", 20, 20,
+                LanguageManager.getString("image.wrench-solid"));
+        this.setGraphic(wrenchIcon);
 
         if (mechanic == null){
-            setText(LanguageManager.getString("mechanic.none.assigned"));
-            setDisable(true);
+            this.setText(LanguageManager.getString("mechanic.none.assigned"));
+            this.setDisable(true);
         }else {
-            setText(mechanic.getName());
-            setOnAction(e ->
+            this.setText(mechanic.getName());
+            this.setOnAction(e ->
                     ViewManager.getInstance().showMechanics()
             );
         }
-    }
-    public MechanicHyperLink(){
-        setText(LanguageManager.getString("mechanic.none.assigned"));
-        setDisable(true);
     }
 }

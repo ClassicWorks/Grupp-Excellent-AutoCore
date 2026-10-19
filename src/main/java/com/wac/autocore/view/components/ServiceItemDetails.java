@@ -118,6 +118,7 @@ public class ServiceItemDetails extends BorderPane {
                 return;
             }
 
+            //TODO dialogbox
             errorLabel.setStyle("-fx-text-fill: green;");
             errorLabel.setText(LanguageManager.getString("service.saved"));
             onSaved.run();

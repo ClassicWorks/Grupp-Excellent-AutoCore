@@ -47,6 +47,7 @@ public class WorkOrderDetails extends BorderPane {
                 workOrder.getStatus().name().toLowerCase().replace('_', '-')
         );
 
+        //TODO styling through CSS, maybe borderPane
         return new HBox(10, titleLabel, statusLabel);
     }
 
@@ -83,6 +84,10 @@ public class WorkOrderDetails extends BorderPane {
                     createFormFieldContainer("workorder.details.date", dateLabel),
                     createFormFieldContainer("workorder.details.description", descriptionLabel)
             );
+        }else {
+            Label noBookingError = new Label(LanguageManager.getString("workorder.details.noBookingError"));
+            noBookingError.getStyleClass().add("error-label");
+            info.getChildren().add(noBookingError);
         }
 
         info.getChildren().addAll(createServiceSection());
@@ -135,6 +140,7 @@ public class WorkOrderDetails extends BorderPane {
     }
 
     private VBox createServiceSection() {
+        //TODO styling with CSS
         GridPane grid = new GridPane();
         grid.setHgap(20);
         grid.setVgap(5);

@@ -25,12 +25,8 @@ public class ServicePackCard extends VBox {
             serviceItemBox.getChildren().add(createServiceItemRow(serviceItem));
         }
 
-        double totalPrice = serviceItems.stream()
-                .mapToDouble(ServiceItem::getPrice)
-                .sum();
-        int totalTime = serviceItems.stream()
-                .mapToInt(ServiceItem::getEstimatedMinutes)
-                .sum();
+        double totalPrice = servicePack.getPrice();
+        int totalTime = servicePack.getEstimatedMinutes();
 
         Label priceAndTimeLabel = new Label(String.format(LanguageManager.getString("servicePack.totalPriceAndTime"),
                 totalPrice,

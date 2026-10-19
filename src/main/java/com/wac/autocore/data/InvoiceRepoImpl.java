@@ -1,12 +1,10 @@
 package com.wac.autocore.data;
 
 import com.wac.autocore.model.Invoice;
-import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +33,15 @@ public class InvoiceRepoImpl implements InvoiceRepo{
     public List<Invoice> getAll() {
         try(Session s = HibernateUtil.getSessionFactory().openSession()){
             return s.createQuery("from Invoice", Invoice.class)
+                    .list();
+        }
+    }
+
+    @Override
+    public List<Invoice> getWherePayedIs(boolean isPayed) {
+        try(Session s = HibernateUtil.getSessionFactory().openSession()){
+            return s.createQuery("from Invoice i where i.paid = :isPayed", Invoice.class)
+                    .setParameter("isPayed", isPayed)
                     .list();
         }
     }
