@@ -94,7 +94,7 @@ public class MechanicDetails extends BorderPane {
 
         saveBtn.setOnAction(e -> {
             errorLabel.setText("");
-            errorLabel.setStyle("");
+            errorLabel.getStyleClass().remove("success");
 
             if (nameField.getText().trim().isEmpty()) {
                 errorLabel.setText(LanguageManager.getString("mechanic.error.nameEmpty"));
@@ -112,7 +112,7 @@ public class MechanicDetails extends BorderPane {
                 return;
             }
 
-            errorLabel.setStyle("-fx-text-fill: green;");
+            errorLabel.getStyleClass().add("success");
             errorLabel.setText(LanguageManager.getString("mechanic.saved"));
             onSaved.run();
         });

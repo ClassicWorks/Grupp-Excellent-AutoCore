@@ -108,6 +108,10 @@ HyperLink{
     -fx-text-fill: -fx-error-ink;
 }
 
+.error-label.success {
+    -fx-text-fill: -fx-status-completed-ink;
+}
+
 .error-label.smaller,
 .form-field-label.smaller,
 .link-label.smaller{

@@ -102,7 +102,7 @@ public class CustomerDetails extends BorderPane {
 
         saveBtn.setOnAction(e -> {
             errorLabel.setText("");
-            errorLabel.setStyle("");
+            errorLabel.getStyleClass().remove("success");
 
             if (nameField.getText().trim().isEmpty()) {
                 errorLabel.setText(LanguageManager.getString("customer.error.nameEmpty"));
@@ -120,7 +120,7 @@ public class CustomerDetails extends BorderPane {
                 return;
             }
 
-            errorLabel.setStyle("-fx-text-fill: green;");
+            errorLabel.getStyleClass().add("success");
             errorLabel.setText(LanguageManager.getString("customer.saved"));
             onSaved.run();
         });
