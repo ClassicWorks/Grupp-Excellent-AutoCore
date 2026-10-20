@@ -221,7 +221,7 @@ public class VehicleDetails extends BorderPane {
 
         saveBtn.setOnAction(e -> {
             errorLabel.setText("");
-            errorLabel.setStyle("");
+            errorLabel.getStyleClass().remove("success");
 
             if (!isInteger(yearField.getText().trim())) {
                 errorLabel.setText(LanguageManager.getString("vehicle.error.yearNumber"));
@@ -245,7 +245,7 @@ public class VehicleDetails extends BorderPane {
             vehicle = updated;
             updateCustomerSection();
 
-            errorLabel.setStyle("-fx-text-fill: green;");
+            errorLabel.getStyleClass().add("success");
             errorLabel.setText(LanguageManager.getString("vehicle.saved"));
             onSaved.run();
         });
