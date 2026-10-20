@@ -23,6 +23,8 @@ public class GarageSystem {
     private final PaymentRepo paymentRepo;
     private final ServicePackRepo servicePackRepo;
 
+    private final CustomerService customerService;
+
     public GarageSystem() {
         vehicleRepo = new VehicleRepoImpl();
         customerRepo = new CustomerRepoImpl();
@@ -33,6 +35,8 @@ public class GarageSystem {
         invoiceRepo = new InvoiceRepoImpl();
         paymentRepo  = new PaymentRepoImpl();
         servicePackRepo = new ServicePackRepoImpl();
+
+        customerService = new CustomerService(customerRepo, vehicleRepo);
     }
 
     public void showCustomers() {
@@ -50,20 +54,16 @@ public class GarageSystem {
     }
 
     public List<Customer> getCustomers() {
-        if (customerRepo.getAll().isEmpty()) {
-            System.out.println("No customers found.");
-        }
-
-        return customerRepo.getAll();
+        return customerService.getCustomers();
     }
 
     public Optional<Customer> getCustomer(int id){
-        return customerRepo.get(id);
+        return customerService.getCustomer(id);
     }
 
 
     public List<Customer> getCustomerMatching(String query) {
-        return customerRepo.getMatchingName(query);
+        return customerService.getCustomerMatching(query);
     }
 
     public void showVehicles() {
@@ -194,24 +194,7 @@ public class GarageSystem {
     }
 
     public Customer updateCustomer(int customerId, String name, String phone, String email) {
-        if (name == null || name.trim().isEmpty()) {
-            System.out.println("Customer name cannot be empty.");
-            return null;
-        }
-
-        Optional<Customer> optionalCustomer = getCustomer(customerId);
-
-        if (!optionalCustomer.isPresent()) {
-            System.out.println("Customer with ID " + customerId + " does not exist.");
-            return null;
-        }
-
-        Customer customer = optionalCustomer.get();
-        customer.setName(name.trim());
-        customer.setPhone(phone);
-        customer.setEmail(email);
-
-        return customerRepo.update(customer);
+        return customerService.updateCustomer(customerId, name, phone, email);
     }
 
     public Mechanic updateMechanic(int mechanicId, String name, String phone, String specialization) {
@@ -272,7 +255,7 @@ public class GarageSystem {
     }
 
     public boolean customerHasVehicles(int customerId) {
-        return vehicleRepo.customerHasVehicle(customerId);
+        return customerService.customerHasVehicles(customerId);
     }
 
     public boolean vehicleHasBookings(int vehicleId) {
@@ -284,16 +267,7 @@ public class GarageSystem {
     }
 
     public boolean deleteCustomer(int customerId) {
-        if (!customerRepo.get(customerId).isPresent()) {
-            System.out.println("Customer not found.");
-            return false;
-        }
-        if (customerHasVehicles(customerId)) {
-            System.out.println("Customer has vehicles and cannot be deleted.");
-            return false;
-        }
-        customerRepo.delete(customerId);
-        return true;
+        return customerService.deleteCustomer(customerId);
     }
 
     //TODO om alla bokningar är klar/avbrutna, koppla lös dem
@@ -528,15 +502,7 @@ public class GarageSystem {
     }
 
     public Customer createCustomer(String name, String phone, String email) {
-        //TODO check if values are correct and normalize, name not too long, email contains correct
-        Customer customer = new Customer(name, phone, email);
-
-        Customer savedCustomer = customerRepo.save(customer);
-
-        System.out.println("Customer created successfully.");
-        System.out.println(savedCustomer);
-
-        return savedCustomer;
+        return customerService.createCustomer(name, phone, email);
     }
 
     public Vehicle createVehicle(String registrationNumber,
