@@ -2,11 +2,15 @@ package com.wac.autocore.service;
 
 import com.wac.autocore.data.*;
 import com.wac.autocore.model.*;
+import com.wac.autocore.service.discount.Discount;
+import com.wac.autocore.service.discount.DiscountCodes;
+import com.wac.autocore.service.discount.PercentageDiscount;
 import com.wac.autocore.service.payment.PaymentMethod;
 import com.wac.autocore.service.payment.PaymentMethodFactory;
 import com.wac.autocore.util.TranslationService;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -22,6 +26,7 @@ public class GarageSystem {
     private final InvoiceRepo invoiceRepo;
     private final PaymentRepo paymentRepo;
     private final ServicePackRepo servicePackRepo;
+    private static final Discount VIP_DISCOUNT = new PercentageDiscount(0.10);
 
     private final CustomerService customerService;
 
@@ -917,38 +922,31 @@ public class GarageSystem {
             amount += item.getPriceAtOrder();
         }
 
-        double discount = 0.0;
+        List<Discount> discounts = new ArrayList<>();
 
         Booking booking = workOrder.getBooking();
-
         if (booking != null
                 && booking.getVehicle() != null
                 && booking.getVehicle().getCustomer() != null
                 && booking.getVehicle().getCustomer().isVip()) {
-
-            discount += amount * 0.10;
-            System.out.println("VIP discount applied: 10%");
+            discounts.add(VIP_DISCOUNT);
         }
 
         if (discountCode != null && !discountCode.trim().isEmpty()) {
-
-            if (discountCode.equalsIgnoreCase("WELCOME10")) {
-                discount += amount * 0.10;
-                System.out.println("Discount code WELCOME10 applied.");
-
-            } else if (discountCode.equalsIgnoreCase("SERVICE200")) {
-                discount += 200.0;
-                System.out.println("Discount code SERVICE200 applied.");
-
+            Optional<Discount> codeDiscount = DiscountCodes.find(discountCode);
+            if (codeDiscount.isPresent()) {
+                discounts.add(codeDiscount.get());
             } else {
                 System.out.println("Unknown discount code. No code discount applied.");
             }
         }
 
-        if (discount > amount) {
-            discount = amount;
+        double discount = 0.0;
+        for (Discount d : discounts) {
+            discount += d.calculate(amount);
         }
 
+        discount = Math.min(discount, amount);
 
         Invoice invoice = new Invoice(
                 workOrder,
