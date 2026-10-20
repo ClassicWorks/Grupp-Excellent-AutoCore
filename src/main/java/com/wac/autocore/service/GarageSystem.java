@@ -739,6 +739,7 @@ public class GarageSystem {
 
         return savedWorkOrder;
     }
+
     public void confirmWorkOrder (int workOrderId) throws IllegalArgumentException {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
@@ -748,15 +749,15 @@ public class GarageSystem {
 
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (workOrder.getStatus() != WorkOrderStatus.DRAFT) {
-            throw new IllegalArgumentException("Wrong status on work order. Only draft work orders can be confirmed.");
+        if (!workOrder.getStatus().canTransitionTo(WorkOrderStatus.CONFIRMED)) {
+            throw new IllegalArgumentException("Only draft work orders can be confirmed");
         }
 
         if(workOrder.getItems().isEmpty()){
             throw new IllegalArgumentException("No service items. Work order must contains at least one service item");
         }
 
-        workOrder.setStatus(WorkOrderStatus.CONFIRMED);
+        workOrder.changeStatus(WorkOrderStatus.CONFIRMED);
         workOrderRepo.update(workOrder);
 
         System.out.println("Work order " + workOrderId + " has been confirmed.");
@@ -835,14 +836,14 @@ public class GarageSystem {
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (workOrder.getStatus() != WorkOrderStatus.CONFIRMED) {
+        if (!workOrder.getStatus().canTransitionTo(WorkOrderStatus.IN_PROGRESS)) {
             throw new IllegalArgumentException("Only confirmed work orders can be started.");
         }
 
         Mechanic mechanic = workOrder.getMechanic();
 
         if(mechanic == null){
-            throw new IllegalArgumentException("No mechanic. Mechanic must be selected to confirm order");
+            throw new IllegalArgumentException("No mechanic. A mechanic must be selected to start the work order.");
         }
 
         if(workOrder.getItems().isEmpty()){
@@ -857,7 +858,7 @@ public class GarageSystem {
             booking.setStatus("IN_PROGRESS");
         }
 
-        workOrder.setStatus(WorkOrderStatus.IN_PROGRESS);
+        workOrder.changeStatus(WorkOrderStatus.IN_PROGRESS);
         workOrderRepo.update(workOrder);
 
         System.out.println("Work order " + workOrderId + " has been started.");
@@ -871,9 +872,8 @@ public class GarageSystem {
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (workOrder.getStatus() != WorkOrderStatus.IN_PROGRESS) {
+        if (!workOrder.getStatus().canTransitionTo(WorkOrderStatus.COMPLETED)) {
             throw new IllegalArgumentException("Only work orders in progress can be completed.");
-
         }
 
         Mechanic mechanic = workOrder.getMechanic();
@@ -887,7 +887,7 @@ public class GarageSystem {
             booking.setStatus("COMPLETED");
         }
 
-        workOrder.setStatus(WorkOrderStatus.COMPLETED);
+        workOrder.changeStatus(WorkOrderStatus.COMPLETED);
         workOrderRepo.update(workOrder);
 
         System.out.println("Work order " + workOrderId + " has been completed.");
@@ -917,7 +917,7 @@ public class GarageSystem {
             booking.setStatus("CANCELLED");
         }
 
-        workOrder.setStatus(WorkOrderStatus.CANCELLED);
+        workOrder.changeStatus(WorkOrderStatus.CANCELLED);
         workOrderRepo.update(workOrder);
 
         System.out.println("Work order " + workOrderId + " has been cancelled.");

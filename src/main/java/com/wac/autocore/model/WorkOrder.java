@@ -69,8 +69,13 @@ public class WorkOrder {
         return status;
     }
 
-    public void setStatus(WorkOrderStatus status) {
-        this.status = status;
+    public void changeStatus(WorkOrderStatus newStatus) {
+        if (!status.canTransitionTo(newStatus)) {
+            throw new IllegalStateException(
+                    "Work order " + id + " cannot change status from " + status + " to " + newStatus + "."
+            );
+        }
+        this.status = newStatus;
     }
 
     public WorkOrderType getType() {
