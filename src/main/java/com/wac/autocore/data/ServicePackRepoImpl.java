@@ -24,7 +24,7 @@ public class ServicePackRepoImpl implements ServicePackRepo {
     public ServicePack update(ServicePack sp) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
-            ServicePack saved = (ServicePack) s.merge(sp);
+            ServicePack saved = s.merge(sp);
             transaction.commit();
             return saved;
         }
@@ -62,9 +62,9 @@ public class ServicePackRepoImpl implements ServicePackRepo {
     public void delete(int id) {
         try(Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
-            ServicePack sp = s.get(ServicePack.class, id);
+            ServicePack sp = s.find(ServicePack.class, id);
             if(sp != null){
-                s.delete(sp);
+                s.remove(sp);
             }
 
             transaction.commit();

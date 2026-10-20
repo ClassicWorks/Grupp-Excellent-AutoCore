@@ -24,7 +24,7 @@ public class ServiceItemRepoImpl implements ServiceItemRepo {
     public ServiceItem update(ServiceItem si) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
-            ServiceItem saved = (ServiceItem) s.merge(si);
+            ServiceItem saved = s.merge(si);
             transaction.commit();
             return saved;
         }    }
