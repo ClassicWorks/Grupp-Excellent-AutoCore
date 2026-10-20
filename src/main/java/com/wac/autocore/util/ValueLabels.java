@@ -1,6 +1,7 @@
 package com.wac.autocore.util;
 
 import com.wac.autocore.model.WorkOrderStatus;
+import com.wac.autocore.model.WorkOrderType;
 
 public class ValueLabels {
 
@@ -34,6 +35,13 @@ public class ValueLabels {
 
     public static String workOrderStatus(WorkOrderStatus status) {
         return lookup("workorder.status.", status.name(), status.name());
+    }
+
+    public static String workOrderType(WorkOrderType type) {
+        if (type == null) {
+            return LanguageManager.getString("workorder.type.none");
+        }
+        return lookup("workorder.type.", type.name(), type.name());
     }
 
     private static String normalize(String value) {

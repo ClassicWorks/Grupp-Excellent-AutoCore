@@ -124,7 +124,8 @@ public class WorkOrderRepoImpl implements WorkOrderRepo {
             return s.createQuery(
                             "select distinct wo from WorkOrder wo " +
                             "left join fetch wo.items " +
-                                    "where wo.status = :status ",
+                                    "where wo.status = :status " +
+                                    "order by wo.id desc",
                             WorkOrder.class)
                     .setParameter("status", status)
                     .getResultList();

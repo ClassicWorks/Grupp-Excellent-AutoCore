@@ -45,12 +45,11 @@
 /* TODO
     invoice-popup
 
-*/
 /*------------
      Text
 --------------*/
 
-Label, Text, HyperLink{
+Label, Text, .hyperlink{
     -fx-font-family: "IBM Plex Sans", sans-serif;
     -fx-font-size: 14px;
 
@@ -60,10 +59,6 @@ Label{
 }
 Text{
     -fx-fill: -fx-dark-ink;
-}
-
-HyperLink{
-
 }
 
 .page-title{
@@ -105,6 +100,10 @@ HyperLink{
 .error-label{
     -fx-font-weight: 500;
     -fx-text-fill: -fx-error-ink;
+}
+
+.error-label.success {
+    -fx-text-fill: -fx-status-completed-ink;
 }
 
 .error-label.smaller,

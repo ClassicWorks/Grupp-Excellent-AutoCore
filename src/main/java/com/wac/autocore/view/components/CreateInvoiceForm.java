@@ -1,6 +1,5 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.WorkOrder;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.ComboBoxLabels;
@@ -72,14 +71,12 @@ public class CreateInvoiceForm {
 
             String discountCode = discountCodeField.getText().trim();
 
-            Invoice invoice = garageSystem.createInvoice(selectedWorkOrder.getId(), discountCode);
-
-            if (invoice == null) {
-                errorLabel.setText(LanguageManager.getString("invoice.form.error.failed"));
-                return;
+            try {
+                garageSystem.createInvoice(selectedWorkOrder.getId(), discountCode);
+                popupStage.close();
+            } catch (IllegalArgumentException ex) {
+                errorLabel.setText(ex.getMessage());
             }
-
-            popupStage.close();
         });
 
         cancelBtn.setOnAction(e -> popupStage.close());

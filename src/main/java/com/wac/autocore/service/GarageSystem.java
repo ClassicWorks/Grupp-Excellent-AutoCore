@@ -3,11 +3,15 @@ package com.wac.autocore.service;
 import com.wac.autocore.data.*;
 import com.wac.autocore.exceptions.*;
 import com.wac.autocore.model.*;
+import com.wac.autocore.service.discount.Discount;
+import com.wac.autocore.service.discount.DiscountCodes;
+import com.wac.autocore.service.discount.PercentageDiscount;
 import com.wac.autocore.service.payment.PaymentMethod;
 import com.wac.autocore.service.payment.PaymentMethodFactory;
 import com.wac.autocore.util.TranslationService;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -23,6 +27,9 @@ public class GarageSystem {
     private final InvoiceRepo invoiceRepo;
     private final PaymentRepo paymentRepo;
     private final ServicePackRepo servicePackRepo;
+    private static final Discount VIP_DISCOUNT = new PercentageDiscount(0.10);
+
+    private final CustomerService customerService;
 
     public GarageSystem() {
         vehicleRepo = new VehicleRepoImpl();
@@ -34,6 +41,8 @@ public class GarageSystem {
         invoiceRepo = new InvoiceRepoImpl();
         paymentRepo  = new PaymentRepoImpl();
         servicePackRepo = new ServicePackRepoImpl();
+
+        customerService = new CustomerService(customerRepo, vehicleRepo);
     }
 
     public void showCustomers() {
@@ -51,20 +60,16 @@ public class GarageSystem {
     }
 
     public List<Customer> getCustomers() {
-        if (customerRepo.getAll().isEmpty()) {
-            System.out.println("No customers found.");
-        }
-
-        return customerRepo.getAll();
+        return customerService.getCustomers();
     }
 
     public Optional<Customer> getCustomer(int id){
-        return customerRepo.get(id);
+        return customerService.getCustomer(id);
     }
 
 
     public List<Customer> getCustomerMatching(String query) {
-        return customerRepo.getMatchingName(query);
+        return customerService.getCustomerMatching(query);
     }
 
     public void showVehicles() {
@@ -86,7 +91,6 @@ public class GarageSystem {
         if (vehicles.isEmpty()) {
             System.out.println("No vehicles found.");
         }
-
         return vehicles;
     }
 
@@ -194,22 +198,7 @@ public class GarageSystem {
     }
 
     public Customer updateCustomer(int customerId, String name, String phone, String email) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new InputNotValidException("Customer name cannot be empty.");
-        }
-
-        Optional<Customer> optionalCustomer = getCustomer(customerId);
-
-        if (!optionalCustomer.isPresent()) {
-            throw new CustomerNotFoundException(customerId);
-        }
-
-        Customer customer = optionalCustomer.get();
-        customer.setName(name.trim());
-        customer.setPhone(phone);
-        customer.setEmail(email);
-
-        return customerRepo.update(customer);
+        return customerService.updateCustomer(customerId, name, phone, email);
     }
 
     public Mechanic updateMechanic(int mechanicId, String name, String phone, String specialization) {
@@ -265,7 +254,7 @@ public class GarageSystem {
     }
 
     public boolean customerHasVehicles(int customerId) {
-        return vehicleRepo.customerHasVehicle(customerId);
+        return customerService.customerHasVehicles(customerId);
     }
 
     public boolean vehicleHasBookings(int vehicleId) {
@@ -277,14 +266,7 @@ public class GarageSystem {
     }
 
     public boolean deleteCustomer(int customerId) {
-        if (!customerRepo.get(customerId).isPresent()) {
-            throw new CustomerNotFoundException(customerId);
-        }
-        if (customerHasVehicles(customerId)) {
-            throw new DeletionNotAllowedException("Customer has vehicles and cannot be deleted.");
-        }
-        customerRepo.delete(customerId);
-        return true;
+        return customerService.deleteCustomer(customerId);
     }
 
     //TODO om alla bokningar är klar/avbrutna, koppla lös dem
@@ -438,7 +420,9 @@ public class GarageSystem {
     }
 
     public List<WorkOrder> getCompletedWorkOrdersWithoutInvoices() {
-        return workOrderRepo.getCompletedWorkOrdersWithoutInvoices();
+        return workOrderRepo.getCompletedWorkOrdersWithoutInvoices().stream()
+                .filter(workOrder -> workOrder.getType() != WorkOrderType.WARRANTY)
+                .collect(Collectors.toList());
     }
 
     public Optional<WorkOrder> getWorkOrderWithItems(int workOrderId) {
@@ -513,17 +497,7 @@ public class GarageSystem {
     }
 
     public Customer createCustomer(String name, String phone, String email) {
-        if(name == null || name.trim().isEmpty()){
-            throw new InputNotValidException("Customer name cannot be empty.");
-        }
-        Customer customer = new Customer(name, phone, email);
-
-        Customer savedCustomer = customerRepo.save(customer);
-
-        System.out.println("Customer created successfully.");
-        System.out.println(savedCustomer);
-
-        return savedCustomer;
+        return customerService.createCustomer(name, phone, email);
     }
 
     public Vehicle createVehicle(String registrationNumber,
@@ -696,8 +670,14 @@ public class GarageSystem {
 
     public WorkOrder createWorkOrder(int bookingId,
                                      int mechanicId,
+                                     WorkOrderType type,
                                      int... serviceItemIds)
     throws IllegalArgumentException{
+
+        if (type == null) {
+            //TODO change
+            throw new IllegalArgumentException("A work order must have a type.");
+        }
 
         Optional<Booking> optionalBooking = getBooking(bookingId);
 
@@ -724,7 +704,8 @@ public class GarageSystem {
 
         WorkOrder workOrder = new WorkOrder(
                 booking,
-                mechanic
+                mechanic,
+                type
         );
 
         for (int serviceItemId : serviceItemIds) {
@@ -746,7 +727,8 @@ public class GarageSystem {
 
         return savedWorkOrder;
     }
-    public void confirmWorkOrder (int workOrderId) {
+
+    public void confirmWorkOrder (int workOrderId) throws IllegalArgumentException {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
@@ -755,7 +737,7 @@ public class GarageSystem {
 
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (workOrder.getStatus() != WorkOrderStatus.DRAFT) {
+        if (!workOrder.getStatus().canTransitionTo(WorkOrderStatus.CONFIRMED)) {
             throw new StatusNotValidException("Wrong status on work order. Only draft work orders can be confirmed.");
         }
 
@@ -763,7 +745,7 @@ public class GarageSystem {
             throw new InputNotValidException("No service items. Work order must contains at least one service item");
         }
 
-        workOrder.setStatus(WorkOrderStatus.CONFIRMED);
+        workOrder.changeStatus(WorkOrderStatus.CONFIRMED);
         workOrderRepo.update(workOrder);
 
         System.out.println("Work order " + workOrderId + " has been confirmed.");
@@ -780,7 +762,7 @@ public class GarageSystem {
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (!workOrder.getStatus().canEditServices()) {
+        if (!workOrder.getStatus().canEdit()) {
             throw new StatusNotValidException("Services can only be changed before the work order is started.");
         }
 
@@ -808,6 +790,28 @@ public class GarageSystem {
         return workOrderRepo.update(workOrder);
     }
 
+    //TODO exceptions
+    public WorkOrder updateWorkOrderType(int workOrderId, WorkOrderType type)
+            throws IllegalArgumentException {
+        if (type == null) {
+            throw new IllegalArgumentException("A work order must have a type.");
+        }
+
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
+
+        if (!optionalWorkOrder.isPresent()) {
+            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
+        }
+        WorkOrder workOrder = optionalWorkOrder.get();
+
+        if (!workOrder.getStatus().canEdit()) {
+            throw new IllegalArgumentException("The type can only be changed before the work order is started.");
+        }
+
+        workOrder.setType(type);
+        return workOrderRepo.update(workOrder);
+    }
+
     public void startWorkOrder(int workOrderId) {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
@@ -816,21 +820,21 @@ public class GarageSystem {
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (workOrder.getStatus() != WorkOrderStatus.CONFIRMED) {
+        if (!workOrder.getStatus().canTransitionTo(WorkOrderStatus.IN_PROGRESS)) {
             throw new IllegalArgumentException("Only confirmed work orders can be started.");
         }
 
         Mechanic mechanic = workOrder.getMechanic();
 
         if(mechanic == null){
-            throw new IllegalArgumentException("No mechanic. Mechanic must be selected to start order");
+            throw new IllegalArgumentException("No mechanic. A mechanic must be selected to start the work order.");
         }
-
-        mechanic.setAvailable(false);
 
         if(workOrder.getItems().isEmpty()){
             throw new IllegalArgumentException("No service items. Work order must contains at least one service item");
         }
+
+        mechanic.setAvailable(false);
 
         Booking booking = workOrder.getBooking();
 
@@ -838,7 +842,7 @@ public class GarageSystem {
             booking.setStatus("IN_PROGRESS");
         }
 
-        workOrder.setStatus(WorkOrderStatus.IN_PROGRESS);
+        workOrder.changeStatus(WorkOrderStatus.IN_PROGRESS);
         workOrderRepo.update(workOrder);
 
         System.out.println("Work order " + workOrderId + " has been started.");
@@ -852,9 +856,8 @@ public class GarageSystem {
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
-        if (workOrder.getStatus() != WorkOrderStatus.IN_PROGRESS) {
+        if (!workOrder.getStatus().canTransitionTo(WorkOrderStatus.COMPLETED)) {
             throw new IllegalArgumentException("Only work orders in progress can be completed.");
-
         }
 
         Mechanic mechanic = workOrder.getMechanic();
@@ -868,7 +871,7 @@ public class GarageSystem {
             booking.setStatus("COMPLETED");
         }
 
-        workOrder.setStatus(WorkOrderStatus.COMPLETED);
+        workOrder.changeStatus(WorkOrderStatus.COMPLETED);
         workOrderRepo.update(workOrder);
 
         System.out.println("Work order " + workOrderId + " has been completed.");
@@ -898,7 +901,7 @@ public class GarageSystem {
             booking.setStatus("CANCELLED");
         }
 
-        workOrder.setStatus(WorkOrderStatus.CANCELLED);
+        workOrder.changeStatus(WorkOrderStatus.CANCELLED);
         workOrderRepo.update(workOrder);
 
         System.out.println("Work order " + workOrderId + " has been cancelled.");
@@ -916,44 +919,47 @@ public class GarageSystem {
             throw new IllegalArgumentException("Invoice can only be created for a completed work order.");
         }
 
+        if (workOrder.getType() == WorkOrderType.WARRANTY) {
+            throw new IllegalArgumentException("Warranty work is not invoiced.");
+        }
+
+        boolean alreadyInvoiced = invoiceRepo.getAll().stream()
+                .anyMatch(invoice -> invoice.getWorkOrder().getId() == workOrderId);
+        if (alreadyInvoiced) {
+            throw new IllegalArgumentException("Work order " + workOrderId + " already has an invoice.");
+        }
+
         double amount = 0.0;
 
         for (WorkOrderItem item : workOrder.getItems()) {
             amount += item.getPriceAtOrder();
         }
 
-        double discount = 0.0;
+        List<Discount> discounts = new ArrayList<>();
 
         Booking booking = workOrder.getBooking();
-
         if (booking != null
                 && booking.getVehicle() != null
                 && booking.getVehicle().getCustomer() != null
                 && booking.getVehicle().getCustomer().isVip()) {
-
-            discount += amount * 0.10;
-            System.out.println("VIP discount applied: 10%");
+            discounts.add(VIP_DISCOUNT);
         }
 
         if (discountCode != null && !discountCode.trim().isEmpty()) {
-
-            if (discountCode.equalsIgnoreCase("WELCOME10")) {
-                discount += amount * 0.10;
-                System.out.println("Discount code WELCOME10 applied.");
-
-            } else if (discountCode.equalsIgnoreCase("SERVICE200")) {
-                discount += 200.0;
-                System.out.println("Discount code SERVICE200 applied.");
-
+            Optional<Discount> codeDiscount = DiscountCodes.find(discountCode);
+            if (codeDiscount.isPresent()) {
+                discounts.add(codeDiscount.get());
             } else {
                 System.out.println("Unknown discount code. No code discount applied.");
             }
         }
 
-        if (discount > amount) {
-            discount = amount;
+        double discount = 0.0;
+        for (Discount d : discounts) {
+            discount += d.calculate(amount);
         }
 
+        discount = Math.min(discount, amount);
 
         Invoice invoice = new Invoice(
                 workOrder,

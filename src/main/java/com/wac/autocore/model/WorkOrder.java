@@ -27,9 +27,14 @@ public class WorkOrder {
     @Column(name = "status", nullable = false, length = 15)
     private WorkOrderStatus status;
 
-    public WorkOrder(Booking booking, Mechanic mechanic) {
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_type", length = 15)
+    private WorkOrderType type;
+
+    public WorkOrder(Booking booking, Mechanic mechanic, WorkOrderType workOrderType) {
         this.booking = booking;
         this.mechanic = mechanic;
+        this.type = workOrderType;
         this.status = WorkOrderStatus.DRAFT;
     }
 
@@ -64,8 +69,21 @@ public class WorkOrder {
         return status;
     }
 
-    public void setStatus(WorkOrderStatus status) {
-        this.status = status;
+    public void changeStatus(WorkOrderStatus newStatus) {
+        if (!status.canTransitionTo(newStatus)) {
+            throw new IllegalStateException(
+                    "Work order " + id + " cannot change status from " + status + " to " + newStatus + "."
+            );
+        }
+        this.status = newStatus;
+    }
+
+    public WorkOrderType getType() {
+        return type;
+    }
+
+    public void setType(WorkOrderType type) {
+        this.type = type;
     }
 
     public void addItem(ServiceItem serviceItem, double priceAtOrder) {
@@ -98,6 +116,7 @@ public class WorkOrder {
         return id +
                 " - Booking ID: " + booking +
                 " | Mechanic ID: " + mechanic +
+                " | Type: " + type +
                 " | Status: " + status;
     }
 }

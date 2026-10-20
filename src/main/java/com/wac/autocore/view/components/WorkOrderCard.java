@@ -25,6 +25,8 @@ public class WorkOrderCard extends VBox {
 
         HBox header = new HBox(10, titleLabel, statusLabel);
 
+        Label typeLabel = new Label(ValueLabels.workOrderType(workOrder.getType()));
+
         Vehicle vehicle = workOrder.getBooking() != null ? workOrder.getBooking().getVehicle() : null;
 
         Label vehicleLabel = new Label(vehicle != null
@@ -40,7 +42,7 @@ public class WorkOrderCard extends VBox {
         Label priceLabel = new Label(String.format(
                 LanguageManager.getString("invoice.details.amountFormat"), workOrder.getTotalPrice()));
 
-        this.getChildren().addAll(header, vehicleLabel, customerLabel, priceLabel);
+        this.getChildren().addAll(header, typeLabel, vehicleLabel, customerLabel, priceLabel);
         this.getStyleClass().addAll("card", "clickable", "work-order-card");
         this.setMaxWidth(Double.MAX_VALUE);
 

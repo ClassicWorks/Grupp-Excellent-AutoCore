@@ -53,7 +53,7 @@ public class InvoiceDetailsPopup {
         WorkOrder workOrder = optionalWorkOrder.get();
 
         Label title = new Label(String.format(LanguageManager.getString("invoice.id"), invoice.getId()));
-        title.getStyleClass().add("form-heading");
+        title.getStyleClass().add("form-title");
 
         Label dateLabel = new Label(String.format(
                 LanguageManager.getString("invoice.details.date"), invoice.getInvoiceDate()));

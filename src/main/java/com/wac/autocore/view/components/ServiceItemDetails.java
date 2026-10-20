@@ -96,6 +96,7 @@ public class ServiceItemDetails extends BorderPane {
 
         saveBtn.setOnAction(e -> {
             errorLabel.setText("");
+            errorLabel.getStyleClass().remove("success");
 
             String input = priceField.getText().trim().replace(',', '.');
 
@@ -119,7 +120,7 @@ public class ServiceItemDetails extends BorderPane {
             }
 
             //TODO dialogbox
-            errorLabel.setStyle("-fx-text-fill: green;");
+            errorLabel.getStyleClass().add("success");
             errorLabel.setText(LanguageManager.getString("service.saved"));
             onSaved.run();
         });
