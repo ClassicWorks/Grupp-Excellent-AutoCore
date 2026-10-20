@@ -24,7 +24,7 @@ public class CustomerRepoImpl implements CustomerRepo{
     public Customer update(Customer c) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
-            Customer saved = (Customer) s.merge(c);
+            Customer saved = s.merge(c);
             transaction.commit();
             return saved;
         }
@@ -63,9 +63,9 @@ public class CustomerRepoImpl implements CustomerRepo{
     public void delete(int id) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()) {
             Transaction transaction = s.beginTransaction();
-            Customer c = s.get(Customer.class, id);
+            Customer c = s.find(Customer.class, id);
             if (c != null) {
-                s.delete(c);
+                s.remove(c);
             }
             transaction.commit();
         }

@@ -24,7 +24,7 @@ public class WorkOrderRepoImpl implements WorkOrderRepo {
     public WorkOrder update(WorkOrder wo) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
-            WorkOrder saved = (WorkOrder)s.merge(wo);
+            WorkOrder saved = s.merge(wo);
             transaction.commit();
             return saved;
         }

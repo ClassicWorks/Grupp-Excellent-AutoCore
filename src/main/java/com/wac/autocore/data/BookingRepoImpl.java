@@ -23,7 +23,7 @@ public class BookingRepoImpl implements BookingRepo{
     public Booking update(Booking b) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
-            Booking savedBooking = (Booking)s.merge(b);
+            Booking savedBooking = s.merge(b);
             transaction.commit();
             return savedBooking;
         }
