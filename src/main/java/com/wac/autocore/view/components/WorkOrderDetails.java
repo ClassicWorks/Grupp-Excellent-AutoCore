@@ -85,7 +85,7 @@ public class WorkOrderDetails extends BorderPane {
                     createFormFieldContainer("workorder.details.description", descriptionLabel)
             );
         }else {
-            Label noBookingError = new Label(LanguageManager.getString("workorder.details.noBookingError"));
+            Label noBookingError = new Label(LanguageManager.getString("workorder.details.noBooking"));
             noBookingError.getStyleClass().add("error-label");
             info.getChildren().add(noBookingError);
         }
@@ -124,16 +124,7 @@ public class WorkOrderDetails extends BorderPane {
             if (selected == null || selected == workOrder.getType()) {
                 return;
             }
-            try {
-                garageSystem.updateWorkOrderType(workOrder.getId(), selected);
-            } catch (IllegalArgumentException ex) {
-                AppDialog.showError(
-                        LanguageManager.getString("workorder.dialog.error.title"),
-                        LanguageManager.getString("workorder.dialog.error.header"),
-                        ex.getMessage()
-                );
-            }
-            onChanged.run();
+            withErrorHandling(() -> garageSystem.updateWorkOrderType(workOrder.getId(), selected)).run();
         });
 
         return typeComboBox;
@@ -196,42 +187,18 @@ public class WorkOrderDetails extends BorderPane {
         }
 
         if (status == WorkOrderStatus.DRAFT) {
-            buttons.getChildren().add(createButton("workorder.confirm", "confirm-btn", () -> {
-                try {
-                    garageSystem.confirmWorkOrder(workOrder.getId());
-                } catch (IllegalArgumentException e) {
-                    AppDialog.showError("Could not continue",
-                            "Something went wrong",
-                            e.getMessage());
-                }
-                onChanged.run();
-            }));
+            buttons.getChildren().add(createButton("workorder.confirm", "confirm-btn",
+                    withErrorHandling(() -> garageSystem.confirmWorkOrder(workOrder.getId()))));
         }
 
         if (status == WorkOrderStatus.CONFIRMED) {
-            buttons.getChildren().add(createButton("workorder.start", "confirm-btn", () -> {
-                try {
-                    garageSystem.startWorkOrder(workOrder.getId());
-                } catch (IllegalArgumentException e) {
-                    AppDialog.showError("Could not continue",
-                            "Something went wrong",
-                            e.getMessage());
-                }
-                onChanged.run();
-            }));
+            buttons.getChildren().add(createButton("workorder.start", "confirm-btn",
+                    withErrorHandling(() -> garageSystem.startWorkOrder(workOrder.getId()))));
         }
 
         if (status == WorkOrderStatus.IN_PROGRESS) {
-            buttons.getChildren().add(createButton("workorder.complete", "confirm-btn", () -> {
-                try {
-                    garageSystem.completeWorkOrder(workOrder.getId());
-                } catch (IllegalArgumentException e) {
-                    AppDialog.showError(LanguageManager.getString("workorder.dialog.error.title"),
-                            LanguageManager.getString("workorder.dialog.error.header"),
-                            e.getMessage());
-                }
-                onChanged.run();
-            }));
+            buttons.getChildren().add(createButton("workorder.complete", "confirm-btn",
+                    withErrorHandling(() -> garageSystem.completeWorkOrder(workOrder.getId()))));
         }
 
         if (status == WorkOrderStatus.COMPLETED) {
@@ -257,6 +224,20 @@ public class WorkOrderDetails extends BorderPane {
         return button;
     }
 
+    private Runnable withErrorHandling(Runnable action) {
+        return () -> {
+            try {
+                action.run();
+            } catch (IllegalArgumentException e) {
+                AppDialog.showError(
+                        LanguageManager.getString("workorder.dialog.error.title"),
+                        LanguageManager.getString("workorder.dialog.error.header"),
+                        e.getMessage());
+            }
+            onChanged.run();
+        };
+    }
+
     private void cancelWithConfirmation() {
         boolean confirmed = AppDialog.showConfirm(
                 LanguageManager.getString("workorder.cancel.dialog.title"),
@@ -264,8 +245,7 @@ public class WorkOrderDetails extends BorderPane {
                 LanguageManager.getString("workorder.cancel.dialog.message"));
 
         if (confirmed) {
-            garageSystem.cancelWorkOrder(workOrder.getId());
-            onChanged.run();
+            withErrorHandling(() -> garageSystem.cancelWorkOrder(workOrder.getId())).run();
         }
     }
 
