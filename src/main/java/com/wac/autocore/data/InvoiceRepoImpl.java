@@ -23,7 +23,7 @@ public class InvoiceRepoImpl implements InvoiceRepo{
     public Invoice update(Invoice i) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
-            Invoice saved = (Invoice) s.merge(i);
+            Invoice saved = s.merge(i);
             transaction.commit();
             return saved;
         }

@@ -1,7 +1,6 @@
 package com.wac.autocore.model;
 
-import javax.persistence.*;
-
+import jakarta.persistence.*;
 @Entity
 @Table(name = "service_item")
 public class ServiceItem {

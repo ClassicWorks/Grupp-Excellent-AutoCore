@@ -22,7 +22,7 @@ public class MechanicRepoImpl implements MechanicRepo {
     public Mechanic update(Mechanic m) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
-            Mechanic saved = (Mechanic)s.merge(m);
+            Mechanic saved = s.merge(m);
             transaction.commit();
             return saved;
         }
@@ -58,9 +58,9 @@ public class MechanicRepoImpl implements MechanicRepo {
     public void delete(int id) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()) {
             Transaction transaction = s.beginTransaction();
-            Mechanic m = s.get(Mechanic.class, id);
+            Mechanic m = s.find(Mechanic.class, id);
             if (m != null) {
-                s.delete(m);
+                s.remove(m);
             }
             transaction.commit();
         }

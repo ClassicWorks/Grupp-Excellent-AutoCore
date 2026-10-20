@@ -22,7 +22,7 @@ public class VehicleRepoImpl implements VehicleRepo{
     public Vehicle update(Vehicle v) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()){
             Transaction transaction = s.beginTransaction();
-            Vehicle saved = (Vehicle) s.merge(v);
+            Vehicle saved = s.merge(v);
             transaction.commit();
             return saved;
         }
@@ -72,9 +72,9 @@ public class VehicleRepoImpl implements VehicleRepo{
     public void delete(int id) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()) {
             Transaction transaction = s.beginTransaction();
-            Vehicle v = s.get(Vehicle.class, id);
+            Vehicle v = s.find(Vehicle.class, id);
             if (v != null) {
-                s.delete(v);
+                s.remove(v);
             }
             transaction.commit();
         }
