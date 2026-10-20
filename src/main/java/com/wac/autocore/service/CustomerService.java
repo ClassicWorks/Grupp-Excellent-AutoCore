@@ -2,6 +2,9 @@ package com.wac.autocore.service;
 
 import com.wac.autocore.data.CustomerRepo;
 import com.wac.autocore.data.VehicleRepo;
+import com.wac.autocore.exceptions.CustomerNotFoundException;
+import com.wac.autocore.exceptions.DeletionNotAllowedException;
+import com.wac.autocore.exceptions.InputNotValidException;
 import com.wac.autocore.model.Customer;
 
 import java.util.List;
@@ -45,8 +48,7 @@ public class CustomerService {
 
     public Customer updateCustomer(int customerId, String name, String phone, String email) {
         if (name == null || name.trim().isEmpty()) {
-            System.out.println("Customer name cannot be empty.");
-            return null;
+            throw new InputNotValidException("Customer name cannot be empty.");
         }
 
         Optional<Customer> optionalCustomer = getCustomer(customerId);
@@ -70,12 +72,10 @@ public class CustomerService {
 
     public boolean deleteCustomer(int customerId) {
         if (!customerRepo.get(customerId).isPresent()) {
-            System.out.println("Customer not found.");
-            return false;
+            throw new CustomerNotFoundException("Customer not found.");
         }
         if (customerHasVehicles(customerId)) {
-            System.out.println("Customer has vehicles and cannot be deleted.");
-            return false;
+            throw new DeletionNotAllowedException("Customer has vehicles and cannot be deleted.");
         }
         customerRepo.delete(customerId);
         return true;

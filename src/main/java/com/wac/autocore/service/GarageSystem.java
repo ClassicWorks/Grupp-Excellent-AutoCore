@@ -325,14 +325,14 @@ public class GarageSystem {
     public ServicePack updateServicePack(int servicePackId, ServicePack updatedServicePack){
         Optional<ServicePack> optionalServicePack = getServicePack(servicePackId);
         if(!optionalServicePack.isPresent()){
-            throw new ServicePackNotFoundException("Service pack with ID " + servicePackId + " does not exist.");
+            throw new ServicePackNotFoundException(servicePackId);
         }
 
         //Om någon ServiceItem inte finns kasta exception
         updatedServicePack.getServiceItems().forEach(si -> {
             Optional<ServiceItem> optionalServiceItem = getServiceItem(si.getId());
             if(!optionalServiceItem.isPresent()) {
-                throw new ServiceItemNotFoundException("Service item with ID " + si.getId() + " does not exist.");
+                throw new ServiceItemNotFoundException(si.getId());
             }
         });
 
@@ -524,7 +524,7 @@ public class GarageSystem {
         Optional<Customer> optionalCustomer = getCustomer(customerId);
 
         if (!optionalCustomer.isPresent()) {
-            throw new CustomerNotFoundException("Customer with ID " + customerId + " does not exist.");
+            throw new CustomerNotFoundException(customerId);
         }
         Customer customer = optionalCustomer.get();
 
@@ -560,7 +560,7 @@ public class GarageSystem {
         Optional<Vehicle> optionalVehicle = getVehicle(vehicleId);
 
         if (!optionalVehicle.isPresent()) {
-            throw new VehicleNotFoundException("Vehicle with ID " + vehicleId + " does not exist.");
+            throw new VehicleNotFoundException(vehicleId);
         }
 
         Booking booking = new Booking(
@@ -598,7 +598,7 @@ public class GarageSystem {
         Optional<Vehicle> optionalVehicle = getVehicle(vehicleId);
 
         if (!optionalVehicle.isPresent()) {
-           throw new VehicleNotFoundException("Vehicle with ID " + vehicleId + " does not exist.");
+           throw new VehicleNotFoundException(vehicleId);
         }
 
         String targetLang = "sv".equals(descriptionLang) ? "en" : "sv";
@@ -776,7 +776,7 @@ public class GarageSystem {
             Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
 
             if (!optionalServiceItem.isPresent()) {
-                throw new ServiceItemNotFoundException("Service item with ID " + serviceItemId + " does not exist.");
+                throw new ServiceItemNotFoundException(serviceItemId);
             }
 
             if (workOrder.hasService(serviceItemId)) {
@@ -794,18 +794,18 @@ public class GarageSystem {
     public WorkOrder updateWorkOrderType(int workOrderId, WorkOrderType type)
             throws IllegalArgumentException {
         if (type == null) {
-            throw new IllegalArgumentException("A work order must have a type.");
+            throw new InputNotValidException("A work order must have a type.");
         }
 
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
-            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
+            throw new WorkOrderNotFoundException(workOrderId);
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
         if (!workOrder.getStatus().canEdit()) {
-            throw new IllegalArgumentException("The type can only be changed before the work order is started.");
+            throw new StatusNotValidException("The type can only be changed before the work order is started.");
         }
 
         workOrder.setType(type);
@@ -816,22 +816,22 @@ public class GarageSystem {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
-            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
+            throw new WorkOrderNotFoundException(workOrderId);
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
         if (!workOrder.getStatus().canTransitionTo(WorkOrderStatus.IN_PROGRESS)) {
-            throw new IllegalArgumentException("Only confirmed work orders can be started.");
+            throw new StatusNotValidException("Only confirmed work orders can be started.");
         }
 
         Mechanic mechanic = workOrder.getMechanic();
 
         if(mechanic == null){
-            throw new IllegalArgumentException("No mechanic. A mechanic must be selected to start the work order.");
+            throw new MechanicNotFoundException("No mechanic. A mechanic must be selected to start the work order.");
         }
 
         if(workOrder.getItems().isEmpty()){
-            throw new IllegalArgumentException("No service items. Work order must contains at least one service item");
+            throw new InputNotValidException("No service items. Work order must contains at least one service item");
         }
 
         mechanic.setAvailable(false);
@@ -852,12 +852,12 @@ public class GarageSystem {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
-            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
+            throw new WorkOrderNotFoundException(workOrderId);
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
         if (!workOrder.getStatus().canTransitionTo(WorkOrderStatus.COMPLETED)) {
-            throw new IllegalArgumentException("Only work orders in progress can be completed.");
+            throw new StatusNotValidException("Only work orders in progress can be completed.");
         }
 
         Mechanic mechanic = workOrder.getMechanic();
@@ -881,13 +881,13 @@ public class GarageSystem {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
-            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
+            throw new WorkOrderNotFoundException(workOrderId);
         }
 
         WorkOrder workOrder = optionalWorkOrder.get();
 
         if (!workOrder.getStatus().canBeCancelled()) {
-            throw new IllegalArgumentException("Work order cannot be cancelled.");
+            throw new StatusNotValidException("Work order cannot be cancelled.");
         }
 
         Mechanic mechanic = workOrder.getMechanic();
@@ -911,22 +911,22 @@ public class GarageSystem {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (!optionalWorkOrder.isPresent()) {
-            throw new IllegalArgumentException("Work order with ID " + workOrderId + " does not exist.");
+            throw new WorkOrderNotFoundException(workOrderId);
         }
         WorkOrder workOrder = optionalWorkOrder.get();
 
         if (workOrder.getStatus() != WorkOrderStatus.COMPLETED) {
-            throw new IllegalArgumentException("Invoice can only be created for a completed work order.");
+            throw new StatusNotValidException("Invoice can only be created for a completed work order.");
         }
 
         if (workOrder.getType() == WorkOrderType.WARRANTY) {
-            throw new IllegalArgumentException("Warranty work is not invoiced.");
+            throw new StatusNotValidException("Warranty work is not invoiced.");
         }
 
         boolean alreadyInvoiced = invoiceRepo.getAll().stream()
                 .anyMatch(invoice -> invoice.getWorkOrder().getId() == workOrderId);
         if (alreadyInvoiced) {
-            throw new IllegalArgumentException("Work order " + workOrderId + " already has an invoice.");
+            throw new StatusNotValidException("Work order " + workOrderId + " already has an invoice.");
         }
 
         double amount = 0.0;
@@ -984,14 +984,12 @@ public class GarageSystem {
         Optional<Invoice> optionalInvoice = getInvoice(invoiceId);
 
         if (!optionalInvoice.isPresent()) {
-            System.out.println("Invoice with ID " + invoiceId + " does not exist.");
-            return null;
+            throw new InvoiceNotFoundException(invoiceId);
         }
         Invoice invoice = optionalInvoice.get();
 
         if (invoice.isPaid()) {
-            System.out.println("Invoice has already been paid.");
-            return null;
+            throw new StatusNotValidException("Invoice has already been paid.");
         }
 
         Payment payment = new Payment(
@@ -1007,7 +1005,7 @@ public class GarageSystem {
         if (paymentMethod.isPresent()) {
             successful = paymentMethod.get().pay(invoice.getTotalAmount());
         } else {
-            System.out.println("Unknown payment type.");
+            throw new InputNotValidException("Unknown payment type: " + paymentType);
         }
 
         payment.setSuccessful(successful);
