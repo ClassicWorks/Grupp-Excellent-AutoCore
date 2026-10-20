@@ -42,16 +42,12 @@
     -fx-background-color: -fx-main-background;
 }
 
-/* TODO
-    status-label
-    invoice-popup
 
-*/
 /*------------
      Text
 --------------*/
 
-Label, Text, HyperLink{
+Label, Text, .hyperlink{
     -fx-font-family: "IBM Plex Sans", sans-serif;
     -fx-font-size: 14px;
 
@@ -61,10 +57,6 @@ Label{
 }
 Text{
     -fx-fill: -fx-dark-ink;
-}
-
-HyperLink{
-
 }
 
 .page-title{
