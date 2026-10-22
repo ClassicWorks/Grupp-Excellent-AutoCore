@@ -6,7 +6,6 @@ import com.wac.autocore.model.*;
 import com.wac.autocore.service.discount.Discount;
 import com.wac.autocore.service.discount.DiscountCodes;
 import com.wac.autocore.service.discount.PercentageDiscount;
-import com.wac.autocore.util.TranslationService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,6 +28,7 @@ public class GarageSystem {
     private final CustomerService customerService;
     private final PaymentService paymentService;
     private final VehicleService vehicleService;
+    private final BookingService bookingService;
     private final WorkOrderService workOrderService;
 
     public GarageSystem() {
@@ -45,6 +45,7 @@ public class GarageSystem {
         paymentService = new PaymentService(new PaymentRepoImpl(), invoiceRepo);
         vehicleService = new VehicleService(vehicleRepo, customerRepo, bookingRepo);
         workOrderService = new WorkOrderService(bookingRepo, workOrderRepo, mechanicRepo, serviceItemRepo);
+        bookingService = new BookingService(vehicleRepo, bookingRepo);
     }
 
     public void showCustomers() {
@@ -91,30 +92,15 @@ public class GarageSystem {
     }
 
     public void showBookings() {
-        System.out.println();
-        System.out.println("=== BOOKINGS ===");
-
-        if (bookingRepo.getAll().isEmpty()) {
-            System.out.println("No bookings found.");
-            return;
-        }
-
-        for (Booking booking : bookingRepo.getAll()) {
-            System.out.println(booking);
-        }
+        bookingService.showBookings();
     }
 
     public List<Booking> getBookings() {
-        List<Booking> bookings = bookingRepo.getAll();
-        if (bookings.isEmpty()) {
-            System.out.println("No bookings found.");
-        }
-
-        return bookings;
+        return bookingService.getBookings();
     }
 
     public Optional<Booking> getBooking(int id){
-        return bookingRepo.get(id);
+        return bookingService.getBooking(id);
     }
 
     public void showServiceItems() {
@@ -415,78 +401,11 @@ public class GarageSystem {
         return vehicleService.createVehicle(registrationNumber, brand, model, year, customerId);
     }
 
-    public Booking createBooking(int vehicleId,
-                                 LocalDate date,
-                                 String description) {
-        if(vehicleId <= 0){
-            throw new InputNotValidException("Vehicle ID cannot be zero or negative.");
-        }
-        if(date == null){
-            throw new InputNotValidException("Booking date cannot be empty.");
-        }
-        if(description == null || description.trim().isEmpty() || description.length() > 255){
-            throw new InputNotValidException("Booking description cannot be empty or more that 255 characters.");
-        }
-        Optional<Vehicle> optionalVehicle = getVehicle(vehicleId);
-
-        if (!optionalVehicle.isPresent()) {
-            throw new VehicleNotFoundException(vehicleId);
-        }
-
-        Booking booking = new Booking(
-                optionalVehicle.get(),
-                date,
-                description
-        );
-
-        Booking savedBooking = bookingRepo.save(booking);
-
-        System.out.println("Booking created successfully.");
-        System.out.println(savedBooking);
-
-        return savedBooking;
-    }
-
     public Booking createBookingWithTranslation(int vehicleId,
                                                 LocalDate date,
                                                 String description,
                                                 String descriptionLang) {
-        if(vehicleId <= 0){
-            throw new InputNotValidException("Vehicle ID cannot be zero or negative.");
-        }
-        if(date == null){
-            throw new InputNotValidException("Booking date cannot be empty.");
-        }
-        if(description == null || description.trim().isEmpty() || description.length() > 255){
-            throw new InputNotValidException("Booking description cannot be empty or more that 255 characters.");
-        }
-        if(descriptionLang == null || descriptionLang.trim().isEmpty() || descriptionLang.length() > 5){
-            throw new InputNotValidException("Description language can not be empty or more than 5 characters.");
-        }
-
-        Optional<Vehicle> optionalVehicle = getVehicle(vehicleId);
-
-        if (!optionalVehicle.isPresent()) {
-           throw new VehicleNotFoundException(vehicleId);
-        }
-
-        String targetLang = "sv".equals(descriptionLang) ? "en" : "sv";
-        String translated = TranslationService.translate(description, descriptionLang, targetLang);
-
-        Booking booking = new Booking(
-                optionalVehicle.get(),
-                date,
-                description,
-                descriptionLang,
-                translated
-        );
-
-        Booking savedBooking = bookingRepo.save(booking);
-
-        System.out.println("Booking created successfully.");
-        System.out.println(savedBooking);
-
-        return savedBooking;
+        return bookingService.createBookingWithTranslation(vehicleId, date, description, descriptionLang);
     }
 
 
@@ -507,34 +426,6 @@ public class GarageSystem {
         }
 
         return servicePackRepo.save(servicePack);
-    }
-
-    public Booking createBookingFrom(int previousBookingId) {
-        Optional<Booking> optionalPrevious = getBooking(previousBookingId);
-
-        if (!optionalPrevious.isPresent()) {
-            throw new BookingNotFoundException(previousBookingId);
-        }
-        Booking previous = optionalPrevious.get();
-
-        if (previous.getVehicle() == null) {
-            throw new VehicleNotFoundException("Booking with ID " + previousBookingId + " has no vehicle.");
-        }
-
-        Booking booking = new Booking(
-                previous.getVehicle(),
-                LocalDate.now(),
-                previous.getDescription(),
-                previous.getDescriptionLang(),
-                previous.getDescriptionTranslated()
-        );
-
-        Booking savedBooking = bookingRepo.save(booking);
-
-        System.out.println("Booking created from booking " + previousBookingId + ".");
-        System.out.println(savedBooking);
-
-        return savedBooking;
     }
 
     public WorkOrder createWorkOrder(int bookingId,
