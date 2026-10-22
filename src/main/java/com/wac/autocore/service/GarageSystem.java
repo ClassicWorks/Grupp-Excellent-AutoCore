@@ -3,9 +3,6 @@ package com.wac.autocore.service;
 import com.wac.autocore.data.*;
 import com.wac.autocore.exceptions.*;
 import com.wac.autocore.model.*;
-import com.wac.autocore.service.discount.Discount;
-import com.wac.autocore.service.discount.DiscountCodes;
-import com.wac.autocore.service.discount.PercentageDiscount;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -21,12 +18,11 @@ public class GarageSystem {
     private final ServiceItemRepo serviceItemRepo;
     private final BookingRepo bookingRepo;
     private final WorkOrderRepo workOrderRepo;
-    private final InvoiceRepo invoiceRepo;
     private final ServicePackRepo servicePackRepo;
-    private static final Discount VIP_DISCOUNT = new PercentageDiscount(0.10);
 
     private final CustomerService customerService;
     private final PaymentService paymentService;
+    private final InvoiceService invoiceService;
     private final VehicleService vehicleService;
     private final BookingService bookingService;
     private final WorkOrderService workOrderService;
@@ -38,11 +34,11 @@ public class GarageSystem {
         serviceItemRepo = new ServiceItemRepoImpl();
         bookingRepo = new BookingRepoImpl();
         workOrderRepo = new WorkOrderRepoImpl();
-        invoiceRepo = new InvoiceRepoImpl();
         servicePackRepo = new ServicePackRepoImpl();
 
         customerService = new CustomerService(customerRepo, vehicleRepo);
-        paymentService = new PaymentService(new PaymentRepoImpl(), invoiceRepo);
+        invoiceService = new InvoiceService(new InvoiceRepoImpl(), workOrderRepo);
+        paymentService = new PaymentService(new PaymentRepoImpl(), invoiceService);
         vehicleService = new VehicleService(vehicleRepo, customerRepo, bookingRepo);
         workOrderService = new WorkOrderService(bookingRepo, workOrderRepo, mechanicRepo, serviceItemRepo);
         bookingService = new BookingService(vehicleRepo, bookingRepo);
@@ -350,43 +346,24 @@ public class GarageSystem {
         return workOrderService.getWorkOrder(id);
     }
 
-    public void showInvoices() {
-        System.out.println();
-        System.out.println("=== INVOICES ===");
-
-        List<Invoice> invoices = invoiceRepo.getAll();
-        if (invoices.isEmpty()) {
-            System.out.println("No invoices found.");
-            return;
-        }
-
-        for (Invoice invoice : invoices) {
-            System.out.println(invoice);
-        }
+    public List<Invoice> getInvoices() {
+        return invoiceService.getInvoices();
     }
 
-    public List<Invoice> getInvoices(){
-        List<Invoice> invoices = invoiceRepo.getAll();
-        if (invoices.isEmpty()) {
-            System.out.println("No invoices found.");
-        }
-        return invoices;
-    }
-
-    public Optional<Invoice> getInvoice(int id){
-        return invoiceRepo.get(id);
+    public Optional<Invoice> getInvoice(int id) {
+        return invoiceService.getInvoice(id);
     }
 
     public List<Payment> getPayments() {
         return paymentService.getPayments();
     }
 
-    public List<Invoice> getUnpaidInvoices(){
-        return invoiceRepo.getWherePayedIs(false);
+    public List<Invoice> getUnpaidInvoices() {
+        return invoiceService.getUnpaidInvoices();
     }
 
-    public List<Invoice> getPaidInvoices(){
-        return invoiceRepo.getWherePayedIs(true);
+    public List<Invoice> getPaidInvoices() {
+        return invoiceService.getPaidInvoices();
     }
 
     public Customer createCustomer(String name, String phone, String email) {
@@ -477,76 +454,7 @@ public class GarageSystem {
     }
 
     public Invoice createInvoice(int workOrderId, String discountCode) {
-        Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
-
-        if (!optionalWorkOrder.isPresent()) {
-            throw new WorkOrderNotFoundException(workOrderId);
-        }
-        WorkOrder workOrder = optionalWorkOrder.get();
-
-        if (workOrder.getStatus() != WorkOrderStatus.COMPLETED) {
-            throw new StatusNotValidException("Invoice can only be created for a completed work order.");
-        }
-
-        if (workOrder.getType() == WorkOrderType.WARRANTY) {
-            throw new StatusNotValidException("Warranty work is not invoiced.");
-        }
-
-        boolean alreadyInvoiced = invoiceRepo.getAll().stream()
-                .anyMatch(invoice -> invoice.getWorkOrder().getId() == workOrderId);
-        if (alreadyInvoiced) {
-            throw new StatusNotValidException("Work order " + workOrderId + " already has an invoice.");
-        }
-
-        double amount = 0.0;
-
-        for (WorkOrderItem item : workOrder.getItems()) {
-            amount += item.getPriceAtOrder();
-        }
-
-        List<Discount> discounts = new ArrayList<>();
-
-        Booking booking = workOrder.getBooking();
-        if (booking != null
-                && booking.getVehicle() != null
-                && booking.getVehicle().getCustomer() != null
-                && booking.getVehicle().getCustomer().isVip()) {
-            discounts.add(VIP_DISCOUNT);
-        }
-
-        if (discountCode != null && !discountCode.trim().isEmpty()) {
-            Optional<Discount> codeDiscount = DiscountCodes.find(discountCode);
-            if (codeDiscount.isPresent()) {
-                discounts.add(codeDiscount.get());
-            } else {
-                System.out.println("Unknown discount code. No code discount applied.");
-            }
-        }
-
-        double discount = 0.0;
-        for (Discount d : discounts) {
-            discount += d.calculate(amount);
-        }
-
-        discount = Math.min(discount, amount);
-
-        Invoice invoice = new Invoice(
-                workOrder,
-                LocalDate.now(),
-                amount
-        );
-
-        invoice.setDiscount(discount);
-
-        Invoice savedInvoice = invoiceRepo.save(invoice);
-
-        System.out.println("Invoice created successfully.");
-        System.out.println(savedInvoice);
-
-        System.out.println("Sending invoice notification to customer...");
-        System.out.println("Notification sent.");
-
-        return savedInvoice;
+        return invoiceService.createInvoice(workOrderId, discountCode);
     }
 
     public Payment processPayment(int invoiceId, String paymentType) {

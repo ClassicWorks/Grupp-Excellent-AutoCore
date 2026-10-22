@@ -1,6 +1,5 @@
 package com.wac.autocore.service;
 
-import com.wac.autocore.data.InvoiceRepo;
 import com.wac.autocore.data.PaymentRepo;
 import com.wac.autocore.exceptions.InputNotValidException;
 import com.wac.autocore.exceptions.InvoiceNotFoundException;
@@ -15,11 +14,11 @@ import java.util.Optional;
 
 public class PaymentService {
     private final PaymentRepo paymentRepo;
-    private final InvoiceRepo invoiceRepo;
+    private final InvoiceService invoiceService;
 
-    public PaymentService(PaymentRepo paymentRepo, InvoiceRepo invoiceRepo) {
+    public PaymentService(PaymentRepo paymentRepo, InvoiceService invoiceService) {
         this.paymentRepo = paymentRepo;
-        this.invoiceRepo = invoiceRepo;
+        this.invoiceService = invoiceService;
     }
 
     public List<Payment> getPayments() {
@@ -35,7 +34,7 @@ public class PaymentService {
     }
 
     public Payment processPayment(int invoiceId, String paymentType) {
-        Invoice invoice = invoiceRepo.get(invoiceId)
+        Invoice invoice = invoiceService.getInvoice(invoiceId)
                 .orElseThrow(() -> new InvoiceNotFoundException(invoiceId));
 
         if (invoice.isPaid()) {
@@ -53,7 +52,7 @@ public class PaymentService {
         Payment savedPayment = paymentRepo.save(payment);
 
         if (successful) {
-            markInvoiceAsPaid(invoice);
+            invoiceService.markAsPaid(invoice);
 
             System.out.println("Payment completed successfully.");
             System.out.println("Sending payment confirmation to customer...");
@@ -73,10 +72,5 @@ public class PaymentService {
         }
 
         return paymentMethod.get().pay(amount);
-    }
-
-    private void markInvoiceAsPaid(Invoice invoice) {
-        invoice.setPaid(true);
-        invoiceRepo.update(invoice);
     }
 }
