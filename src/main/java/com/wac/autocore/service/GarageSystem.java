@@ -401,12 +401,6 @@ public class GarageSystem {
         return vehicleService.createVehicle(registrationNumber, brand, model, year, customerId);
     }
 
-    public Booking createBooking(int vehicleId,
-                                 LocalDate date,
-                                 String description) {
-        return bookingService.createBooking(vehicleId, date, description);
-    }
-
     public Booking createBookingWithTranslation(int vehicleId,
                                                 LocalDate date,
                                                 String description,
@@ -414,10 +408,6 @@ public class GarageSystem {
         return bookingService.createBookingWithTranslation(vehicleId, date, description, descriptionLang);
     }
 
-
-    public Booking createBookingFrom(int previousBookingId) {
-        return bookingService.createBookingFrom(previousBookingId);
-    }
 
     public ServicePack createServicePack(String name, int... serviceItemIds){
         if(!servicePackRepo.nameAvailable(name)){
