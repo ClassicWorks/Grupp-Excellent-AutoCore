@@ -5,7 +5,6 @@ import com.wac.autocore.exceptions.*;
 import com.wac.autocore.model.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,6 +25,7 @@ public class GarageSystem {
     private final VehicleService vehicleService;
     private final BookingService bookingService;
     private final WorkOrderService workOrderService;
+    private final MechanicService mechanicService;
 
     public GarageSystem() {
         vehicleRepo = new VehicleRepoImpl();
@@ -42,6 +42,7 @@ public class GarageSystem {
         vehicleService = new VehicleService(vehicleRepo, customerRepo, bookingRepo);
         workOrderService = new WorkOrderService(bookingRepo, workOrderRepo, mechanicRepo, serviceItemRepo);
         bookingService = new BookingService(vehicleRepo, bookingRepo);
+        mechanicService = new MechanicService(mechanicRepo, workOrderRepo);
     }
 
     public void showCustomers() {
@@ -172,22 +173,7 @@ public class GarageSystem {
     }
 
     public Mechanic updateMechanic(int mechanicId, String name, String phone, String specialization) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new InputNotValidException("Mechanic name cannot be empty.");
-        }
-
-        Optional<Mechanic> optionalMechanic = getMechanic(mechanicId);
-
-        if (!optionalMechanic.isPresent()) {
-            throw new MechanicNotFoundException(mechanicId);
-        }
-
-        Mechanic mechanic = optionalMechanic.get();
-        mechanic.setName(name.trim());
-        mechanic.setPhone(phone);
-        mechanic.setSpecialization(specialization);
-
-        return mechanicRepo.update(mechanic);
+        return mechanicService.updateMechanic(mechanicId, name, phone, specialization);
     }
 
     public Vehicle updateVehicle(int vehicleId, String registrationNumber, String brand,
@@ -204,7 +190,7 @@ public class GarageSystem {
     }
 
     public boolean mechanicHasUncompletedWorkOrders(int mechanicId) {
-        return workOrderRepo.mechanicHasUncompletedWorkOrders(mechanicId);
+        return mechanicService.mechanicHasUncompletedWorkOrders(mechanicId);
     }
 
     public boolean deleteCustomer(int customerId) {
@@ -218,22 +204,7 @@ public class GarageSystem {
 
     //TODO implementera UnitOfWork då när man tar bort en mekaniker ska den koppla bort den från existerande workOrders (som ej är klar/avbrutna)
     public boolean deleteMechanic(int mechanicId) {
-        if (!mechanicRepo.get(mechanicId).isPresent()) {
-            throw new MechanicNotFoundException(mechanicId);
-        }
-        //If mechanic has work assigned they cannot be deleted. Connected WorkOrders need to be removed before
-        if (mechanicHasUncompletedWorkOrders(mechanicId)) {
-            throw new DeletionNotAllowedException("Mechanic has work orders and cannot be deleted.");
-        }
-        //All workOrders connected gets disconnected
-        List<WorkOrder> mechanicsWorkOrders = workOrderRepo.getWorkOrdersByMechanic(mechanicId);
-        for(WorkOrder workOrder : mechanicsWorkOrders){
-            workOrder.setMechanic(null);
-            workOrderRepo.update(workOrder);
-        }
-
-        mechanicRepo.delete(mechanicId);
-        return true;
+        return mechanicService.deleteMechanic(mechanicId);
     }
 
     public void showServicePacks() {
@@ -283,39 +254,19 @@ public class GarageSystem {
     }
 
     public void showMechanics() {
-        System.out.println();
-        System.out.println("=== MECHANICS ===");
-
-        if (mechanicRepo.getAll().isEmpty()) {
-            System.out.println("No mechanics found.");
-            return;
-        }
-
-        for (Mechanic mechanic : mechanicRepo.getAll()) {
-            System.out.println(mechanic);
-        }
+        mechanicService.showMechanics();
     }
 
     public List<Mechanic> getMechanics() {
-        List<Mechanic> mechanics = mechanicRepo.getAll();
-        if (mechanics.isEmpty()) {
-            System.out.println("No mechanics found.");
-        }
-
-        return mechanics;
+        return mechanicService.getMechanics();
     }
 
     public List<Mechanic> getAvailableMechanics() {
-        List<Mechanic> mechanics = mechanicRepo.getAllAvailable();
-        if (mechanics.isEmpty()) {
-            System.out.println("No available mechanics found.");
-        }
-
-        return mechanics;
+        return mechanicService.getAvailableMechanics();
     }
 
     public Optional<Mechanic> getMechanic(int id){
-        return mechanicRepo.get(id);
+        return mechanicService.getMechanic(id);
     }
 
     public void showWorkOrders() {
