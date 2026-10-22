@@ -30,6 +30,7 @@ public class GarageSystem {
     private static final Discount VIP_DISCOUNT = new PercentageDiscount(0.10);
 
     private final CustomerService customerService;
+    private final VehicleService vehicleService;
 
     public GarageSystem() {
         vehicleRepo = new VehicleRepoImpl();
@@ -43,6 +44,7 @@ public class GarageSystem {
         servicePackRepo = new ServicePackRepoImpl();
 
         customerService = new CustomerService(customerRepo, vehicleRepo);
+        vehicleService = new VehicleService(vehicleRepo, customerRepo, bookingRepo);
     }
 
     public void showCustomers() {
@@ -73,33 +75,19 @@ public class GarageSystem {
     }
 
     public void showVehicles() {
-        System.out.println();
-        System.out.println("=== VEHICLES ===");
-
-        if (vehicleRepo.getAll().isEmpty()) {
-            System.out.println("No vehicles found.");
-            return;
-        }
-
-        for (Vehicle vehicle : vehicleRepo.getAll()) {
-            System.out.println(vehicle);
-        }
+        vehicleService.showVehicles();
     }
 
     public List<Vehicle> getVehicles() {
-        List<Vehicle> vehicles = vehicleRepo.getAll();
-        if (vehicles.isEmpty()) {
-            System.out.println("No vehicles found.");
-        }
-        return vehicles;
+        return vehicleService.getVehicles();
     }
 
     public Optional<Vehicle> getVehicle(int id){
-        return vehicleRepo.get(id);
+        return vehicleService.getVehicle(id);
     }
 
     public List<Vehicle> getCustomersVehicle(int customerId){
-        return vehicleRepo.getVehicleByCustomerId(customerId);
+        return vehicleService.getCustomersVehicle(customerId);
     }
 
     public void showBookings() {
@@ -222,35 +210,7 @@ public class GarageSystem {
 
     public Vehicle updateVehicle(int vehicleId, String registrationNumber, String brand,
                                  String model, int year, Integer customerId) {
-        if (registrationNumber == null || registrationNumber.trim().isEmpty()
-                || model == null || model.trim().isEmpty()) {
-            throw new InputNotValidException("Registration number and model cannot be empty.");
-        }
-
-        Optional<Vehicle> optionalVehicle = getVehicle(vehicleId);
-
-        if (!optionalVehicle.isPresent()) {
-            throw new VehicleNotFoundException(vehicleId);
-        }
-
-        Customer customer = null;
-        if (customerId != null) {
-            Optional<Customer> optionalCustomer = getCustomer(customerId);
-
-            if (!optionalCustomer.isPresent()) {
-                throw new CustomerNotFoundException(customerId);
-            }
-            customer = optionalCustomer.get();
-        }
-
-        Vehicle vehicle = optionalVehicle.get();
-        vehicle.setRegistrationNumber(registrationNumber.trim());
-        vehicle.setBrand(brand == null ? "" : brand.trim());
-        vehicle.setModel(model.trim());
-        vehicle.setYear(year);
-        vehicle.setCustomer(customer);
-
-        return vehicleRepo.update(vehicle);
+       return vehicleService.updateVehicle(vehicleId, registrationNumber, brand, model, year, customerId);
     }
 
     public boolean customerHasVehicles(int customerId) {
@@ -258,7 +218,7 @@ public class GarageSystem {
     }
 
     public boolean vehicleHasBookings(int vehicleId) {
-        return bookingRepo.vehicleHasBooking(vehicleId);
+        return vehicleService.vehicleHasBookings(vehicleId);
     }
 
     public boolean mechanicHasUncompletedWorkOrders(int mechanicId) {
@@ -271,14 +231,7 @@ public class GarageSystem {
 
     //TODO om alla bokningar är klar/avbrutna, koppla lös dem
     public boolean deleteVehicle(int vehicleId) {
-        if (!vehicleRepo.get(vehicleId).isPresent()) {
-            throw new VehicleNotFoundException(vehicleId);
-        }
-        if (vehicleHasBookings(vehicleId)) {
-            throw new DeletionNotAllowedException("Vehicle has bookings and cannot be deleted.");
-        }
-        vehicleRepo.delete(vehicleId);
-        return true;
+        return vehicleService.deleteVehicle(vehicleId);
     }
 
     //TODO implementera UnitOfWork då när man tar bort en mekaniker ska den koppla bort den från existerande workOrders (som ej är klar/avbrutna)
@@ -505,44 +458,7 @@ public class GarageSystem {
                                  String model,
                                  int year,
                                  int customerId) {
-        if(registrationNumber == null || registrationNumber.trim().isEmpty()){
-            throw new InputNotValidException("Vehicle registration number cannot be empty.");
-        }
-        if(brand == null || brand.trim().isEmpty()){
-            throw new InputNotValidException("Vehicle brand cannot be empty.");
-        }
-        if(model == null || model.trim().isEmpty()){
-            throw new InputNotValidException("Vehicle model cannot be empty.");
-        }
-        if(year <= 1649 || year > LocalDate.now().getYear()){
-            throw new InputNotValidException("Vehicle year cannot be before 1649 or efter current year.");
-        }
-        if(customerId <= 0){
-            throw new InputNotValidException("Customer ID cannot be zero or negative.");
-        }
-
-        Optional<Customer> optionalCustomer = getCustomer(customerId);
-
-        if (!optionalCustomer.isPresent()) {
-            throw new CustomerNotFoundException(customerId);
-        }
-        Customer customer = optionalCustomer.get();
-
-
-        Vehicle vehicle = new Vehicle(
-                registrationNumber,
-                brand,
-                model,
-                year,
-                customer
-        );
-
-        Vehicle savedVehicle = vehicleRepo.save(vehicle);
-
-        System.out.println("Vehicle created successfully.");
-        System.out.println(savedVehicle);
-
-        return savedVehicle;
+        return vehicleService.createVehicle(registrationNumber, brand, model, year, customerId);
     }
 
     public Booking createBooking(int vehicleId,
