@@ -1,5 +1,7 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.exceptions.BusinessRuleException;
+import com.wac.autocore.exceptions.ValidationException;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
@@ -63,14 +65,13 @@ public class WorkOrderDetails extends BorderPane {
                 : LanguageManager.getString("workorders.error.vehicleNotFound"));
 
         CustomerHyperLink customerLink = new CustomerHyperLink(customer);
-        MechanicHyperLink mechanicLink = new MechanicHyperLink(mechanic);
 
 
         VBox info = new VBox(
                 createFormFieldContainer("workorder.details.vehicle", vehicleLabel),
                 createFormFieldContainer("workorder.details.customer", customerLink),
-                createFormFieldContainer("workorder.details.mechanic", mechanicLink),
-                createFormFieldContainer("workorder.type.label", createTypeNode())
+                createFormFieldContainer("workorder.type.label", createTypeNode()),
+                createFormFieldContainer("workorder.details.mechanic", createMechanicNode())
         );
 
         if (booking != null) {
@@ -128,6 +129,29 @@ public class WorkOrderDetails extends BorderPane {
         });
 
         return typeComboBox;
+    }
+
+    //SKa den verkligen sparas så fort man ändrar?
+    private Node createMechanicNode(){
+        if (!workOrder.getStatus().canEdit()) {
+            return new MechanicHyperLink(workOrder.getMechanic());
+        }
+
+        ComboBox<Mechanic> mechanicComboBox = new ComboBox<>();
+        mechanicComboBox.getItems().setAll(garageSystem.getAvailableMechanics());
+        mechanicComboBox.setConverter(ComboBoxLabels.mechanic());
+        mechanicComboBox.setPromptText(LanguageManager.getString("workorder.details.mechanic.prompt"));
+        mechanicComboBox.setValue(workOrder.getMechanic());
+
+        mechanicComboBox.setOnAction(e -> {
+            Mechanic selected = mechanicComboBox.getValue();
+            if (selected == workOrder.getMechanic()) {
+                return;
+            }
+            withErrorHandling(() -> garageSystem.updateWorkOrderMechanic(workOrder.getId(), selected.getId())).run();
+        });
+
+        return mechanicComboBox;
     }
 
     private VBox createServiceSection() {
@@ -228,7 +252,7 @@ public class WorkOrderDetails extends BorderPane {
         return () -> {
             try {
                 action.run();
-            } catch (IllegalArgumentException e) {
+            } catch (BusinessRuleException | ValidationException e) {
                 AppDialog.showError(
                         LanguageManager.getString("workorder.dialog.error.title"),
                         LanguageManager.getString("workorder.dialog.error.header"),

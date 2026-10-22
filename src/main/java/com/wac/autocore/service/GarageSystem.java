@@ -581,7 +581,6 @@ public class GarageSystem {
                                                 LocalDate date,
                                                 String description,
                                                 String descriptionLang) {
-        //TODO check if values are correct, id > 0, description is not too long, descriptionLang is correct
         if(vehicleId <= 0){
             throw new InputNotValidException("Vehicle ID cannot be zero or negative.");
         }
@@ -698,7 +697,7 @@ public class GarageSystem {
             mechanic = optionalMechanic.get();
 
             if (!mechanic.isAvailable()) {
-                throw new MechanicNotAvailable("Mechanic " + mechanic.getName() + " is not available.");
+                throw new MechanicNotAvailableException("Mechanic " + mechanic.getName() + " is not available.");
             }
         }
 
@@ -790,7 +789,7 @@ public class GarageSystem {
         return workOrderRepo.update(workOrder);
     }
 
-    //TODO exceptions
+
     public WorkOrder updateWorkOrderType(int workOrderId, WorkOrderType type)
             throws IllegalArgumentException {
         if (type == null) {
@@ -809,6 +808,45 @@ public class GarageSystem {
         }
 
         workOrder.setType(type);
+        return workOrderRepo.update(workOrder);
+    }
+
+    /**
+     * Updates which mechanic is connected to work order.
+     * Method throws WorkOrderNotFoundException if workOrderId is not present in database.
+     * Throws StatusNotValidException if the status of the work order is not in an editable state.
+     * Throws MechanicNotFoundException if mechanicId is not present in database.
+     * Throws MechanicNotAvailableException if the mechanic is not available.
+     * @param workOrderId id of work order to be updated.
+     * @param mechanicId id of mechanic to be connected to work order. If value is 0, the mechanic connected to work order will be changed to null.
+     * @return updated work order
+     */
+    public WorkOrder updateWorkOrderMechanic(int workOrderId, int mechanicId){
+        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
+
+        if (!optionalWorkOrder.isPresent()) {
+            throw new WorkOrderNotFoundException(workOrderId);
+        }
+        WorkOrder workOrder = optionalWorkOrder.get();
+
+        if (!workOrder.getStatus().canEdit()) {
+            throw new StatusNotValidException("The type can only be changed before the work order is started.");
+        }
+
+        Mechanic mechanic = null;
+        if(mechanicId > 0) {
+            Optional<Mechanic> optionalMechanic = getMechanic(mechanicId);
+
+            if (!optionalMechanic.isPresent()) {
+                throw new MechanicNotFoundException(mechanicId);
+            }
+            mechanic = optionalMechanic.get();
+
+            if (!mechanic.isAvailable()) {
+                throw new MechanicNotAvailableException("Mechanic " + mechanic.getName() + " is not available.");
+            }
+        }
+        workOrder.setMechanic(mechanic);
         return workOrderRepo.update(workOrder);
     }
 
