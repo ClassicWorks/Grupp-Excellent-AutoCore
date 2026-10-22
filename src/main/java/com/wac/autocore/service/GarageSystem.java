@@ -29,6 +29,7 @@ public class GarageSystem {
     private final CustomerService customerService;
     private final PaymentService paymentService;
     private final VehicleService vehicleService;
+    private final WorkOrderService workOrderService;
 
     public GarageSystem() {
         vehicleRepo = new VehicleRepoImpl();
@@ -43,6 +44,7 @@ public class GarageSystem {
         customerService = new CustomerService(customerRepo, vehicleRepo);
         paymentService = new PaymentService(new PaymentRepoImpl(), invoiceRepo);
         vehicleService = new VehicleService(vehicleRepo, customerRepo, bookingRepo);
+        workOrderService = new WorkOrderService(bookingRepo, workOrderRepo, mechanicRepo, serviceItemRepo);
     }
 
     public void showCustomers() {
@@ -335,53 +337,31 @@ public class GarageSystem {
     }
 
     public void showWorkOrders() {
-        System.out.println();
-        System.out.println("=== WORK ORDERS ===");
-
-        if (workOrderRepo.getAll().isEmpty()) {
-            System.out.println("No work orders found.");
-            return;
-        }
-
-        for (WorkOrder workOrder : workOrderRepo.getAll()) {
-            System.out.println(workOrder);
-        }
+        workOrderService.showWorkOrders();
     }
 
     public List<WorkOrder> getWorkOrders() {
-        List<WorkOrder> workOrders = workOrderRepo.getAll();
-        if (workOrders.isEmpty()) {
-            System.out.println("No work orders found.");
-        }
-
-        return workOrders;
+        return workOrderService.getWorkOrders();
     }
 
     public List<WorkOrder> getWorkOrdersWithItems(){
-        List<WorkOrder> workOrders = workOrderRepo.getAllWithItems();
-        if (workOrders.isEmpty()) {
-            System.out.println("No work orders found.");
-        }
-
-        return workOrders;
+        return workOrderService.getWorkOrdersWithItems();
     }
 
     public List<WorkOrder> getWorkOrdersWithItemsByStatus(WorkOrderStatus status){
-        return workOrderRepo.getWithStatus(status);
+        return workOrderService.getWorkOrdersWithItemsByStatus(status);
     }
 
     public List<WorkOrder> getCompletedWorkOrdersWithoutInvoices() {
-        return workOrderRepo.getCompletedWorkOrdersWithoutInvoices().stream()
-                .filter(workOrder -> workOrder.getType() != WorkOrderType.WARRANTY)
-                .collect(Collectors.toList());
+        return workOrderService.getCompletedWorkOrdersWithoutInvoices();
     }
 
     public Optional<WorkOrder> getWorkOrderWithItems(int workOrderId) {
-        return workOrderRepo.getWithItems(workOrderId);
+        return workOrderService.getWorkOrderWithItems(workOrderId);
     }
 
     public Optional<WorkOrder> getWorkOrder(int id){
-        return workOrderRepo.get(id);
+        return workOrderService.getWorkOrder(id);
     }
 
     public void showInvoices() {
@@ -510,7 +490,7 @@ public class GarageSystem {
     }
 
 
-    public ServicePack createServicePack(String name, int... serviceItemIds) throws IllegalArgumentException {
+    public ServicePack createServicePack(String name, int... serviceItemIds){
         if(!servicePackRepo.nameAvailable(name)){
             throw new InputNotValidException("Service pack with name \"" + name + "\" already exists.");
         }
@@ -560,145 +540,23 @@ public class GarageSystem {
     public WorkOrder createWorkOrder(int bookingId,
                                      int mechanicId,
                                      WorkOrderType type,
-                                     int... serviceItemIds)
-    throws IllegalArgumentException{
-
-        if (type == null) {
-            //TODO change
-            throw new IllegalArgumentException("A work order must have a type.");
-        }
-
-        Optional<Booking> optionalBooking = getBooking(bookingId);
-
-        if (!optionalBooking.isPresent()) {
-            throw new BookingNotFoundException(bookingId);
-        }
-        Booking booking = optionalBooking.get();
-
-        //WorkOrder can in draft have no mechanic and no serviceItems, if mechanic or serviceItem is
-        // selected but does not exist, the method throws IllegalArgumentException
-        Mechanic mechanic = null;
-        if(mechanicId > 0) {
-            Optional<Mechanic> optionalMechanic = getMechanic(mechanicId);
-
-            if (!optionalMechanic.isPresent()) {
-                throw new MechanicNotFoundException(mechanicId);
-            }
-            mechanic = optionalMechanic.get();
-
-            if (!mechanic.isAvailable()) {
-                throw new MechanicNotAvailableException("Mechanic " + mechanic.getName() + " is not available.");
-            }
-        }
-
-        WorkOrder workOrder = new WorkOrder(
-                booking,
-                mechanic,
-                type
-        );
-
-        for (int serviceItemId : serviceItemIds) {
-            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
-            if (!optionalServiceItem.isPresent()) {
-                throw new ServiceItemNotFoundException(serviceItemId);
-            }
-            ServiceItem serviceItem = optionalServiceItem.get();
-            workOrder.addItem(serviceItem, serviceItem.getPrice());
-        }
-
-
-        WorkOrder savedWorkOrder = workOrderRepo.save(workOrder);
-        booking.setStatus("WORK_ORDER_CREATED");
-        bookingRepo.update(booking);
-
-        System.out.println("Work order created successfully.");
-        System.out.println(savedWorkOrder);
-
-        return savedWorkOrder;
+                                     int... serviceItemIds) {
+        return workOrderService.createWorkOrder(bookingId, mechanicId, type, serviceItemIds);
     }
 
-    public void confirmWorkOrder (int workOrderId) throws IllegalArgumentException {
-        Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
-
-        if (!optionalWorkOrder.isPresent()) {
-            throw new WorkOrderNotFoundException(workOrderId);
-        }
-
-        WorkOrder workOrder = optionalWorkOrder.get();
-
-        if (!workOrder.getStatus().canTransitionTo(WorkOrderStatus.CONFIRMED)) {
-            throw new StatusNotValidException("Wrong status on work order. Only draft work orders can be confirmed.");
-        }
-
-        if(workOrder.getItems().isEmpty()){
-            throw new InputNotValidException("No service items. Work order must contains at least one service item");
-        }
-
-        workOrder.changeStatus(WorkOrderStatus.CONFIRMED);
-        workOrderRepo.update(workOrder);
-
-        System.out.println("Work order " + workOrderId + " has been confirmed.");
+    public void confirmWorkOrder (int workOrderId){
+        workOrderService.confirmWorkOrder(workOrderId);
     }
 
     public WorkOrder updateWorkOrderServices(int workOrderId,
                                              List<Integer> serviceItemIdsToAdd,
-                                             List<Integer> itemIdsToRemove)
-    throws WorkOrderNotFoundException, StatusNotValidException, NotInListException, ServiceItemNotFoundException {
-        Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
-
-        if (!optionalWorkOrder.isPresent()) {
-            throw new WorkOrderNotFoundException(workOrderId);
-        }
-        WorkOrder workOrder = optionalWorkOrder.get();
-
-        if (!workOrder.getStatus().canEdit()) {
-            throw new StatusNotValidException("Services can only be changed before the work order is started.");
-        }
-
-        for (Integer itemId : itemIdsToRemove) {
-            if (!workOrder.removeItem(itemId)) {
-                throw new NotInListException("Item with ID " + itemId + " is not on the work order.");
-            }
-        }
-
-        for (Integer serviceItemId : serviceItemIdsToAdd) {
-            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
-
-            if (!optionalServiceItem.isPresent()) {
-                throw new ServiceItemNotFoundException(serviceItemId);
-            }
-
-            if (workOrder.hasService(serviceItemId)) {
-                continue;
-            }
-
-            ServiceItem serviceItem = optionalServiceItem.get();
-            workOrder.addItem(serviceItem, serviceItem.getPrice());
-        }
-
-        return workOrderRepo.update(workOrder);
+                                             List<Integer> itemIdsToRemove) {
+        return workOrderService.updateWorkOrderServices(workOrderId, serviceItemIdsToAdd, itemIdsToRemove);
     }
 
 
-    public WorkOrder updateWorkOrderType(int workOrderId, WorkOrderType type)
-            throws IllegalArgumentException {
-        if (type == null) {
-            throw new InputNotValidException("A work order must have a type.");
-        }
-
-        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
-
-        if (!optionalWorkOrder.isPresent()) {
-            throw new WorkOrderNotFoundException(workOrderId);
-        }
-        WorkOrder workOrder = optionalWorkOrder.get();
-
-        if (!workOrder.getStatus().canEdit()) {
-            throw new StatusNotValidException("The type can only be changed before the work order is started.");
-        }
-
-        workOrder.setType(type);
-        return workOrderRepo.update(workOrder);
+    public WorkOrder updateWorkOrderType(int workOrderId, WorkOrderType type) {
+        return workOrderService.updateWorkOrderType(workOrderId, type);
     }
 
     /**
@@ -712,127 +570,19 @@ public class GarageSystem {
      * @return updated work order
      */
     public WorkOrder updateWorkOrderMechanic(int workOrderId, int mechanicId){
-        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
-
-        if (!optionalWorkOrder.isPresent()) {
-            throw new WorkOrderNotFoundException(workOrderId);
-        }
-        WorkOrder workOrder = optionalWorkOrder.get();
-
-        if (!workOrder.getStatus().canEdit()) {
-            throw new StatusNotValidException("The type can only be changed before the work order is started.");
-        }
-
-        Mechanic mechanic = null;
-        if(mechanicId > 0) {
-            Optional<Mechanic> optionalMechanic = getMechanic(mechanicId);
-
-            if (!optionalMechanic.isPresent()) {
-                throw new MechanicNotFoundException(mechanicId);
-            }
-            mechanic = optionalMechanic.get();
-
-            if (!mechanic.isAvailable()) {
-                throw new MechanicNotAvailableException("Mechanic " + mechanic.getName() + " is not available.");
-            }
-        }
-        workOrder.setMechanic(mechanic);
-        return workOrderRepo.update(workOrder);
+        return workOrderService.updateWorkOrderMechanic(workOrderId, mechanicId);
     }
 
     public void startWorkOrder(int workOrderId) {
-        Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
-
-        if (!optionalWorkOrder.isPresent()) {
-            throw new WorkOrderNotFoundException(workOrderId);
-        }
-        WorkOrder workOrder = optionalWorkOrder.get();
-
-        if (!workOrder.getStatus().canTransitionTo(WorkOrderStatus.IN_PROGRESS)) {
-            throw new StatusNotValidException("Only confirmed work orders can be started.");
-        }
-
-        Mechanic mechanic = workOrder.getMechanic();
-
-        if(mechanic == null){
-            throw new MechanicNotFoundException("No mechanic. A mechanic must be selected to start the work order.");
-        }
-
-        if(workOrder.getItems().isEmpty()){
-            throw new InputNotValidException("No service items. Work order must contains at least one service item");
-        }
-
-        mechanic.setAvailable(false);
-
-        Booking booking = workOrder.getBooking();
-
-        if (booking != null) {
-            booking.setStatus("IN_PROGRESS");
-        }
-
-        workOrder.changeStatus(WorkOrderStatus.IN_PROGRESS);
-        workOrderRepo.update(workOrder);
-
-        System.out.println("Work order " + workOrderId + " has been started.");
+        workOrderService.startWorkOrder(workOrderId);
     }
 
     public void completeWorkOrder(int workOrderId) {
-        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
-
-        if (!optionalWorkOrder.isPresent()) {
-            throw new WorkOrderNotFoundException(workOrderId);
-        }
-        WorkOrder workOrder = optionalWorkOrder.get();
-
-        if (!workOrder.getStatus().canTransitionTo(WorkOrderStatus.COMPLETED)) {
-            throw new StatusNotValidException("Only work orders in progress can be completed.");
-        }
-
-        Mechanic mechanic = workOrder.getMechanic();
-        Booking booking = workOrder.getBooking();
-
-        if (mechanic != null) {
-            mechanic.setAvailable(true);
-        }
-
-        if (booking != null) {
-            booking.setStatus("COMPLETED");
-        }
-
-        workOrder.changeStatus(WorkOrderStatus.COMPLETED);
-        workOrderRepo.update(workOrder);
-
-        System.out.println("Work order " + workOrderId + " has been completed.");
+        workOrderService.completeWorkOrder(workOrderId);
     }
 
     public void cancelWorkOrder(int workOrderId) {
-        Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
-
-        if (!optionalWorkOrder.isPresent()) {
-            throw new WorkOrderNotFoundException(workOrderId);
-        }
-
-        WorkOrder workOrder = optionalWorkOrder.get();
-
-        if (!workOrder.getStatus().canBeCancelled()) {
-            throw new StatusNotValidException("Work order cannot be cancelled.");
-        }
-
-        Mechanic mechanic = workOrder.getMechanic();
-        Booking booking = workOrder.getBooking();
-
-        if (workOrder.getStatus() == WorkOrderStatus.IN_PROGRESS && mechanic != null) {
-            mechanic.setAvailable(true);
-        }
-
-        if (booking != null) {
-            booking.setStatus("CANCELLED");
-        }
-
-        workOrder.changeStatus(WorkOrderStatus.CANCELLED);
-        workOrderRepo.update(workOrder);
-
-        System.out.println("Work order " + workOrderId + " has been cancelled.");
+        workOrderService.cancelWorkOrder(workOrderId);
     }
 
     public Invoice createInvoice(int workOrderId, String discountCode) {
