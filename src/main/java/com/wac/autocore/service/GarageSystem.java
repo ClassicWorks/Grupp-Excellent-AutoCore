@@ -6,8 +6,6 @@ import com.wac.autocore.model.*;
 import com.wac.autocore.service.discount.Discount;
 import com.wac.autocore.service.discount.DiscountCodes;
 import com.wac.autocore.service.discount.PercentageDiscount;
-import com.wac.autocore.service.payment.PaymentMethod;
-import com.wac.autocore.service.payment.PaymentMethodFactory;
 import com.wac.autocore.util.TranslationService;
 
 import java.time.LocalDate;
@@ -25,11 +23,11 @@ public class GarageSystem {
     private final BookingRepo bookingRepo;
     private final WorkOrderRepo workOrderRepo;
     private final InvoiceRepo invoiceRepo;
-    private final PaymentRepo paymentRepo;
     private final ServicePackRepo servicePackRepo;
     private static final Discount VIP_DISCOUNT = new PercentageDiscount(0.10);
 
     private final CustomerService customerService;
+    private final PaymentService paymentService;
 
     public GarageSystem() {
         vehicleRepo = new VehicleRepoImpl();
@@ -39,10 +37,10 @@ public class GarageSystem {
         bookingRepo = new BookingRepoImpl();
         workOrderRepo = new WorkOrderRepoImpl();
         invoiceRepo = new InvoiceRepoImpl();
-        paymentRepo  = new PaymentRepoImpl();
         servicePackRepo = new ServicePackRepoImpl();
 
         customerService = new CustomerService(customerRepo, vehicleRepo);
+        paymentService = new PaymentService(new PaymentRepoImpl(), invoiceRepo);
     }
 
     public void showCustomers() {
@@ -460,28 +458,8 @@ public class GarageSystem {
         return invoiceRepo.get(id);
     }
 
-    public void showPayments() {
-        System.out.println();
-        System.out.println("=== PAYMENTS ===");
-
-        List<Payment> payments = paymentRepo.getAll();
-        if (payments.isEmpty()) {
-            System.out.println("No payments found.");
-            return;
-        }
-
-        for (Payment payment : payments) {
-            System.out.println(payment);
-        }
-    }
-
-    public List<Payment> getPayments(){
-        List<Payment> payments = paymentRepo.getAll();
-        if (payments.isEmpty()) {
-            System.out.println("No payments found.");
-        }
-
-        return payments;
+    public List<Payment> getPayments() {
+        return paymentService.getPayments();
     }
 
     public List<Invoice> getUnpaidInvoices(){
@@ -490,10 +468,6 @@ public class GarageSystem {
 
     public List<Invoice> getPaidInvoices(){
         return invoiceRepo.getWherePayedIs(true);
-    }
-
-    public Optional<Payment> getPayment(int id){
-        return paymentRepo.get(id);
     }
 
     public Customer createCustomer(String name, String phone, String email) {
@@ -1019,47 +993,6 @@ public class GarageSystem {
     }
 
     public Payment processPayment(int invoiceId, String paymentType) {
-        Optional<Invoice> optionalInvoice = getInvoice(invoiceId);
-
-        if (!optionalInvoice.isPresent()) {
-            throw new InvoiceNotFoundException(invoiceId);
-        }
-        Invoice invoice = optionalInvoice.get();
-
-        if (invoice.isPaid()) {
-            throw new StatusNotValidException("Invoice has already been paid.");
-        }
-
-        Payment payment = new Payment(
-                invoice,
-                invoice.getTotalAmount(),
-                paymentType
-        );
-
-        boolean successful = false;
-
-        Optional<PaymentMethod> paymentMethod = PaymentMethodFactory.create(paymentType);
-
-        if (paymentMethod.isPresent()) {
-            successful = paymentMethod.get().pay(invoice.getTotalAmount());
-        } else {
-            throw new InputNotValidException("Unknown payment type: " + paymentType);
-        }
-
-        payment.setSuccessful(successful);
-        Payment savedPayment = paymentRepo.save(payment);
-
-        if (successful) {
-            invoice.setPaid(true);
-            invoiceRepo.update(invoice);
-
-            System.out.println("Payment completed successfully.");
-            System.out.println("Sending payment confirmation to customer...");
-            System.out.println("Confirmation sent.");
-        } else {
-            System.out.println("Payment failed.");
-        }
-
-        return savedPayment;
+        return paymentService.processPayment(invoiceId, paymentType);
     }
 }
