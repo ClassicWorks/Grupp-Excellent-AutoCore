@@ -12,6 +12,7 @@ public interface VehicleRepo {
     Optional<Vehicle> get(int id);
     List<Vehicle> getVehicleByCustomerId(int customerId);
     boolean customerHasVehicle(int customerId);
+    boolean existsByRegistrationNumber(String registrationNumber);
 
     void delete(int id);
 }
