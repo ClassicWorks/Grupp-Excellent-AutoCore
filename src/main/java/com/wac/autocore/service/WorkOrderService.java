@@ -64,32 +64,47 @@ public class WorkOrderService {
     }
 
     public Optional<WorkOrder> getWorkOrderWithItems(int workOrderId) {
+        if(workOrderId <= 0)
+            return Optional.empty();
         return workOrderRepo.getWithItems(workOrderId);
     }
 
-    public Optional<WorkOrder> getWorkOrder(int id){
-        return workOrderRepo.get(id);
+    public Optional<WorkOrder> getWorkOrder(int workOrderId){
+        if(workOrderId <= 0)
+            return Optional.empty();
+        return workOrderRepo.get(workOrderId);
     }
 
+    /**
+     * Creates a new work order based on the provided parameters. If a mechanic or service items are
+     * specified, the method validates their existence and availability. Updates the connected booking
+     * status to "WORK_ORDER_CREATED" upon successful creation of the work order.
+     *
+     * @param bookingId the ID of the booking associated with the new work order.
+     * @param mechanicId the ID of the mechanic assigned to the work order. If no mechanic is assigned, pass 0.
+     * @param type the type of the work order, cannot be null.
+     * @param serviceItemIds IDs of service items to be included in the work order. This parameter accepts multiple values.
+     * @return the created work order after saving it to the repository.
+     * @throws InputNotValidException if the provided work order type is null.
+     * @throws BookingNotFoundException if the booking associated with the given bookingId is not found.
+     * @throws MechanicNotFoundException if the mechanic associated with the given mechanicId is not found and mechanicId is greater than 0.
+     * @throws MechanicNotAvailableException if the mechanic with the given ID is not available for assignment.
+     * @throws ServiceItemNotFoundException if a service item with the given ID does not exist.
+     */
     public WorkOrder createWorkOrder(int bookingId,
                                      int mechanicId,
                                      WorkOrderType type,
                                      int... serviceItemIds) {
 
         if (type == null) {
-            //TODO change
-            throw new IllegalArgumentException("A work order must have a type.");
+            throw new InputNotValidException("A work order must have a type.");
         }
 
-        Optional<Booking> optionalBooking = bookingRepo.get(bookingId);
-
-        if (!optionalBooking.isPresent()) {
-            throw new BookingNotFoundException(bookingId);
-        }
-        Booking booking = optionalBooking.get();
+        Booking booking = bookingRepo.get(bookingId)
+                .orElseThrow(() -> new BookingNotFoundException(bookingId));
 
         //WorkOrder can in draft have no mechanic and no serviceItems, if mechanic or serviceItem is
-        // selected but does not exist, the method throws IllegalArgumentException
+        // selected but does not exist, the method throws Exception
         Mechanic mechanic = null;
         if(mechanicId > 0) {
             Optional<Mechanic> optionalMechanic = mechanicRepo.get(mechanicId);
@@ -130,6 +145,14 @@ public class WorkOrderService {
         return savedWorkOrder;
     }
 
+    /**
+     * Confirms a work order by changing its status to "CONFIRMED".
+     *
+     * @param workOrderId the unique identifier of the work order to be confirmed
+     * @throws WorkOrderNotFoundException if the work order with the specified ID does not exist
+     * @throws StatusNotValidException if the current status of the work order does not allow transitioning to "CONFIRMED"
+     * @throws InputNotValidException if the work order does not contain any service items
+     */
     public void confirmWorkOrder (int workOrderId) {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
@@ -153,6 +176,18 @@ public class WorkOrderService {
         System.out.println("Work order " + workOrderId + " has been confirmed.");
     }
 
+    /**
+     * Updates the services associated with a given work order by adding and/or removing service items.
+     *
+     * @param workOrderId the unique identifier of the work order to be updated
+     * @param serviceItemIdsToAdd a list of service item IDs to be added to the work order
+     * @param itemIdsToRemove a list of service item IDs to be removed from the work order
+     * @return updated work order
+     * @throws WorkOrderNotFoundException if the work order with the specified ID is not found
+     * @throws StatusNotValidException if the work order's status is not editable
+     * @throws NotInListException if one or more service items to remove are not present in the work order
+     * @throws ServiceItemNotFoundException if one or more service items to add are not found
+     */
     public WorkOrder updateWorkOrderServices(int workOrderId,
                                              List<Integer> serviceItemIdsToAdd,
                                              List<Integer> itemIdsToRemove) {
@@ -192,6 +227,16 @@ public class WorkOrderService {
     }
 
 
+    /**
+     * Updates the type of work order with the specified ID.
+     *
+     * @param workOrderId the unique identifier of the work order to be updated
+     * @param type the new type to assign to the work order
+     * @return the updated work order after applying the new type
+     * @throws InputNotValidException if the provided type is null
+     * @throws WorkOrderNotFoundException if no work order is found with the specified ID
+     * @throws StatusNotValidException if the work order status does not allow modifications to its type
+     */
     public WorkOrder updateWorkOrderType(int workOrderId, WorkOrderType type) {
         if (type == null) {
             throw new InputNotValidException("A work order must have a type.");
@@ -214,13 +259,14 @@ public class WorkOrderService {
 
     /**
      * Updates which mechanic is connected to work order.
-     * Method throws WorkOrderNotFoundException if workOrderId is not present in database.
-     * Throws StatusNotValidException if the status of the work order is not in an editable state.
-     * Throws MechanicNotFoundException if mechanicId is not present in database.
-     * Throws MechanicNotAvailableException if the mechanic is not available.
+     *
      * @param workOrderId id of work order to be updated.
      * @param mechanicId id of mechanic to be connected to work order. If value is 0, the mechanic connected to work order will be changed to null.
      * @return updated work order
+     * @throws WorkOrderNotFoundException if workOrderId is not present in database.
+     * @throws StatusNotValidException if the status of the work order is not in an editable state.
+     * @throws MechanicNotFoundException if mechanicId is not present in database.
+     * @throws MechanicNotAvailableException if the mechanic is not available.
      */
     public WorkOrder updateWorkOrderMechanic(int workOrderId, int mechanicId){
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
@@ -251,6 +297,16 @@ public class WorkOrderService {
         return workOrderRepo.update(workOrder);
     }
 
+    /**
+     * Starts a work order by transitioning its status to "IN_PROGRESS" and updates the availability
+     * of the assigned mechanic and marks the connected booking as "IN_PROGRESS".
+     *
+     * @param workOrderId the unique identifier of the work order to be started
+     * @throws WorkOrderNotFoundException if the work order with the specified ID does not exist
+     * @throws StatusNotValidException if the current status of the work order does not allow transitioning to "IN_PROGRESS"
+     * @throws MechanicNotFoundException if no mechanic is assigned to the work order
+     * @throws InputNotValidException if the work order does not contain any service items
+     */
     public void startWorkOrder(int workOrderId) {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
@@ -287,6 +343,15 @@ public class WorkOrderService {
         System.out.println("Work order " + workOrderId + " has been started.");
     }
 
+    /**
+     * Completes a work order by transitioning its status to "COMPLETED". Marks the connected mechanic
+     * as available and updates the booking status to "COMPLETED". If no mechanic respectively mechanic is
+     * connected, the method will not throw any exceptions.
+     *
+     * @param workOrderId the unique identifier of the work order to be completed
+     * @throws WorkOrderNotFoundException if the work order with the specified ID does not exist
+     * @throws StatusNotValidException if the current work order status does not allow transitioning to "COMPLETED"
+     */
     public void completeWorkOrder(int workOrderId) {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
@@ -316,6 +381,16 @@ public class WorkOrderService {
         System.out.println("Work order " + workOrderId + " has been completed.");
     }
 
+    /**
+     * Cancels the work order with the specified ID. Updates the status of the work order to
+     * "CANCELLED". If the work order is "IN_PROGRESS" and has an assigned mechanic, the mechanic's
+     * availability is updated. Additionally, the connected booking's status is set to "CANCELLED",
+     * if applicable.
+     *
+     * @param workOrderId the unique identifier of the work order to be cancelled
+     * @throws WorkOrderNotFoundException if the work order with the specified ID is not found
+     * @throws StatusNotValidException if the current status of the work order does not allow it to be cancelled
+     */
     public void cancelWorkOrder(int workOrderId) {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
