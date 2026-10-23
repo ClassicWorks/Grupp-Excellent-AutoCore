@@ -27,4 +27,8 @@ public enum WorkOrderStatus {
                 return false;
         }
     }
+
+    public boolean canBeInvoiced() {
+        return this == COMPLETED;
+    }
 }

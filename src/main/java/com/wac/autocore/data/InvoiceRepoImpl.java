@@ -47,6 +47,20 @@ public class InvoiceRepoImpl implements InvoiceRepo{
     }
 
     @Override
+    public boolean existsByWorkOrderId(int workOrderId) {
+        try(Session s = HibernateUtil.getSessionFactory().openSession()) {
+            Long numOfInvoices = s.createQuery(
+                            "select count(i) from Invoice i " +
+                                    "where i.workOrder.id = :workOrderId",
+                            Long.class)
+                    .setParameter("workOrderId", workOrderId)
+                    .uniqueResult();
+
+            return numOfInvoices > 0;
+        }
+    }
+
+    @Override
     public Optional<Invoice> get(int id) {
         try (Session s = HibernateUtil.getSessionFactory().openSession()) {
             return s.createQuery(
