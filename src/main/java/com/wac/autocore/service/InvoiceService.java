@@ -4,12 +4,7 @@ import com.wac.autocore.data.InvoiceRepo;
 import com.wac.autocore.data.WorkOrderRepo;
 import com.wac.autocore.exceptions.StatusNotValidException;
 import com.wac.autocore.exceptions.WorkOrderNotFoundException;
-import com.wac.autocore.model.Booking;
-import com.wac.autocore.model.Invoice;
-import com.wac.autocore.model.WorkOrder;
-import com.wac.autocore.model.WorkOrderItem;
-import com.wac.autocore.model.WorkOrderStatus;
-import com.wac.autocore.model.WorkOrderType;
+import com.wac.autocore.model.*;
 import com.wac.autocore.service.discount.Discount;
 import com.wac.autocore.service.discount.DiscountCodes;
 import com.wac.autocore.service.discount.PercentageDiscount;
@@ -44,11 +39,11 @@ public class InvoiceService {
     }
 
     public List<Invoice> getUnpaidInvoices() {
-        return invoiceRepo.getWherePayedIs(false);
+        return invoiceRepo.findByPayed(false);
     }
 
     public List<Invoice> getPaidInvoices() {
-        return invoiceRepo.getWherePayedIs(true);
+        return invoiceRepo.findByPayed(true);
     }
 
     public List<WorkOrder> getWorkOrdersThatCanBeInvoiced() {
@@ -159,4 +154,20 @@ public class InvoiceService {
 
         return Math.min(discount, amount);
     }
+
+    /**
+     * Prints all invoices, for debugging and testing purposes.
+     */
+    public void showInvoices(){
+        System.out.println();
+        System.out.println("=== INVOICES ===");
+
+        if (invoiceRepo.getAll().isEmpty()) {
+            System.out.println("No services found.");
+            return;
+        }
+
+        for (Invoice invo : invoiceRepo.getAll()) {
+            System.out.println(invo);
+        }    }
 }

@@ -55,7 +55,7 @@ public class VehicleRepoImpl implements VehicleRepo{
     }
 
     @Override
-    public boolean customerHasVehicle(int customerId) {
+    public boolean existsByCustomerId(int customerId) {
         try(Session s = HibernateUtil.getSessionFactory().openSession()) {
             Long numOfVehicles = s.createQuery(
                             "select count(v) from Vehicle v " +

@@ -38,7 +38,7 @@ public class InvoiceRepoImpl implements InvoiceRepo{
     }
 
     @Override
-    public List<Invoice> getWherePayedIs(boolean isPayed) {
+    public List<Invoice> findByPayed(boolean isPayed) {
         try(Session s = HibernateUtil.getSessionFactory().openSession()){
             return s.createQuery("from Invoice i where i.paid = :isPayed", Invoice.class)
                     .setParameter("isPayed", isPayed)

@@ -215,6 +215,10 @@ public class GarageSystem {
         return workOrderService.getWorkOrder(id);
     }
 
+    public void showInvoices(){
+        invoiceService.showInvoices();
+    }
+
     public List<Invoice> getInvoices() {
         return invoiceService.getInvoices();
     }

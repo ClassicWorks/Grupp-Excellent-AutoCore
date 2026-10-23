@@ -9,9 +9,8 @@ import com.wac.autocore.exceptions.ServicePackNotFoundException;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.ServicePack;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ServiceItemService {
@@ -131,8 +130,8 @@ public class ServiceItemService {
      * @param updatedServicePack the updated ServicePack object containing the new details;
      *                           must have a non-empty name, a unique name, and non-null service items
      * @return the updated ServicePack object after applying the changes
-     * @throws InputNotValidException if the updated service pack has an empty name or service items is null
-     * @throws NotUniqueException if the updated service pack's name is not unique
+     * @throws InputNotValidException if the updated service pack has an empty name or service items are empty
+     * @throws NotUniqueException if the updated service pack's name is different from before and not unique
      * @throws ServicePackNotFoundException if no service pack is found with the specified ID
      * @throws ServiceItemNotFoundException if any service item in the updated service pack does not exist
      */
@@ -140,27 +139,38 @@ public class ServiceItemService {
         if(updatedServicePack.getName() == null || updatedServicePack.getName().trim().isEmpty()){
             throw new InputNotValidException("Name cannot be empty");
         }
-        if(updatedServicePack.getServiceItems() == null){
-            throw new InputNotValidException("Service items cannot be null");
+        if(updatedServicePack.getServiceItems() == null || updatedServicePack.getServiceItems().isEmpty()){
+            throw new InputNotValidException("Service items cannot be empty");
         }
 
         ServicePack servicePackToUpdate = getServicePack(servicePackId)
                 .orElseThrow(() -> new ServicePackNotFoundException(servicePackId));
 
-        if(servicePackToUpdate.getName().equals(updatedServicePack.getName()) && servicePackRepo.existsByName(updatedServicePack.getName())){
+        if(!servicePackToUpdate.getName().equals(updatedServicePack.getName()) && servicePackRepo.existsByName(updatedServicePack.getName())){
             throw new NotUniqueException("Service pack with name \"" + updatedServicePack.getName() + "\" already exists.");
         }
 
+        List<ServiceItem> serviceItemsNoDuplicates = new ArrayList<>(
+                updatedServicePack.getServiceItems().stream()
+                        .collect(Collectors.toMap(
+                                ServiceItem::getId,
+                                Function.identity(),
+                                (existing, duplicate) -> existing,
+                                LinkedHashMap::new
+                        ))
+                        .values()
+        );
+
         //Om någon ServiceItem inte finns kastas exception
-        updatedServicePack.getServiceItems().forEach(si -> {
+        serviceItemsNoDuplicates.forEach(si -> {
             Optional<ServiceItem> optionalServiceItem = getServiceItem(si.getId());
-            if(!optionalServiceItem.isPresent()) {
+            if(optionalServiceItem.isEmpty()) {
                 throw new ServiceItemNotFoundException(si.getId());
             }
         });
 
         servicePackToUpdate.setName(updatedServicePack.getName());
-        servicePackToUpdate.setServiceItems(updatedServicePack.getServiceItems());
+        servicePackToUpdate.setServiceItems(serviceItemsNoDuplicates);
 
         return servicePackRepo.update(servicePackToUpdate);
     }
@@ -171,7 +181,7 @@ public class ServiceItemService {
      * @param name the name of the service pack to be created; must not be null or empty
      * @param serviceItemIds the IDs of the service items to be included in the service pack
      * @return the created and saved ServicePack object containing the specified details
-     * @throws InputNotValidException if the provided name is null, empty, or only contains whitespace
+     * @throws InputNotValidException if the provided name is null or empty, or service items are null or empty
      * @throws NotUniqueException if a service pack with the given name already exists
      * @throws ServiceItemNotFoundException if any of the provided service item IDs does not exist
      */
@@ -179,17 +189,20 @@ public class ServiceItemService {
         if(name == null || name.trim().isEmpty()) {
             throw new InputNotValidException("Service pack name cannot be empty.");
         }
+        if(serviceItemIds == null || serviceItemIds.length == 0){
+            throw new InputNotValidException("Service items cannot be empty");
+        }
         if(servicePackRepo.existsByName(name)){
             throw new NotUniqueException("Service pack with name \"" + name + "\" already exists.");
         }
         ServicePack servicePack = new ServicePack(name);
 
+        //Ta bort dubletter
+        serviceItemIds = Arrays.stream(serviceItemIds).distinct().toArray();
+
         for(int serviceItemId : serviceItemIds) {
-            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
-            if(!optionalServiceItem.isPresent()) {
-                throw new ServiceItemNotFoundException(serviceItemId);
-            }
-            ServiceItem serviceItem = optionalServiceItem.get();
+            ServiceItem serviceItem = getServiceItem(serviceItemId)
+                    .orElseThrow(() -> new ServiceItemNotFoundException(serviceItemId));
 
             servicePack.addServiceItem(serviceItem);
         }
