@@ -26,6 +26,7 @@ public class GarageSystem {
     private final BookingService bookingService;
     private final WorkOrderService workOrderService;
     private final MechanicService mechanicService;
+    private final ServiceItemService serviceItemService;
 
     public GarageSystem() {
         vehicleRepo = new VehicleRepoImpl();
@@ -43,20 +44,11 @@ public class GarageSystem {
         workOrderService = new WorkOrderService(bookingRepo, workOrderRepo, mechanicRepo, serviceItemRepo);
         bookingService = new BookingService(vehicleRepo, bookingRepo);
         mechanicService = new MechanicService(mechanicRepo, workOrderRepo);
+        serviceItemService = new ServiceItemService(serviceItemRepo, servicePackRepo);
     }
 
     public void showCustomers() {
-        System.out.println();
-        System.out.println("=== CUSTOMERS ===");
-
-        if (customerRepo.getAll().isEmpty()) {
-            System.out.println("No customers found.");
-            return;
-        }
-
-        for (Customer customer : customerRepo.getAll()) {
-            System.out.println(customer);
-        }
+        customerService.showCustomers();
     }
 
     public List<Customer> getCustomers() {
@@ -101,71 +93,28 @@ public class GarageSystem {
     }
 
     public void showServiceItems() {
-        System.out.println();
-        System.out.println("=== SERVICES ===");
-
-        if (serviceItemRepo.getAll().isEmpty()) {
-            System.out.println("No services found.");
-            return;
-        }
-
-        for (ServiceItem serviceItem : serviceItemRepo.getAll()) {
-            System.out.println(serviceItem);
-        }
+        serviceItemService.showServiceItems();
     }
 
     public List<ServiceItem> getServiceItems() {
-        List<ServiceItem> serviceItems = serviceItemRepo.getAll();
-        if (serviceItems.isEmpty()) {
-            System.out.println("No services found.");
-        }
-
-        return serviceItems;
+        return serviceItemService.getServiceItems();
     }
 
     public List<ServiceItem> getServiceItemsByIds(List<Integer> serviceIds) {
-        List<ServiceItem> serviceItems = serviceItemRepo.getByIds(serviceIds);
-        if (serviceItems.isEmpty()) {
-            System.out.println("No services found.");
-        }
-
-        return serviceItems;
+        return serviceItemService.getServiceItemsByIds(serviceIds);
     }
 
 
     public List<Integer> getMissingIds(List<Integer> lookingForIds, List<ServiceItem> serviceList) {
-        Set<Integer> foundIds = serviceList.stream()
-                .map(ServiceItem::getId)
-                .collect(Collectors.toSet());
-
-        return lookingForIds.stream()
-                .filter(id -> !foundIds.contains(id))
-                .collect(Collectors.toList());
+        return serviceItemService.getMissingIds(lookingForIds, serviceList);
     }
 
     public Optional<ServiceItem> getServiceItem(int id){
-        return serviceItemRepo.get(id);
+        return serviceItemService.getServiceItem(id);
     }
 
     public ServiceItem updateServiceItemPrice(int serviceItemId, double newPrice) {
-        if (newPrice < 0) {
-            throw new InputNotValidException("Price can not  be negative");
-        }
-
-        Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
-
-        if (!optionalServiceItem.isPresent()) {
-            throw new ServiceItemNotFoundException(serviceItemId);
-        }
-
-        ServiceItem serviceItem = optionalServiceItem.get();
-
-        serviceItem.setPrice(newPrice);
-        ServiceItem savedServiceItem = serviceItemRepo.update(serviceItem);
-
-        System.out.println("Price for " + savedServiceItem.getName() + " updated to " + newPrice + " SEK.");
-
-        return savedServiceItem;
+        return serviceItemService.updateServiceItemPrice(serviceItemId, newPrice);
     }
 
     public Customer updateCustomer(int customerId, String name, String phone, String email) {
@@ -197,60 +146,32 @@ public class GarageSystem {
         return customerService.deleteCustomer(customerId);
     }
 
-    //TODO om alla bokningar är klar/avbrutna, koppla lös dem
     public boolean deleteVehicle(int vehicleId) {
         return vehicleService.deleteVehicle(vehicleId);
     }
 
-    //TODO implementera UnitOfWork då när man tar bort en mekaniker ska den koppla bort den från existerande workOrders (som ej är klar/avbrutna)
     public boolean deleteMechanic(int mechanicId) {
         return mechanicService.deleteMechanic(mechanicId);
     }
 
     public void showServicePacks() {
-        System.out.println();
-        System.out.println("=== SERVICE PACKS ===");
-        if (servicePackRepo.getAll().isEmpty()) {
-            System.out.println("No services found.");
-            return;
-        }
-        for (ServicePack servicePack : servicePackRepo.getAll()) {
-            System.out.println(servicePack);
-        }
+        serviceItemService.showServicePacks();
     }
 
     public List<ServicePack> getServicePacks() {
-        return servicePackRepo.getAll();
+        return serviceItemService.getServicePacks();
     }
 
     public Optional<ServicePack> getServicePack(int id){
-        return servicePackRepo.getById(id);
+        return serviceItemService.getServicePack(id);
     }
 
-    //TODO get values and Garagesystem check
     public ServicePack updateServicePack(int servicePackId, ServicePack updatedServicePack){
-        Optional<ServicePack> optionalServicePack = getServicePack(servicePackId);
-        if(!optionalServicePack.isPresent()){
-            throw new ServicePackNotFoundException(servicePackId);
-        }
-
-        //Om någon ServiceItem inte finns kasta exception
-        updatedServicePack.getServiceItems().forEach(si -> {
-            Optional<ServiceItem> optionalServiceItem = getServiceItem(si.getId());
-            if(!optionalServiceItem.isPresent()) {
-                throw new ServiceItemNotFoundException(si.getId());
-            }
-        });
-
-        ServicePack servicePackToUpdate = optionalServicePack.get();
-        servicePackToUpdate.setName(updatedServicePack.getName());
-        servicePackToUpdate.setServiceItems(updatedServicePack.getServiceItems());
-
-        return servicePackRepo.update(servicePackToUpdate);
+        return serviceItemService.updateServicePack(servicePackId, updatedServicePack);
     }
 
     public void deleteServicePack(int id){
-        servicePackRepo.delete(id);
+        serviceItemService.deleteServicePack(id);
     }
 
     public void showMechanics() {
@@ -338,22 +259,7 @@ public class GarageSystem {
 
 
     public ServicePack createServicePack(String name, int... serviceItemIds){
-        if(!servicePackRepo.nameAvailable(name)){
-            throw new InputNotValidException("Service pack with name \"" + name + "\" already exists.");
-        }
-        ServicePack servicePack = new ServicePack(name);
-
-        for(int serviceItemId : serviceItemIds) {
-            Optional<ServiceItem> optionalServiceItem = getServiceItem(serviceItemId);
-            if(!optionalServiceItem.isPresent()) {
-                throw new ServiceItemNotFoundException(serviceItemId);
-            }
-            ServiceItem serviceItem = optionalServiceItem.get();
-
-            servicePack.addServiceItem(serviceItem);
-        }
-
-        return servicePackRepo.save(servicePack);
+        return serviceItemService.createServicePack(name, serviceItemIds);
     }
 
     public WorkOrder createWorkOrder(int bookingId,
