@@ -80,4 +80,18 @@ public class CustomerService {
         customerRepo.delete(customerId);
         return true;
     }
+
+    public void showCustomers() {
+        System.out.println();
+        System.out.println("=== CUSTOMERS ===");
+
+        if (customerRepo.getAll().isEmpty()) {
+            System.out.println("No customers found.");
+            return;
+        }
+
+        for (Customer customer : customerRepo.getAll()) {
+            System.out.println(customer);
+        }
+    }
 }
