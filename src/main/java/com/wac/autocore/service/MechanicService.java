@@ -68,16 +68,21 @@ public class MechanicService {
      * @throws MechanicNotFoundException if no mechanic is found with the given mechanicId
      */
     public Mechanic updateMechanic(int mechanicId, String name, String phone, String specialization) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new InputNotValidException("Mechanic name cannot be empty.");
+        if (name == null || name.trim().isEmpty() || name.trim().length() > 50) {
+            throw new InputNotValidException("Mechanic name cannot be empty or longer than 50 characters.");
         }
+        if(phone != null && phone.trim().length() > 20)
+            throw new InputNotValidException("Phone cannot be longer than 20 characters");
+
+        if(specialization != null && specialization.trim().length() > 50)
+            throw new InputNotValidException("Specialization cannot be longer than 50 characters");
 
         Mechanic mechanic = getMechanic(mechanicId)
                 .orElseThrow(() -> new MechanicNotFoundException(mechanicId));
 
         mechanic.setName(name.trim());
-        mechanic.setPhone(phone);
-        mechanic.setSpecialization(specialization);
+        mechanic.setPhone(phone == null ? null : phone.trim());
+        mechanic.setSpecialization(specialization == null ? null : specialization.trim());
 
         return mechanicRepo.update(mechanic);
     }
@@ -99,7 +104,7 @@ public class MechanicService {
     //TODO implementera UnitOfWork då när man tar bort en mekaniker ska den koppla bort den från existerande
     // workOrders (som ej är klar/avbrutna)
     public boolean deleteMechanic(int mechanicId) {
-        if (!mechanicRepo.get(mechanicId).isPresent()) {
+        if (mechanicRepo.get(mechanicId).isEmpty()) {
             throw new MechanicNotFoundException(mechanicId);
         }
         //If mechanic has work assigned they cannot be deleted. Connected WorkOrders need to be completed,

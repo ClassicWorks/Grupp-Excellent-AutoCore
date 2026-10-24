@@ -8,7 +8,6 @@ import com.wac.autocore.exceptions.InputNotValidException;
 import com.wac.autocore.model.Customer;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 public class CustomerService {
@@ -46,14 +45,22 @@ public class CustomerService {
      *                                or if the email format is invalid.
      */
     public Customer createCustomer(String name, String phone, String email) {
-        if(name == null || name.trim().isEmpty())
-            throw new InputNotValidException("Customer name cannot be empty.");
+        if(name == null || name.trim().isEmpty() || name.trim().length() > 50)
+            throw new InputNotValidException("Customer name cannot be empty or greater than 50 character.");
 
         if((phone == null || phone.trim().isEmpty()) && (email == null || email.trim().isEmpty()))
             throw new InputNotValidException("Email or phone cannot both be empty.");
 
-        if(email != null && !email.contains("@"))
-            throw new InputNotValidException("Email wrong format");
+        if(phone != null && phone.trim().length() > 20)
+            throw new InputNotValidException("Phone cannot be greater than 20 character.");
+
+        if(email != null) {
+            if (email.trim().length() > 50)
+                throw new InputNotValidException("Email cannot be longer than 20 characters.");
+
+            if (!email.contains("@"))
+                throw new InputNotValidException("Wrong format om email");
+        }
 
         Customer customer = new Customer(name.trim(), phone, email);
 
@@ -78,14 +85,22 @@ public class CustomerService {
      * @throws CustomerNotFoundException if no customer with the given ID exists.
      */
     public Customer updateCustomer(int customerId, String name, String phone, String email) {
-        if(name == null || name.trim().isEmpty())
-            throw new InputNotValidException("Customer name cannot be empty.");
+        if(name == null || name.trim().isEmpty() || name.trim().length() > 50)
+            throw new InputNotValidException("Customer name cannot be empty or greater than 50 character.");
 
         if((phone == null || phone.trim().isEmpty()) && (email == null || email.trim().isEmpty()))
             throw new InputNotValidException("Email or phone cannot both be empty.");
 
-        if(email != null && !email.contains("@"))
-            throw new InputNotValidException("Email wrong format");
+        if(phone != null && phone.trim().length() > 20)
+            throw new InputNotValidException("Phone cannot be greater than 20 character.");
+
+        if(email != null) {
+            if (email.trim().length() > 50)
+                throw new InputNotValidException("Email cannot be longer than 20 characters.");
+
+            if (!email.contains("@"))
+                throw new InputNotValidException("Wrong format om email");
+        }
 
         Customer customer = getCustomer(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException(customerId));
@@ -111,7 +126,7 @@ public class CustomerService {
      * @throws DeletionNotAllowedException if the customer has associated vehicles
      */
     public boolean deleteCustomer(int customerId) {
-        if (!customerRepo.get(customerId).isPresent()) {
+        if (customerRepo.get(customerId).isEmpty()) {
             throw new CustomerNotFoundException("Customer not found.");
         }
         if (customerHasVehicles(customerId)) {

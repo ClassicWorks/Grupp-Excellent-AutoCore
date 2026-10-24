@@ -6,7 +6,6 @@ import com.wac.autocore.model.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class WorkOrderService {
     private final BookingRepo bookingRepo;
@@ -103,7 +102,7 @@ public class WorkOrderService {
         if(mechanicId > 0) {
             Optional<Mechanic> optionalMechanic = mechanicRepo.get(mechanicId);
 
-            if (!optionalMechanic.isPresent()) {
+            if (optionalMechanic.isEmpty()) {
                 throw new MechanicNotFoundException(mechanicId);
             }
             mechanic = optionalMechanic.get();
@@ -121,7 +120,7 @@ public class WorkOrderService {
 
         for (int serviceItemId : serviceItemIds) {
             Optional<ServiceItem> optionalServiceItem = serviceItemRepo.get(serviceItemId);
-            if (!optionalServiceItem.isPresent()) {
+            if (optionalServiceItem.isEmpty()) {
                 throw new ServiceItemNotFoundException(serviceItemId);
             }
             ServiceItem serviceItem = optionalServiceItem.get();
@@ -150,7 +149,7 @@ public class WorkOrderService {
     public void confirmWorkOrder (int workOrderId) {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
-        if (!optionalWorkOrder.isPresent()) {
+        if (optionalWorkOrder.isEmpty()) {
             throw new WorkOrderNotFoundException(workOrderId);
         }
 
@@ -187,7 +186,7 @@ public class WorkOrderService {
                                              List<Integer> itemIdsToRemove) {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
-        if (!optionalWorkOrder.isPresent()) {
+        if (optionalWorkOrder.isEmpty()) {
             throw new WorkOrderNotFoundException(workOrderId);
         }
         WorkOrder workOrder = optionalWorkOrder.get();
@@ -205,7 +204,7 @@ public class WorkOrderService {
         for (Integer serviceItemId : serviceItemIdsToAdd) {
             Optional<ServiceItem> optionalServiceItem = serviceItemRepo.get(serviceItemId);
 
-            if (!optionalServiceItem.isPresent()) {
+            if (optionalServiceItem.isEmpty()) {
                 throw new ServiceItemNotFoundException(serviceItemId);
             }
 
@@ -238,7 +237,7 @@ public class WorkOrderService {
 
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
-        if (!optionalWorkOrder.isPresent()) {
+        if (optionalWorkOrder.isEmpty()) {
             throw new WorkOrderNotFoundException(workOrderId);
         }
         WorkOrder workOrder = optionalWorkOrder.get();
@@ -265,7 +264,7 @@ public class WorkOrderService {
     public WorkOrder updateWorkOrderMechanic(int workOrderId, int mechanicId){
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
-        if (!optionalWorkOrder.isPresent()) {
+        if (optionalWorkOrder.isEmpty()) {
             throw new WorkOrderNotFoundException(workOrderId);
         }
         WorkOrder workOrder = optionalWorkOrder.get();
@@ -278,7 +277,7 @@ public class WorkOrderService {
         if(mechanicId > 0) {
             Optional<Mechanic> optionalMechanic = mechanicRepo.get(mechanicId);
 
-            if (!optionalMechanic.isPresent()) {
+            if (optionalMechanic.isEmpty()) {
                 throw new MechanicNotFoundException(mechanicId);
             }
             mechanic = optionalMechanic.get();
@@ -304,7 +303,7 @@ public class WorkOrderService {
     public void startWorkOrder(int workOrderId) {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
-        if (!optionalWorkOrder.isPresent()) {
+        if (optionalWorkOrder.isEmpty()) {
             throw new WorkOrderNotFoundException(workOrderId);
         }
         WorkOrder workOrder = optionalWorkOrder.get();
@@ -349,7 +348,7 @@ public class WorkOrderService {
     public void completeWorkOrder(int workOrderId) {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
-        if (!optionalWorkOrder.isPresent()) {
+        if (optionalWorkOrder.isEmpty()) {
             throw new WorkOrderNotFoundException(workOrderId);
         }
         WorkOrder workOrder = optionalWorkOrder.get();
@@ -388,7 +387,7 @@ public class WorkOrderService {
     public void cancelWorkOrder(int workOrderId) {
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
-        if (!optionalWorkOrder.isPresent()) {
+        if (optionalWorkOrder.isEmpty()) {
             throw new WorkOrderNotFoundException(workOrderId);
         }
 

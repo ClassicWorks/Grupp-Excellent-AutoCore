@@ -9,33 +9,21 @@ public class Vehicle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "registration_number", nullable = false)
+    @Column(name = "registration_number", nullable = false, unique = true, length = 10)
     private String registrationNumber;
 
-    @Column(name = "brand", nullable = false)
+    @Column(name = "brand", nullable = false, length = 20)
     private String brand;
 
-    @Column(name = "model", nullable = false)
+    @Column(name = "model", nullable = false, length = 20)
     private String model;
 
     @Column(name = "year", nullable = false)
     private int year;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
-    //private int customerId;
-
-
-    public Vehicle(int id, String registrationNumber, String brand,
-                   String model, int year, Customer customer) {
-        this.id = id;
-        this.registrationNumber = registrationNumber;
-        this.brand = brand;
-        this.model = model;
-        this.year = year;
-        this.customer = customer;
-    }
 
     public Vehicle(String registrationNumber, String brand, String model, int year, Customer customer) {
         this.registrationNumber = registrationNumber;

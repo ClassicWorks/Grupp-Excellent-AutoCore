@@ -74,14 +74,14 @@ public class VehicleService {
                                  String model,
                                  int year,
                                  int customerId) {
-        if(registrationNumber == null || registrationNumber.trim().isEmpty()){
-            throw new InputNotValidException("Vehicle registration number cannot be empty.");
+        if(registrationNumber == null || registrationNumber.trim().isEmpty() || registrationNumber.trim().length() > 10){
+            throw new InputNotValidException("Vehicle registration number cannot be empty or longer than 10 characters.");
         }
-        if(brand == null || brand.trim().isEmpty()){
-            throw new InputNotValidException("Vehicle brand cannot be empty.");
+        if(brand == null || brand.trim().isEmpty() || brand.trim().length() > 20){
+            throw new InputNotValidException("Vehicle brand cannot be empty or longer than 20 characters.");
         }
-        if(model == null || model.trim().isEmpty()){
-            throw new InputNotValidException("Vehicle model cannot be empty.");
+        if(model == null || model.trim().isEmpty() || model.trim().length() > 20){
+            throw new InputNotValidException("Vehicle model cannot be empty or longer than 20 characters.");
         }
         if(year <= 1649 || year > LocalDate.now().getYear()){
             throw new InputNotValidException("Vehicle year cannot be before 1649 or after current year.");
@@ -131,14 +131,14 @@ public class VehicleService {
      */
     public Vehicle updateVehicle(int vehicleId, String registrationNumber, String brand,
                                 String model, int year, int customerId) {
-        if(registrationNumber == null || registrationNumber.trim().isEmpty()){
-            throw new InputNotValidException("Vehicle registration number cannot be empty.");
+        if(registrationNumber == null || registrationNumber.trim().isEmpty() || registrationNumber.trim().length() > 10){
+            throw new InputNotValidException("Vehicle registration number cannot be empty or longer than 10 characters.");
         }
-        if(brand == null || brand.trim().isEmpty()){
-            throw new InputNotValidException("Vehicle brand cannot be empty.");
+        if(brand == null || brand.trim().isEmpty() || brand.trim().length() > 20){
+            throw new InputNotValidException("Vehicle brand cannot be empty or longer than 20 characters.");
         }
-        if(model == null || model.trim().isEmpty()){
-            throw new InputNotValidException("Vehicle model cannot be empty.");
+        if(model == null || model.trim().isEmpty() || model.trim().length() > 20){
+            throw new InputNotValidException("Vehicle model cannot be empty or longer than 20 characters.");
         }
         if(year <= 1649 || year > LocalDate.now().getYear()){
             throw new InputNotValidException("Vehicle year cannot be before 1649 or after current year.");
@@ -179,7 +179,7 @@ public class VehicleService {
      * @throws DeletionNotAllowedException if the vehicle has active bookings and cannot be deleted
      */
     public boolean deleteVehicle(int vehicleId) {
-        if (!vehicleRepo.get(vehicleId).isPresent()) {
+        if (vehicleRepo.get(vehicleId).isEmpty()) {
             throw new VehicleNotFoundException(vehicleId);
         }
         if (vehicleHasBookings(vehicleId)) {

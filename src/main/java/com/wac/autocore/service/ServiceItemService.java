@@ -136,8 +136,9 @@ public class ServiceItemService {
      * @throws ServiceItemNotFoundException if any service item in the updated service pack does not exist
      */
     public ServicePack updateServicePack(int servicePackId, ServicePack updatedServicePack){
-        if(updatedServicePack.getName() == null || updatedServicePack.getName().trim().isEmpty()){
-            throw new InputNotValidException("Name cannot be empty");
+        if(updatedServicePack.getName() == null || updatedServicePack.getName().trim().isEmpty() ||
+                updatedServicePack.getName().trim().length() > 50){
+            throw new InputNotValidException("Name cannot be empty or longer than 50 characters");
         }
         if(updatedServicePack.getServiceItems() == null || updatedServicePack.getServiceItems().isEmpty()){
             throw new InputNotValidException("Service items cannot be empty");
@@ -186,8 +187,8 @@ public class ServiceItemService {
      * @throws ServiceItemNotFoundException if any of the provided service item IDs does not exist
      */
     public ServicePack createServicePack(String name, int... serviceItemIds){
-        if(name == null || name.trim().isEmpty()) {
-            throw new InputNotValidException("Service pack name cannot be empty.");
+        if(name == null || name.trim().isEmpty() || name.trim().length() > 50) {
+            throw new InputNotValidException("Service pack name cannot be empty or longer than 50 characters.");
         }
         if(serviceItemIds == null || serviceItemIds.length == 0){
             throw new InputNotValidException("Service items cannot be empty");
