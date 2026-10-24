@@ -33,7 +33,7 @@ public class CreateInvoiceForm {
         Label title = new Label(LanguageManager.getString("invoice.form.title"));
         title.getStyleClass().add("form-title");
 
-        List<WorkOrder> availableWorkOrders = garageSystem.getCompletedWorkOrdersWithoutInvoices();
+        List<WorkOrder> availableWorkOrders = garageSystem.getWorkOrdersThatCanBeInvoiced();
 
         ObservableList<WorkOrder> workOrderItems = FXCollections.observableArrayList(availableWorkOrders);
 

@@ -22,14 +22,6 @@ public class Mechanic {
     @Column(name = "available")
     private boolean available;
 
-    public Mechanic(int id, String name, String phone, String specialization) {
-        this.id = id;
-        this.name = name;
-        this.phone = phone;
-        this.specialization = specialization;
-        this.available = true;
-    }
-
     public Mechanic(String name, String phone, String specialization) {
         this.name = name;
         this.phone = phone;

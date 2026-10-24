@@ -33,6 +33,19 @@ public class PaymentService {
         return paymentRepo.get(id);
     }
 
+    /**
+     * Processes a payment for a specified invoice by the given payment type.
+     * If the invoice has already been paid or an error occurs during the payment process,
+     * appropriate exceptions are thrown. When payment is successful, the invoice is marked as paid
+     * and a payment confirmation is sent.
+     *
+     * @param invoiceId    the unique identifier of the invoice to be paid
+     * @param paymentType  the type of payment method to process the payment (e.g., credit card, bank transfer)
+     * @return the saved Payment object containing the details of the processed payment
+     * @throws InvoiceNotFoundException if no invoice is found with the specified invoiceId
+     * @throws StatusNotValidException  if the invoice is already marked as paid
+     * @throws InputNotValidException   if the provided paymentType is invalid or unsupported
+     */
     public Payment processPayment(int invoiceId, String paymentType) {
         Invoice invoice = invoiceService.getInvoice(invoiceId)
                 .orElseThrow(() -> new InvoiceNotFoundException(invoiceId));
@@ -64,6 +77,14 @@ public class PaymentService {
         return savedPayment;
     }
 
+    /**
+     * Executes a payment using the specified payment type and amount.
+     *
+     * @param paymentType the type of payment method to process the payment (e.g., CARD, SWISH, CASH)
+     * @param amount      the amount to be paid
+     * @return true if the payment is successful, false otherwise
+     * @throws InputNotValidException if the provided paymentType is invalid or unsupported
+     */
     private boolean executePayment(String paymentType, double amount) {
         Optional<PaymentMethod> paymentMethod = PaymentMethodFactory.create(paymentType);
 

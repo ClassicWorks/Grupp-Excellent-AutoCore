@@ -49,12 +49,16 @@ public class ServicePackRepoImpl implements ServicePackRepo {
     }
 
     @Override
-    public boolean nameAvailable(String name) {
+    public boolean existsByName(String name) {
         try(Session s = HibernateUtil.getSessionFactory().openSession()){
-            return s.createQuery(
-                    "from ServicePack sp where sp.name = :name", ServicePack.class)
+            Long count = s.createQuery(
+                            "select count(sp) from ServicePack sp " +
+                                    "where sp.name = :name",
+                            Long.class)
                     .setParameter("name", name)
-                    .getResultList().isEmpty();
+                    .uniqueResult();
+
+            return count > 0;
         }
     }
 

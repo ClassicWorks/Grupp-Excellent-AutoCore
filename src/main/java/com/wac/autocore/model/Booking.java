@@ -30,14 +30,6 @@ public class Booking {
     @Column(name = "status", nullable = false, length = 30)
     private String status;
 
-    /*public Booking(int id, int vehicle, LocalDate date, String description) {
-        this.id = id;
-        this.vehicle = vehicle;
-        this.date = date;
-        this.description = description;
-        this.status = "BOOKED";
-    }*/
-
     public Booking(Vehicle vehicle, LocalDate date, String description) {
         this.vehicle = vehicle;
         this.date = date;

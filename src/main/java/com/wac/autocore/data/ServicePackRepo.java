@@ -10,7 +10,7 @@ public interface ServicePackRepo {
     ServicePack update(ServicePack sp);
     List<ServicePack> getAll();
     Optional<ServicePack> getById(int id);
-    boolean nameAvailable(String name);
+    boolean existsByName(String name);
     void delete(int id);
 
 }

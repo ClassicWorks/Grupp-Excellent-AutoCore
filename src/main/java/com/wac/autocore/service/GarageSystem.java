@@ -1,14 +1,11 @@
 package com.wac.autocore.service;
 
 import com.wac.autocore.data.*;
-import com.wac.autocore.exceptions.*;
 import com.wac.autocore.model.*;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class GarageSystem {
     private final VehicleRepo vehicleRepo;
@@ -206,8 +203,8 @@ public class GarageSystem {
         return workOrderService.getWorkOrdersWithItemsByStatus(status);
     }
 
-    public List<WorkOrder> getCompletedWorkOrdersWithoutInvoices() {
-        return workOrderService.getCompletedWorkOrdersWithoutInvoices();
+    public List<WorkOrder> getWorkOrdersThatCanBeInvoiced() {
+        return invoiceService.getWorkOrdersThatCanBeInvoiced();
     }
 
     public Optional<WorkOrder> getWorkOrderWithItems(int workOrderId) {
@@ -216,6 +213,10 @@ public class GarageSystem {
 
     public Optional<WorkOrder> getWorkOrder(int id){
         return workOrderService.getWorkOrder(id);
+    }
+
+    public void showInvoices(){
+        invoiceService.showInvoices();
     }
 
     public List<Invoice> getInvoices() {

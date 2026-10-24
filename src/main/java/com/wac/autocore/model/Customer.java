@@ -10,25 +10,17 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @Column(name = "phone")
+    @Column(name = "phone", length = 20)
     private String phone;
 
-    @Column(name = "email")
+    @Column(name = "email", length = 50)
     private String email;
 
     @Column(name = "vip")
     private boolean vip;
-
-    public Customer(int id, String name, String phone, String email) {
-        this.id = id;
-        this.name = name;
-        this.phone = phone;
-        this.email = email;
-        this.vip = false;
-    }
 
     public Customer(String name, String phone, String email) {
         this.name = name;

@@ -22,6 +22,9 @@ public class BookingService {
         this.bookingRepo = bookingRepo;
     }
 
+    /**
+     * Shows alla Bookings. For testing
+     */
     public void showBookings() {
         System.out.println();
         System.out.println("=== BOOKINGS ===");
@@ -49,6 +52,19 @@ public class BookingService {
         return bookingRepo.get(id);
     }
 
+    /**
+     * Creates a new booking for a vehicle, translates the booking description from the chosen descriptionLang,
+     * and saves it in the booking repository.
+     *
+     * @param vehicleId the identifier of the vehicle to be booked. Must be greater than zero.
+     * @param date the date for the booking. Cannot be null.
+     * @param description the description of the booking. Cannot be null, empty, or longer than 255 characters.
+     * @param descriptionLang the language code of the booking description. Cannot be null, empty, or longer than 5 characters.
+     * @return the newly created and saved booking.
+     * @throws InputNotValidException if any of the input parameters are invalid (e.g., negative vehicleId,
+     *                                null date, invalid description, or invalid language code).
+     * @throws VehicleNotFoundException if the vehicle with the specified ID is not found in the repository.
+     */
     public Booking createBookingWithTranslation(int vehicleId,
                                                 LocalDate date,
                                                 String description,
@@ -68,7 +84,7 @@ public class BookingService {
 
         Optional<Vehicle> optionalVehicle = vehicleRepo.get(vehicleId);
 
-        if (!optionalVehicle.isPresent()) {
+        if (optionalVehicle.isEmpty()) {
             throw new VehicleNotFoundException(vehicleId);
         }
 

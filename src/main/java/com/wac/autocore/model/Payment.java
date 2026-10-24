@@ -12,7 +12,7 @@ public class Payment {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "invoice_id")
+    @JoinColumn(name = "invoice_id", nullable = false)
     private Invoice invoice;
 
     @Column(name = "amount")
@@ -26,15 +26,6 @@ public class Payment {
 
     @Column(name = "successful")
     private boolean successful;
-
-    public Payment(int id, Invoice invoice, double amount, String paymentType) {
-        this.id = id;
-        this.invoice = invoice;
-        this.amount = amount;
-        this.paymentType = paymentType;
-        this.paymentDate = LocalDateTime.now();
-        this.successful = false;
-    }
 
     public Payment(Invoice invoice, double amount, String paymentType) {
         this.invoice = invoice;
