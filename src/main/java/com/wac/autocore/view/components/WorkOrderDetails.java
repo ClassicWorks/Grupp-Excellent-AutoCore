@@ -138,7 +138,7 @@ public class WorkOrderDetails extends BorderPane {
         }
 
         ComboBox<Mechanic> mechanicComboBox = new ComboBox<>();
-        mechanicComboBox.getItems().setAll(garageSystem.getAvailableMechanics());
+        mechanicComboBox.getItems().setAll(garageSystem.getMechanics());
         mechanicComboBox.setConverter(ComboBoxLabels.mechanic());
         mechanicComboBox.setPromptText(LanguageManager.getString("workorder.details.mechanic.prompt"));
         mechanicComboBox.setValue(workOrder.getMechanic());

@@ -223,7 +223,7 @@ public class CreateBookingForm {
 
     private ComboBox<Mechanic> createMechanicComboBox() {
         ObservableList<Mechanic> mechanics =
-                FXCollections.observableArrayList(garageSystem.getAvailableMechanics());
+                FXCollections.observableArrayList(garageSystem.getMechanics());
 
         ComboBox<Mechanic> comboBox = new ComboBox<>(mechanics);
 

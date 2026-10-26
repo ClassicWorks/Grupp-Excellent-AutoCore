@@ -185,7 +185,7 @@ public class CreateWorkOrderForm {
         ObservableList<Mechanic> mechanics =
                 FXCollections.observableArrayList();
 
-        mechanics.addAll(garageSystem.getAvailableMechanics());
+        mechanics.addAll(garageSystem.getMechanics());
 
         ComboBox<Mechanic> comboBox =
                 new ComboBox<>(mechanics);
