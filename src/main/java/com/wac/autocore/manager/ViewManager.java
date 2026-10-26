@@ -98,12 +98,6 @@ public class ViewManager {
         showView(new ShowVehicleView().show());
     }
 
-    /*public void showBookings() {
-        currentViewRefresher = this::showBookings;
-        selectNav(SideNav.BOOKINGS);
-        showView(new ShowBookingsView().show());
-    }*/
-
     public void showMechanics() {
         currentViewRefresher = this::showMechanics;
         selectNav(SideNav.MECHANICS);
@@ -165,21 +159,6 @@ public class ViewManager {
         Parent content = new CreateBookingForm(popup, garageSystem).show(vehicleId, preselectedServiceIds);
         showPopup(popup, LanguageManager.getString("bookings.create"), content, this::refreshCurrentView);
     }
-    @Deprecated
-    public void showCreateWorkOrderPopup(int bookingId) {
-        Stage popup = new Stage();
-        Parent content = new CreateWorkOrderForm(popup, garageSystem).show(bookingId);
-
-        showPopup(popup, LanguageManager.getString("workorder.form.title"), content, null);
-    }
-
-    @Deprecated
-    public void showCreateWorkOrderPopup(int bookingId, List<Integer> preselectedServiceIds) {
-        Stage popup = new Stage();
-        Parent content = new CreateWorkOrderForm(popup, garageSystem).show(bookingId, preselectedServiceIds);
-
-        showPopup(popup, LanguageManager.getString("workorder.form.title"), content, this::showWorkOrders);
-    }
 
     public void showEditWorkOrderItemsPopUp(int workOrderId, Runnable onClose) {
         Stage popup = new Stage();
@@ -190,6 +169,7 @@ public class ViewManager {
                 content,
                 onClose);
     }
+    
     public void showCreateVehiclePopup() {
         Stage popup = new Stage();
         Parent content = new CreateVehicleForm(garageSystem, popup).show();
