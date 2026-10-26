@@ -11,21 +11,12 @@ public class ServiceItem {
 
     @Column(name = "name", nullable = false, length = 50)
     private String name;
-    @Column(name = "description", nullable = false, length = 255)
+    @Column(name = "description", nullable = false)
     private String description;
     @Column(name = "price", nullable = false)
     private double price;
     @Column(name = "estimated_minutes", nullable = false)
     private int estimatedMinutes;
-
-    public ServiceItem(int id, String name, String description,
-                       double price, int estimatedMinutes) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.estimatedMinutes = estimatedMinutes;
-    }
 
     public ServiceItem(String name, String description,
                        double price, int estimatedMinutes) {

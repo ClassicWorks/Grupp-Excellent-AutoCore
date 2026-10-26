@@ -55,13 +55,27 @@ public class VehicleRepoImpl implements VehicleRepo{
     }
 
     @Override
-    public boolean customerHasVehicle(int customerId) {
+    public boolean existsByCustomerId(int customerId) {
         try(Session s = HibernateUtil.getSessionFactory().openSession()) {
             Long numOfVehicles = s.createQuery(
                             "select count(v) from Vehicle v " +
                                     "where v.customer.id = :customerId",
                             Long.class)
                     .setParameter("customerId", customerId)
+                    .uniqueResult();
+
+            return numOfVehicles > 0;
+        }
+    }
+
+    @Override
+    public boolean existsByRegistrationNumber(String registrationNumber) {
+        try(Session s = HibernateUtil.getSessionFactory().openSession()) {
+            Long numOfVehicles = s.createQuery(
+                            "select count(v) from Vehicle v " +
+                                    "where v.registrationNumber = :registrationNumber",
+                            Long.class)
+                    .setParameter("registrationNumber", registrationNumber)
                     .uniqueResult();
 
             return numOfVehicles > 0;

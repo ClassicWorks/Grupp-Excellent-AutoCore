@@ -11,7 +11,7 @@ public class Invoice {
     private int id;
 
     @OneToOne
-    @JoinColumn(name = "work_order_id")
+    @JoinColumn(name = "work_order_id", nullable = false)
     private WorkOrder workOrder;
 
     @Column(name = "invoice_date")
@@ -28,16 +28,6 @@ public class Invoice {
 
     @Column(name = "paid")
     private boolean paid;
-
-    public Invoice(int id, WorkOrder workOrder, LocalDate invoiceDate, double amount) {
-        this.id = id;
-        this.workOrder = workOrder;
-        this.invoiceDate = invoiceDate;
-        this.amount = amount;
-        this.discount = 0.0;
-        this.totalAmount = amount;
-        this.paid = false;
-    }
 
     public Invoice(WorkOrder workOrder, LocalDate invoiceDate, double amount) {
         this.workOrder = workOrder;

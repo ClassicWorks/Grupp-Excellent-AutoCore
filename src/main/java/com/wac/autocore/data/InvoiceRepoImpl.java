@@ -38,11 +38,25 @@ public class InvoiceRepoImpl implements InvoiceRepo{
     }
 
     @Override
-    public List<Invoice> getWherePayedIs(boolean isPayed) {
+    public List<Invoice> findByPayed(boolean isPayed) {
         try(Session s = HibernateUtil.getSessionFactory().openSession()){
             return s.createQuery("from Invoice i where i.paid = :isPayed", Invoice.class)
                     .setParameter("isPayed", isPayed)
                     .list();
+        }
+    }
+
+    @Override
+    public boolean existsByWorkOrderId(int workOrderId) {
+        try(Session s = HibernateUtil.getSessionFactory().openSession()) {
+            Long numOfInvoices = s.createQuery(
+                            "select count(i) from Invoice i " +
+                                    "where i.workOrder.id = :workOrderId",
+                            Long.class)
+                    .setParameter("workOrderId", workOrderId)
+                    .uniqueResult();
+
+            return numOfInvoices > 0;
         }
     }
 

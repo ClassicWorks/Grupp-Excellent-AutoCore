@@ -9,6 +9,7 @@ public interface InvoiceRepo {
     Invoice save(Invoice i);
     Invoice update(Invoice i);
     List<Invoice> getAll();
-    List<Invoice> getWherePayedIs(boolean isPayed);
+    List<Invoice> findByPayed(boolean isPayed);
+    boolean existsByWorkOrderId(int workOrderId);
     Optional<Invoice> get(int id);
 }
