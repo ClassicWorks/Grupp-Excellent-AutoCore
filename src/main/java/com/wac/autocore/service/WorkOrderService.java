@@ -106,10 +106,6 @@ public class WorkOrderService {
                 throw new MechanicNotFoundException(mechanicId);
             }
             mechanic = optionalMechanic.get();
-
-            if (!mechanic.isAvailable()) {
-                throw new MechanicNotAvailableException("Mechanic " + mechanic.getName() + " is not available.");
-            }
         }
 
         WorkOrder workOrder = new WorkOrder(
@@ -270,7 +266,7 @@ public class WorkOrderService {
         WorkOrder workOrder = optionalWorkOrder.get();
 
         if (!workOrder.getStatus().canEdit()) {
-            throw new StatusNotValidException("The type can only be changed before the work order is started.");
+            throw new StatusNotValidException("The mechanic can only be changed before the work order is started.");
         }
 
         Mechanic mechanic = null;
@@ -281,10 +277,6 @@ public class WorkOrderService {
                 throw new MechanicNotFoundException(mechanicId);
             }
             mechanic = optionalMechanic.get();
-
-            if (!mechanic.isAvailable()) {
-                throw new MechanicNotAvailableException("Mechanic " + mechanic.getName() + " is not available.");
-            }
         }
         workOrder.setMechanic(mechanic);
         return workOrderRepo.update(workOrder);
@@ -316,6 +308,10 @@ public class WorkOrderService {
 
         if(mechanic == null){
             throw new MechanicNotFoundException("No mechanic. A mechanic must be selected to start the work order.");
+        }
+
+        if (!mechanic.isAvailable()) {
+            throw new MechanicNotAvailableException("Mechanic " + mechanic.getName() + " is not available.");
         }
 
         if(workOrder.getItems().isEmpty()){
