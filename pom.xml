@@ -11,6 +11,18 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
+        <!-- Logback för loggning via SLF4J. Tas bort när Spring Boot läggs till (Spring Boot styr versionen) -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.18</version>
+        </dependency>
+        <!-- jBCrypt hashar lösenord utan Spring. Samma format som Springs BCryptPasswordEncoder -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
         <!-- hibernate 7.4 support java 17, 21, 25, 26 -->
         <dependency>
             <groupId>org.hibernate.orm</groupId>

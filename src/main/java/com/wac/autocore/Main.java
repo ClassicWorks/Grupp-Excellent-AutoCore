@@ -1,6 +1,9 @@
 package com.wac.autocore;
 
+import com.wac.autocore.data.UserRepoImpl;
 import com.wac.autocore.manager.ViewManager;
+import com.wac.autocore.security.PasswordHasher;
+import com.wac.autocore.security.UserSeeder;
 import com.wac.autocore.util.HibernateUtil;
 import com.wac.autocore.util.LanguageManager;
 import javafx.application.Application;
@@ -25,6 +28,7 @@ public class Main extends Application {
             @Override
             protected Void call() {
                 HibernateUtil.getSessionFactory();
+                new UserSeeder(new UserRepoImpl(), new PasswordHasher()).seedTestUsers();
                 return null;
             }
         };
