@@ -21,7 +21,7 @@ public class ShowVehicleView {
     private final VBox detailsContainer = new VBox();
 
     public ShowVehicleView() {
-        garageSystem = new GarageSystem();
+        garageSystem = ViewManager.getInstance().getGarageSystem();
     }
 
     public Parent show(){

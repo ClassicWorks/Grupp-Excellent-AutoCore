@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 public class WorkOrderDetails extends BorderPane {
 
-    private final GarageSystem garageSystem = new GarageSystem();
+    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
     private final WorkOrder workOrder;
     private final Runnable onChanged;
 

@@ -14,6 +14,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
 public class ShowPaymentsView {
+    private final GarageSystem garageSystem;
+
+    public ShowPaymentsView() {
+        garageSystem = ViewManager.getInstance().getGarageSystem();
+    }
 
     public Parent show() {
         BorderPane layout = new BorderPane();
@@ -24,7 +29,7 @@ public class ShowPaymentsView {
         VBox paymentsBox = new VBox();
         paymentsBox.getStyleClass().add("card-container");
 
-        for (Payment payment : new GarageSystem().getPayments()) {
+        for (Payment payment : garageSystem.getPayments()) {
             PaymentCard paymentCard = new PaymentCard(payment);
             paymentsBox.getChildren().add(paymentCard);
         }

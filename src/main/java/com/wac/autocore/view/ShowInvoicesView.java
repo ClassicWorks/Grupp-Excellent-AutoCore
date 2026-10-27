@@ -22,7 +22,7 @@ public class ShowInvoicesView {
     private final GarageSystem garageSystem;
 
     public ShowInvoicesView() {
-        garageSystem = new GarageSystem();
+        garageSystem = ViewManager.getInstance().getGarageSystem();
     }
 
     public Parent show() {

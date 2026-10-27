@@ -2,20 +2,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.2</version>
+        <relativePath/>
+    </parent>
     <groupId>com.wac.autocore</groupId>
     <artifactId>Group-Excellent-AutoCore</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <properties>
         <java.version>21</java.version>
-        <maven.compiler.release>21</maven.compiler.release>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
-        <!-- Logback för loggning via SLF4J. Tas bort när Spring Boot läggs till (Spring Boot styr versionen) -->
+        <!-- Spring Boot utan webb: dependency injection, konfiguration och loggning -->
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.5.18</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
         </dependency>
         <!-- jBCrypt hashar lösenord utan Spring. Samma format som Springs BCryptPasswordEncoder -->
         <dependency>
@@ -23,25 +26,22 @@
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
         </dependency>
-        <!-- hibernate 7.4 support java 17, 21, 25, 26 -->
+        <!-- Hibernate som JPA-implementation, version styrs av Spring Boot -->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>7.4.10.Final</version>
         </dependency>
 
         <!-- jakarta persistance 3.2 passar med hibernate 7.4 -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
-            <version>3.2.0</version>
         </dependency>
 
         <!-- for MySQL server version 8.0.44  -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <version>8.0.33</version>
         </dependency>
 
         <dependency>
@@ -58,15 +58,6 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>com.wac.autocore.Main</mainClass>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.15.0</version>
-                <configuration>
-                    <release>21</release>
-                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
         </plugins>

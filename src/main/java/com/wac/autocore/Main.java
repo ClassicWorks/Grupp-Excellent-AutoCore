@@ -1,5 +1,6 @@
 package com.wac.autocore;
 
+import com.wac.autocore.config.ManualAppContext;
 import com.wac.autocore.data.UserRepoImpl;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.security.PasswordHasher;
@@ -21,7 +22,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         ViewManager viewManager = ViewManager.getInstance();
-        viewManager.init(stage);
+        viewManager.init(stage, new ManualAppContext().garageSystem());
         viewManager.showView(createLoadingView());
 
         Task<Void> loadDatabase = new Task<Void>() {

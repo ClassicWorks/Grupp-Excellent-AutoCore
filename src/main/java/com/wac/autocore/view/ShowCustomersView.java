@@ -25,7 +25,7 @@ public class ShowCustomersView {
     private GridPane mainContent;
 
     public ShowCustomersView() {
-        garageSystem = new GarageSystem();
+        garageSystem = ViewManager.getInstance().getGarageSystem();
     }
 
     public Parent show() {

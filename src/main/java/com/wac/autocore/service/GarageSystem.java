@@ -1,6 +1,5 @@
 package com.wac.autocore.service;
 
-import com.wac.autocore.data.*;
 import com.wac.autocore.model.*;
 
 import java.time.LocalDate;
@@ -8,13 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class GarageSystem {
-    private final VehicleRepo vehicleRepo;
-    private final CustomerRepo customerRepo;
-    private final MechanicRepo mechanicRepo;
-    private final ServiceItemRepo serviceItemRepo;
-    private final BookingRepo bookingRepo;
-    private final WorkOrderRepo workOrderRepo;
-    private final ServicePackRepo servicePackRepo;
 
     private final CustomerService customerService;
     private final PaymentService paymentService;
@@ -25,23 +17,22 @@ public class GarageSystem {
     private final MechanicService mechanicService;
     private final ServiceItemService serviceItemService;
 
-    public GarageSystem() {
-        vehicleRepo = new VehicleRepoImpl();
-        customerRepo = new CustomerRepoImpl();
-        mechanicRepo = new MechanicRepoImpl();
-        serviceItemRepo = new ServiceItemRepoImpl();
-        bookingRepo = new BookingRepoImpl();
-        workOrderRepo = new WorkOrderRepoImpl();
-        servicePackRepo = new ServicePackRepoImpl();
-
-        customerService = new CustomerService(customerRepo, vehicleRepo);
-        invoiceService = new InvoiceService(new InvoiceRepoImpl(), workOrderRepo);
-        paymentService = new PaymentService(new PaymentRepoImpl(), invoiceService);
-        vehicleService = new VehicleService(vehicleRepo, customerRepo, bookingRepo);
-        workOrderService = new WorkOrderService(bookingRepo, workOrderRepo, mechanicRepo, serviceItemRepo);
-        bookingService = new BookingService(vehicleRepo, bookingRepo);
-        mechanicService = new MechanicService(mechanicRepo, workOrderRepo);
-        serviceItemService = new ServiceItemService(serviceItemRepo, servicePackRepo);
+    public GarageSystem(CustomerService customerService,
+                        VehicleService vehicleService,
+                        BookingService bookingService,
+                        WorkOrderService workOrderService,
+                        MechanicService mechanicService,
+                        ServiceItemService serviceItemService,
+                        InvoiceService invoiceService,
+                        PaymentService paymentService) {
+        this.customerService = customerService;
+        this.vehicleService = vehicleService;
+        this.bookingService = bookingService;
+        this.workOrderService = workOrderService;
+        this.mechanicService = mechanicService;
+        this.serviceItemService = serviceItemService;
+        this.invoiceService = invoiceService;
+        this.paymentService = paymentService;
     }
 
     public void showCustomers() {
