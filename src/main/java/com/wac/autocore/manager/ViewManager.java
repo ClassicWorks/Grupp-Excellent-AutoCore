@@ -20,6 +20,7 @@ public class ViewManager {
     private Stage primaryStage;
     private BorderPane rootLayout;
     private SideNav sideNav;
+    private Node sideNavNode;
     private String currentNav;
     private Runnable currentViewRefresher;
     private GarageSystem garageSystem;
@@ -40,7 +41,7 @@ public class ViewManager {
 
         rootLayout = new BorderPane();
         sideNav = new SideNav();
-        rootLayout.setLeft(sideNav.show());
+        sideNavNode = sideNav.show();;
 
         Scene scene = new Scene(rootLayout, 1300, 1000);
         scene.getStylesheets().add("style/stylesheet.css");
@@ -60,6 +61,16 @@ public class ViewManager {
 
     public void showView(Node view) {
         rootLayout.setCenter(view);
+    }
+
+    public void showLogin() {
+        rootLayout.setLeft(null);
+        showView(new LoginView(this::onLoggedIn).show());
+    }
+
+    private void onLoggedIn() {
+        rootLayout.setLeft(sideNavNode);
+        showVehicles();
     }
 
     public void showPopup(Stage popup, String title, Parent content, Runnable onClose) {
