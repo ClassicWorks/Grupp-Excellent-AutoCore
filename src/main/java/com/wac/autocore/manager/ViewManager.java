@@ -35,8 +35,7 @@ public class ViewManager {
         return instance;
     }
 
-    public void init(Stage stage, GarageSystem garageSystem) {
-        this.garageSystem = garageSystem;
+    public void init(Stage stage) {
         this.primaryStage = stage;
 
         rootLayout = new BorderPane();
@@ -53,6 +52,10 @@ public class ViewManager {
 
     public GarageSystem getGarageSystem() {
         return garageSystem;
+    }
+
+    public void setGarageSystem(GarageSystem garageSystem) {
+        this.garageSystem = garageSystem;
     }
 
     public void showView(Node view) {
