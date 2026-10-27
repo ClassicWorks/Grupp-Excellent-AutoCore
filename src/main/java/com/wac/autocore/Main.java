@@ -33,7 +33,7 @@ public class Main extends Application {
             }
         };
 
-        loadDatabase.setOnSucceeded(e -> viewManager.showVehicles());
+        loadDatabase.setOnSucceeded(e -> viewManager.showLogin());
         loadDatabase.setOnFailed(e -> viewManager.showView(createErrorView()));
 
         Thread loadingThread = new Thread(loadDatabase);
