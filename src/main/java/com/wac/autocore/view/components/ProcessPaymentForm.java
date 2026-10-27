@@ -1,5 +1,6 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.Payment;
 import com.wac.autocore.service.GarageSystem;
@@ -19,7 +20,7 @@ import java.util.List;
 
 public class ProcessPaymentForm {
 
-    private final GarageSystem garageSystem = new GarageSystem();
+    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
     private final Stage popupStage;
 
     public ProcessPaymentForm(Stage popupStage) {

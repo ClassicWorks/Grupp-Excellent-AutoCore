@@ -17,7 +17,7 @@ import javafx.scene.layout.VBox;
 import java.util.function.Consumer;
 
 public class VehicleDetails extends BorderPane {
-    private final GarageSystem garageSystem = new GarageSystem();
+    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
     private final Runnable onSaved;
 
     private Vehicle vehicle;

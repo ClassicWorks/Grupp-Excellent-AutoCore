@@ -1,5 +1,6 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.WorkOrder;
 import com.wac.autocore.model.WorkOrderItem;
@@ -20,7 +21,7 @@ import java.util.Optional;
 
 public class InvoiceDetailsPopup {
 
-    private final GarageSystem garageSystem = new GarageSystem();
+    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
     private final Stage popupStage;
     private final int invoiceId;
 

@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 
 public class CreateCustomer {
 
-    private final GarageSystem garageSystem = new GarageSystem();
+    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
     private final Stage popupStage;
     private final Customer customer;
 

@@ -22,7 +22,7 @@ public class ShowServiceItemsView {
     private final GarageSystem garageSystem;
 
     public ShowServiceItemsView() {
-        garageSystem = new GarageSystem();
+        garageSystem = ViewManager.getInstance().getGarageSystem();
     }
 
     private VBox serviceItemsBox;

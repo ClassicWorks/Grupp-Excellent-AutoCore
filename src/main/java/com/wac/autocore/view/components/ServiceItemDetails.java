@@ -1,5 +1,6 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
@@ -18,7 +19,7 @@ public class ServiceItemDetails extends BorderPane {
 
     private final TextField priceField = new TextField();
     private final Label errorLabel = new Label();
-    private final GarageSystem garageSystem = new GarageSystem();
+    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
     private final Runnable onSaved;
 
     public ServiceItemDetails(ServiceItem serviceItem, Runnable onSaved) {

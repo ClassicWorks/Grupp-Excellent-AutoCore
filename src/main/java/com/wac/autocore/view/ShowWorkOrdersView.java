@@ -20,7 +20,7 @@ public class ShowWorkOrdersView {
     private final TabPane tabPane = new TabPane();
 
     public ShowWorkOrdersView() {
-        garageSystem = new GarageSystem();
+        garageSystem = ViewManager.getInstance().getGarageSystem();
     }
 
     public Parent show() {

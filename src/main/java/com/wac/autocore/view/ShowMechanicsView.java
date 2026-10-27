@@ -1,5 +1,6 @@
 package com.wac.autocore.view;
 
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
@@ -25,7 +26,7 @@ public class ShowMechanicsView {
     private final VBox mechanicsBox = new VBox();
 
     public ShowMechanicsView() {
-        garageSystem = new GarageSystem();
+        garageSystem = ViewManager.getInstance().getGarageSystem();
     }
 
     public Parent show() {

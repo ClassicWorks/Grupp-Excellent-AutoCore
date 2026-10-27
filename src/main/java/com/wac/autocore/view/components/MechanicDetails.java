@@ -1,5 +1,6 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
@@ -16,7 +17,7 @@ public class MechanicDetails extends BorderPane {
 
     private final Mechanic mechanic;
     private final Runnable onSaved;
-    private final GarageSystem garageSystem = new GarageSystem();
+    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
 
     private final TextField nameField = new TextField();
     private final TextField phoneField = new TextField();

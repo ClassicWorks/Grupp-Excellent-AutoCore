@@ -23,10 +23,10 @@ public class ViewManager {
     private Node sideNavNode;
     private String currentNav;
     private Runnable currentViewRefresher;
-    private final GarageSystem garageSystem;
+    private GarageSystem garageSystem;
 
     private ViewManager() {
-        garageSystem = new GarageSystem();
+
     }
 
     public static synchronized ViewManager getInstance() {
@@ -49,6 +49,14 @@ public class ViewManager {
         stage.setTitle("Wigell AutoCore");
         stage.setScene(scene);
         stage.show();
+    }
+
+    public GarageSystem getGarageSystem() {
+        return garageSystem;
+    }
+
+    public void setGarageSystem(GarageSystem garageSystem) {
+        this.garageSystem = garageSystem;
     }
 
     public void showView(Node view) {
