@@ -1,11 +1,16 @@
 package com.wac.autocore.view;
 
 import com.wac.autocore.manager.ViewManager;
+import com.wac.autocore.security.AppSession;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
+import com.wac.autocore.view.components.ImageViewWithAltText;
+import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -104,7 +109,26 @@ public class SideNav {
                 invoiceBtn,
                 paymentBtn);
 
-        VBox exitBox = new VBox(languageBtn, exitBtn);
+        //Profile button, looks like the tabs. Click opens a menu with log out
+        String username = AppSession.getInstance().currentUser()
+                .map(user -> user.username())
+                .orElse("");
+
+        Button profileBtn = new Button(username);
+        profileBtn.setGraphic(new ImageViewWithAltText("/imgs/user-solid.png", 20, 20,
+                LanguageManager.getString("image.user-solid")));
+        profileBtn.setGraphicTextGap(10);
+        profileBtn.getStyleClass().addAll("menu-btn", "profile");
+
+        MenuItem logoutItem = new MenuItem(LanguageManager.getString("nav.logout"));
+        logoutItem.setOnAction(e -> ViewManager.getInstance().logout());
+        logoutItem.getStyleClass().add("logout-item");
+
+        ContextMenu profileMenu = new ContextMenu(logoutItem);
+        profileMenu.getStyleClass().add("profile-menu");
+        profileBtn.setOnAction(e -> profileMenu.show(profileBtn, Side.TOP, 0, 0));
+
+        VBox exitBox = new VBox(profileBtn, languageBtn, exitBtn);
 
         navBox.getStyleClass().add("side-nav");
         exitBox.getStyleClass().add("side-nav");

@@ -1,5 +1,10 @@
 package com.wac.autocore.manager;
 
+import com.wac.autocore.data.UserRepoImpl;
+import com.wac.autocore.security.AppSession;
+import com.wac.autocore.security.Authenticator;
+import com.wac.autocore.security.DatabaseAuthenticator;
+import com.wac.autocore.security.PasswordHasher;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.*;
@@ -20,10 +25,12 @@ public class ViewManager {
     private Stage primaryStage;
     private BorderPane rootLayout;
     private SideNav sideNav;
-    private Node sideNavNode;
     private String currentNav;
     private Runnable currentViewRefresher;
     private GarageSystem garageSystem;
+
+    private final Authenticator authenticator =
+            new DatabaseAuthenticator(new UserRepoImpl(), AppSession.getInstance(), new PasswordHasher());
 
     private ViewManager() {
 
@@ -41,7 +48,6 @@ public class ViewManager {
 
         rootLayout = new BorderPane();
         sideNav = new SideNav();
-        sideNavNode = sideNav.show();;
 
         Scene scene = new Scene(rootLayout, 1300, 1000);
         scene.getStylesheets().add("style/stylesheet.css");
@@ -65,12 +71,19 @@ public class ViewManager {
 
     public void showLogin() {
         rootLayout.setLeft(null);
-        showView(new LoginView(this::onLoggedIn).show());
+        showView(new LoginView(authenticator, this::onLoggedIn).show());
     }
 
     private void onLoggedIn() {
-        rootLayout.setLeft(sideNavNode);
+        refreshSideNav();
         showVehicles();
+    }
+
+    public void logout() {
+        authenticator.logout();
+        currentViewRefresher = null;
+        currentNav = null;
+        showLogin();
     }
 
     public void showPopup(Stage popup, String title, Parent content, Runnable onClose) {
@@ -188,7 +201,7 @@ public class ViewManager {
                 content,
                 onClose);
     }
-    
+
     public void showCreateVehiclePopup() {
         Stage popup = new Stage();
         Parent content = new CreateVehicleForm(garageSystem, popup).show();
