@@ -1,10 +1,6 @@
 package com.wac.autocore.view;
 
-import com.wac.autocore.data.UserRepoImpl;
-import com.wac.autocore.security.AppSession;
 import com.wac.autocore.security.Authenticator;
-import com.wac.autocore.security.DatabaseAuthenticator;
-import com.wac.autocore.security.PasswordHasher;
 import com.wac.autocore.util.LanguageManager;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -15,11 +11,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 public class LoginView {
-    private final Authenticator authenticator =
-            new DatabaseAuthenticator(new UserRepoImpl(), AppSession.getInstance(), new PasswordHasher());
+    private final Authenticator authenticator;
     private final Runnable onLoginSuccess;
 
-    public LoginView(Runnable onLoginSuccess) {
+    public LoginView(Authenticator authenticator, Runnable onLoginSuccess) {
+        this.authenticator = authenticator;
         this.onLoginSuccess = onLoginSuccess;
     }
 

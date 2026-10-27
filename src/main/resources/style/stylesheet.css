@@ -604,3 +604,27 @@ CheckBox {
 .app-dialog .content {
     -fx-padding: 16px;
 }
+
+/* Logg out */
+
+.profile-menu {
+    -fx-background-color: #A6432E;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 0;
+    -fx-effect: null;
+}
+
+.profile-menu .menu-item {
+    -fx-background-color: #A6432E;
+    -fx-background-radius: 0;
+    -fx-padding: 10px 16px;
+}
+
+.profile-menu .menu-item:focused {
+    -fx-background-color: #873624;
+}
+
+.logout-item .label {
+    -fx-text-fill: #e6e6e6;
+}
