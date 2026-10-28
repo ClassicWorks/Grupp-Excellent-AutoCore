@@ -1,7 +1,7 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.exceptions.BusinessRuleException;
-import com.wac.autocore.exceptions.ValidationException;
+import com.wac.autocore.controller.ErrorHandler;
+import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
@@ -28,6 +28,8 @@ public class WorkOrderDetails extends BorderPane {
     private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
     private final WorkOrder workOrder;
     private final Runnable onChanged;
+
+    private final ErrorHandler errorHandler = new ErrorHandler();
 
     public WorkOrderDetails(WorkOrder workOrder, Runnable onChanged) {
         this.workOrder = workOrder;
@@ -57,7 +59,6 @@ public class WorkOrderDetails extends BorderPane {
         Booking booking = workOrder.getBooking();
         Vehicle vehicle = booking != null ? booking.getVehicle() : null;
         Customer customer = vehicle != null ? vehicle.getCustomer() : null;
-        Mechanic mechanic = workOrder.getMechanic();
 
         Label vehicleLabel = new Label(vehicle != null
                 ? String.format("%s | %s %s, %d", vehicle.getRegistrationNumber(),
@@ -145,7 +146,8 @@ public class WorkOrderDetails extends BorderPane {
 
         mechanicComboBox.setOnAction(e -> {
             Mechanic selected = mechanicComboBox.getValue();
-            if (selected == workOrder.getMechanic()) {
+            Mechanic current = workOrder.getMechanic();
+            if (selected == null || (current != null && selected.getId() == current.getId())) {
                 return;
             }
             withErrorHandling(() -> garageSystem.updateWorkOrderMechanic(workOrder.getId(), selected.getId())).run();
@@ -250,13 +252,9 @@ public class WorkOrderDetails extends BorderPane {
 
     private Runnable withErrorHandling(Runnable action) {
         return () -> {
-            try {
-                action.run();
-            } catch (BusinessRuleException | ValidationException e) {
-                AppDialog.showError(
-                        LanguageManager.getString("workorder.dialog.error.title"),
-                        LanguageManager.getString("workorder.dialog.error.header"),
-                        e.getMessage());
+            Result<Void> result = errorHandler.run(action);
+            if (!result.isSuccess()) {
+                AppDialog.showErrorMessage(result.error());
             }
             onChanged.run();
         };

@@ -85,6 +85,13 @@ public class AppDialog {
         return result.isPresent() && result.get() == confirmBtn;
     }
 
+    public static void showErrorMessage(String message) {
+        showError(
+                LanguageManager.getString("error.title"),
+                LanguageManager.getString("error.header"),
+                message);
+    }
+
     private static void show(
             Alert.AlertType type,
             String title,
