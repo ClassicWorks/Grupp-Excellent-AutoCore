@@ -1,6 +1,10 @@
 package com.wac.autocore.config;
 
 import com.wac.autocore.data.*;
+import com.wac.autocore.security.AppSession;
+import com.wac.autocore.security.Authenticator;
+import com.wac.autocore.security.DatabaseAuthenticator;
+import com.wac.autocore.security.PasswordHasher;
 import com.wac.autocore.service.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +29,13 @@ public class SpringConfig {
     @Bean
     InvoiceRepo invoiceRepo() { return new InvoiceRepoImpl(); }
     @Bean PaymentRepo paymentRepo() { return new PaymentRepoImpl(); }
+    @Bean UserRepo userRepo() { return new UserRepoImpl(); }
+    @Bean PasswordHasher passwordHasher() { return new PasswordHasher(); }
+
+    @Bean
+    Authenticator authenticator(UserRepo userRepo, PasswordHasher passwordHasher) {
+        return new DatabaseAuthenticator(userRepo, AppSession.getInstance(), passwordHasher);
+    }
 
     @Bean
     CustomerService customerService(CustomerRepo customerRepo, VehicleRepo vehicleRepo) {
