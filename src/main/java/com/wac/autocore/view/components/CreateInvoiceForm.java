@@ -1,5 +1,6 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.exceptions.AutoCoreException;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.WorkOrder;
 import com.wac.autocore.service.GarageSystem;
@@ -75,7 +76,7 @@ public class CreateInvoiceForm {
             try {
                 garageSystem.createInvoice(selectedWorkOrder.getId(), discountCode);
                 popupStage.close();
-            } catch (IllegalArgumentException ex) {
+            } catch (AutoCoreException ex) {
                 errorLabel.setText(ex.getMessage());
             }
         });

@@ -1,5 +1,6 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.exceptions.AutoCoreException;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.ServicePack;
 import com.wac.autocore.model.WorkOrder;
@@ -242,7 +243,7 @@ public class EditWorkOrderItemsForm {
             try {
                 garageSystem.updateWorkOrderServices(workOrderId, serviceItemIdsToAdd, removedItemIds);
                 popupStage.close();
-            } catch (IllegalArgumentException ex) {
+            } catch (AutoCoreException ex) {
                 errorLabel.setText(ex.getMessage());
             }
         });
