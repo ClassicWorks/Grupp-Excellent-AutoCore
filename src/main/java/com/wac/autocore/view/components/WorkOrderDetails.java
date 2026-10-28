@@ -1,6 +1,7 @@
 package com.wac.autocore.view.components;
 
 import com.wac.autocore.controller.ErrorHandler;
+import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
@@ -58,7 +59,6 @@ public class WorkOrderDetails extends BorderPane {
         Booking booking = workOrder.getBooking();
         Vehicle vehicle = booking != null ? booking.getVehicle() : null;
         Customer customer = vehicle != null ? vehicle.getCustomer() : null;
-        Mechanic mechanic = workOrder.getMechanic();
 
         Label vehicleLabel = new Label(vehicle != null
                 ? String.format("%s | %s %s, %d", vehicle.getRegistrationNumber(),
@@ -252,7 +252,10 @@ public class WorkOrderDetails extends BorderPane {
 
     private Runnable withErrorHandling(Runnable action) {
         return () -> {
-            errorHandler.run(action);
+            Result<Void> result = errorHandler.run(action);
+            if (!result.isSuccess()) {
+                AppDialog.showErrorMessage(result.error());
+            }
             onChanged.run();
         };
     }

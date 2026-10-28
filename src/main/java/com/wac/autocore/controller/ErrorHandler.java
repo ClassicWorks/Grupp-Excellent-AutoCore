@@ -4,33 +4,27 @@ import com.wac.autocore.exceptions.AutoCoreException;
 import com.wac.autocore.exceptions.NotAuthenticatedException;
 import com.wac.autocore.exceptions.PermissionDeniedException;
 import com.wac.autocore.util.LanguageManager;
-import com.wac.autocore.view.components.AppDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public class ErrorHandler {
     private static final Logger log = LoggerFactory.getLogger(ErrorHandler.class);
 
-    public boolean run(Runnable action) {
+    public Result<Void> run(Runnable action) {
         return call(() -> {
             action.run();
-            return true;
-        }).isPresent();
+            return null;
+        });
     }
 
-    public <T> Optional<T> call(Supplier<T> action) {
+    public <T> Result<T> call(Supplier<T> action) {
         try {
-            return Optional.ofNullable(action.get());
+            return Result.success(action.get());
         } catch (AutoCoreException e) {
             log.warn("Operation failed: {} - {}", e.getClass().getSimpleName(), e.getMessage());
-            AppDialog.showError(
-                    LanguageManager.getString("error.title"),
-                    LanguageManager.getString("error.header"),
-                    messageFor(e));
-            return Optional.empty();
+            return Result.failure(messageFor(e));
         }
     }
 
