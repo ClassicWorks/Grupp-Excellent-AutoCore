@@ -1,10 +1,7 @@
 package com.wac.autocore.config;
 
 import com.wac.autocore.data.*;
-import com.wac.autocore.security.AppSession;
-import com.wac.autocore.security.Authenticator;
-import com.wac.autocore.security.DatabaseAuthenticator;
-import com.wac.autocore.security.PasswordHasher;
+import com.wac.autocore.security.*;
 import com.wac.autocore.service.*;
 
 public class ManualAppContext implements AppContext {
@@ -44,5 +41,10 @@ public class ManualAppContext implements AppContext {
     @Override
     public Authenticator authenticator() {
         return authenticator;
+    }
+
+    @Override
+    public CurrentUserProvider currentUserProvider() {
+        return AppSession.getInstance();
     }
 }

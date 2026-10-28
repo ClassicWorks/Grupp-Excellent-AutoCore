@@ -20,6 +20,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
+        <!-- Spring Security för inloggning i Spring-läget (utan webb) -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+        </dependency>
         <!-- jBCrypt hashar lösenord utan Spring. Samma format som Springs BCryptPasswordEncoder -->
         <dependency>
             <groupId>org.mindrot</groupId>
@@ -31,8 +36,7 @@
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
         </dependency>
-
-        <!-- jakarta persistance 3.2 passar med hibernate 7.4 -->
+        <!-- JPA-standarden, version styrs av Spring Boot -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>

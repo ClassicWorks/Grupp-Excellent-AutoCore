@@ -1,6 +1,7 @@
 package com.wac.autocore.manager;
 
 import com.wac.autocore.security.Authenticator;
+import com.wac.autocore.security.CurrentUserProvider;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.*;
@@ -26,6 +27,7 @@ public class ViewManager {
     private GarageSystem garageSystem;
 
     private Authenticator authenticator;
+    private CurrentUserProvider currentUserProvider;
 
     private ViewManager() {
 
@@ -42,7 +44,6 @@ public class ViewManager {
         this.primaryStage = stage;
 
         rootLayout = new BorderPane();
-        sideNav = new SideNav();
 
         Scene scene = new Scene(rootLayout, 1300, 1000);
         scene.getStylesheets().add("style/stylesheet.css");
@@ -62,6 +63,10 @@ public class ViewManager {
 
     public void setAuthenticator(Authenticator authenticator) {
         this.authenticator = authenticator;
+    }
+
+    public void setCurrentUserProvider(CurrentUserProvider currentUserProvider) {
+        this.currentUserProvider = currentUserProvider;
     }
 
     public void showView(Node view) {
@@ -160,7 +165,7 @@ public class ViewManager {
     }
 
     public void refreshSideNav() {
-        sideNav = new SideNav();
+        sideNav = new SideNav(currentUserProvider);
         rootLayout.setLeft(sideNav.show());
         if (currentNav != null) {
             sideNav.select(currentNav);
