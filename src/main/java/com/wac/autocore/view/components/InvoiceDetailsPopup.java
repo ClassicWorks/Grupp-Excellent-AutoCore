@@ -1,5 +1,7 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.controller.InvoiceController;
+import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.WorkOrder;
@@ -21,6 +23,7 @@ import java.util.Optional;
 
 public class InvoiceDetailsPopup {
 
+    private final InvoiceController invoiceController = ViewManager.getInstance().getControllers().invoices();
     private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
     private final Stage popupStage;
     private final int invoiceId;
@@ -34,8 +37,16 @@ public class InvoiceDetailsPopup {
         VBox content = new VBox(10);
         content.setPadding(new Insets(20));
 
-        Optional<Invoice> optionalInvoice = garageSystem.getInvoice(invoiceId);
-        if (!optionalInvoice.isPresent()) {
+        Result<Optional<Invoice>> invoiceResult = invoiceController.getInvoice(invoiceId);
+        if (!invoiceResult.isSuccess()) {
+            content.getChildren().addAll(
+                    errorLabel(invoiceResult.error()),
+                    createCloseBtn());
+            return wrapInScrollPane(content);
+        }
+
+        Optional<Invoice> optionalInvoice = invoiceResult.value();
+        if (optionalInvoice.isEmpty()) {
             content.getChildren().addAll(
                     new Label(LanguageManager.getString("invoice.details.error.notFound")),
                     createCloseBtn());
@@ -45,7 +56,7 @@ public class InvoiceDetailsPopup {
 
         Optional<WorkOrder> optionalWorkOrder =
                 garageSystem.getWorkOrderWithItems(invoice.getWorkOrder().getId());
-        if (!optionalWorkOrder.isPresent()) {
+        if (optionalWorkOrder.isEmpty()) {
             content.getChildren().addAll(
                     new Label(LanguageManager.getString("invoice.details.error.workOrderNotFound")),
                     createCloseBtn());
@@ -99,6 +110,13 @@ public class InvoiceDetailsPopup {
                 createCloseBtn());
 
         return wrapInScrollPane(content);
+    }
+
+    private Label errorLabel(String message) {
+        Label label = new Label(message);
+        label.getStyleClass().add("error-label");
+        label.setWrapText(true);
+        return label;
     }
 
     private String formatAmount(double amount) {

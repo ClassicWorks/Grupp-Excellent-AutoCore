@@ -1,8 +1,9 @@
 package com.wac.autocore.view;
 
+import com.wac.autocore.controller.PaymentController;
+import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Payment;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.PaymentCard;
 import javafx.scene.Node;
@@ -13,11 +14,13 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
+import java.util.List;
+
 public class ShowPaymentsView {
-    private final GarageSystem garageSystem;
+    private final PaymentController paymentController;
 
     public ShowPaymentsView() {
-        garageSystem = ViewManager.getInstance().getGarageSystem();
+        paymentController = ViewManager.getInstance().getControllers().payments();
     }
 
     public Parent show() {
@@ -29,9 +32,16 @@ public class ShowPaymentsView {
         VBox paymentsBox = new VBox();
         paymentsBox.getStyleClass().add("card-container");
 
-        for (Payment payment : garageSystem.getPayments()) {
-            PaymentCard paymentCard = new PaymentCard(payment);
-            paymentsBox.getChildren().add(paymentCard);
+        Result<List<Payment>> result = paymentController.getPayments();
+        if (result.isSuccess()) {
+            for (Payment payment : result.value()) {
+                paymentsBox.getChildren().add(new PaymentCard(payment));
+            }
+        } else {
+            Label errorLabel = new Label(result.error());
+            errorLabel.getStyleClass().add("error-label");
+            errorLabel.setWrapText(true);
+            paymentsBox.getChildren().add(errorLabel);
         }
 
         ScrollPane paymentsScroll = new ScrollPane(paymentsBox);

@@ -1,8 +1,9 @@
 package com.wac.autocore.view;
 
+import com.wac.autocore.controller.InvoiceController;
+import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Invoice;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.InvoiceCard;
 import com.wac.autocore.view.components.kanban.KanbanColumn;
@@ -19,10 +20,10 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 
 public class ShowInvoicesView {
-    private final GarageSystem garageSystem;
+    private final InvoiceController invoiceController;
 
     public ShowInvoicesView() {
-        garageSystem = ViewManager.getInstance().getGarageSystem();
+        invoiceController = ViewManager.getInstance().getControllers().invoices();
     }
 
     public Parent show() {
@@ -50,7 +51,11 @@ public class ShowInvoicesView {
     }
 
     private Node getUnpaidList() {
-        List<Invoice> unpaidInvoices = garageSystem.getUnpaidInvoices();
+        Result<List<Invoice>> result = invoiceController.getUnpaidInvoices();
+        if (!result.isSuccess()) {
+            return getErrorLabel(result.error());
+        }
+        List<Invoice> unpaidInvoices = result.value();
 
         if (unpaidInvoices.isEmpty()) {
             return new Label(LanguageManager.getString("invoices.empty.unpaid"));
@@ -59,12 +64,23 @@ public class ShowInvoicesView {
     }
 
     private Node getPaidList() {
-        List<Invoice> paidInvoices = garageSystem.getPaidInvoices();
+        Result<List<Invoice>> result = invoiceController.getPaidInvoices();
+        if (!result.isSuccess()) {
+            return getErrorLabel(result.error());
+        }
+        List<Invoice> paidInvoices = result.value();
 
         if (paidInvoices.isEmpty()) {
             return new Label(LanguageManager.getString("invoices.empty.paid"));
         }
         return getInvoiceCardsFromList(paidInvoices);
+    }
+
+    private Label getErrorLabel(String message) {
+        Label label = new Label(message);
+        label.getStyleClass().add("error-label");
+        label.setWrapText(true);
+        return label;
     }
 
     private VBox getInvoiceCardsFromList(List<Invoice> invoices) {

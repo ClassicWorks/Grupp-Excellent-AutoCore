@@ -1,9 +1,11 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.controller.PaymentController;
+import com.wac.autocore.controller.InvoiceController;
+import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.Payment;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
@@ -20,7 +22,8 @@ import java.util.List;
 
 public class ProcessPaymentForm {
 
-    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
+    private final InvoiceController invoiceController = ViewManager.getInstance().getControllers().invoices();
+    private final PaymentController paymentController = ViewManager.getInstance().getControllers().payments();
     private final Stage popupStage;
 
     public ProcessPaymentForm(Stage popupStage) {
@@ -34,7 +37,16 @@ public class ProcessPaymentForm {
         Label title = new Label(LanguageManager.getString("payment.form.title"));
         title.getStyleClass().add("form-title");
 
-        List<Invoice> unpaidInvoices = garageSystem.getUnpaidInvoices();
+        Label errorLabel = new Label();
+        errorLabel.getStyleClass().add("error-label");
+
+        Result<List<Invoice>> invoicesResult = invoiceController.getUnpaidInvoices();
+        List<Invoice> unpaidInvoices = List.of();
+        if (invoicesResult.isSuccess()) {
+            unpaidInvoices = invoicesResult.value();
+        } else {
+            errorLabel.setText(invoicesResult.error());
+        }
 
         ObservableList<Invoice> invoiceItems = FXCollections.observableArrayList(unpaidInvoices);
 
@@ -54,10 +66,6 @@ public class ProcessPaymentForm {
 
         VBox paymentTypeBox = new VBox(paymentTypeComboBox);
         paymentTypeBox.getStyleClass().add("form-field-container");
-
-
-        Label errorLabel = new Label();
-        errorLabel.getStyleClass().add("error-label");
 
 
         Button processBtn = new Button(LanguageManager.getString("payment.form.submit"));
@@ -83,8 +91,14 @@ public class ProcessPaymentForm {
                 return;
             }
 
-            Payment payment = garageSystem.processPayment(selectedInvoice.getId(), selectedType);
+            Result<Payment> result = paymentController.processPayment(selectedInvoice.getId(), selectedType);
 
+            if (!result.isSuccess()) {
+                errorLabel.setText(result.error());
+                return;
+            }
+
+            Payment payment = result.value();
             if (payment == null || !payment.isSuccessful()) {
                 errorLabel.setText(LanguageManager.getString("payment.form.error.failed"));
                 return;

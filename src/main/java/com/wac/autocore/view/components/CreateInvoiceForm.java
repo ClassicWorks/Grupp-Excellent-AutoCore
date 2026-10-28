@@ -1,9 +1,9 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.exceptions.AutoCoreException;
+import com.wac.autocore.controller.InvoiceController;
+import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.WorkOrder;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
@@ -21,7 +21,7 @@ import java.util.List;
 
 public class CreateInvoiceForm {
 
-    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
+    private final InvoiceController invoiceController = ViewManager.getInstance().getControllers().invoices();
     private final Stage popupStage;
 
     public CreateInvoiceForm(Stage popupStage) {
@@ -35,7 +35,16 @@ public class CreateInvoiceForm {
         Label title = new Label(LanguageManager.getString("invoice.form.title"));
         title.getStyleClass().add("form-title");
 
-        List<WorkOrder> availableWorkOrders = garageSystem.getWorkOrdersThatCanBeInvoiced();
+        Label errorLabel = new Label();
+        errorLabel.getStyleClass().add("error-label");
+
+        Result<List<WorkOrder>> workOrdersResult = invoiceController.getWorkOrdersThatCanBeInvoiced();
+        List<WorkOrder> availableWorkOrders = List.of();
+        if (workOrdersResult.isSuccess()) {
+            availableWorkOrders = workOrdersResult.value();
+        } else {
+            errorLabel.setText(workOrdersResult.error());
+        }
 
         ObservableList<WorkOrder> workOrderItems = FXCollections.observableArrayList(availableWorkOrders);
 
@@ -51,9 +60,6 @@ public class CreateInvoiceForm {
 
         VBox discountBox = new VBox(discountCodeField);
         discountBox.getStyleClass().add("form-field-container");
-
-        Label errorLabel = new Label();
-        errorLabel.getStyleClass().add("error-label");
 
         Button createBtn = new Button(LanguageManager.getString("invoice.form.submit"));
         createBtn.getStyleClass().add("confirm-btn");
@@ -73,11 +79,11 @@ public class CreateInvoiceForm {
 
             String discountCode = discountCodeField.getText().trim();
 
-            try {
-                garageSystem.createInvoice(selectedWorkOrder.getId(), discountCode);
+            Result<?> result = invoiceController.createInvoice(selectedWorkOrder.getId(), discountCode);
+            if (result.isSuccess()) {
                 popupStage.close();
-            } catch (AutoCoreException ex) {
-                errorLabel.setText(ex.getMessage());
+            } else {
+                errorLabel.setText(result.error());
             }
         });
 
