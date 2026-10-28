@@ -9,111 +9,61 @@ import java.util.Optional;
 
 public class CatalogController {
     private final ServiceItemService serviceItemService;
-    //private final GlobalExceptionHandler exceptionHandler;
+    private final ErrorHandler errorHandler;
 
     public CatalogController(
-            ServiceItemService serviceItemService
-            //GlobalExceptionHandler exceptionHandler
+            ServiceItemService serviceItemService, ErrorHandler errorHandler
     ) {
         this.serviceItemService = serviceItemService;
-        //this.exceptionHandler = exceptionHandler;
+        this.errorHandler = errorHandler;
     }
 
-    public List<ServiceItem> getServiceItems() {
-        try {
-            return serviceItemService.getServiceItems();
-        } catch (Exception e) {
-            //exceptionHandler.handle(e);
-            return List.of();
-        }
+    public Result<List<ServiceItem>> getServiceItems() {
+        return errorHandler.call(serviceItemService::getServiceItems);
     }
 
-    public List<ServiceItem> getServiceItemsByIds(List<Integer> serviceIds) {
-        try {
-            return serviceItemService.getServiceItemsByIds(serviceIds);
-        } catch (Exception e) {
-            //exceptionHandler.handle(e);
-            return List.of();
-        }
+    public Result<List<ServiceItem>> getServiceItemsByIds(List<Integer> serviceIds) {
+        return errorHandler.call(() -> serviceItemService.getServiceItemsByIds(serviceIds));
     }
 
-    public List<Integer> getMissingIds(
+    public Result<List<Integer>> getMissingIds(
             List<Integer> lookingForIds,
             List<ServiceItem> serviceList
     ) {
-        try {
-            return serviceItemService.getMissingIds(lookingForIds, serviceList);
-        } catch (Exception e) {
-            //exceptionHandler.handle(e);
-            return List.of();
-        }
+        return errorHandler.call(() -> serviceItemService.getMissingIds(lookingForIds, serviceList));
     }
 
-    public Optional<ServiceItem> getServiceItem(int id) {
-        try {
-            return serviceItemService.getServiceItem(id);
-        } catch (Exception e) {
-            //exceptionHandler.handle(e);
-            return Optional.empty();
-        }
+    public Result<Optional<ServiceItem>> getServiceItem(int id) {
+        return errorHandler.call(() ->serviceItemService.getServiceItem(id));
     }
 
-    public ServiceItem updateServiceItemPrice(int serviceItemId, double newPrice) {
-        try {
-            return serviceItemService.updateServiceItemPrice(serviceItemId, newPrice);
-        } catch (Exception e) {
-            //exceptionHandler.handle(e);
-            return null;
-        }
+    public Result<ServiceItem> updateServiceItemPrice(int serviceItemId, double newPrice) {
+        return errorHandler.call(() -> serviceItemService.updateServiceItemPrice(serviceItemId, newPrice));
     }
 
-    public List<ServicePack> getServicePacks() {
-        try {
-            return serviceItemService.getServicePacks();
-        } catch (Exception e) {
-            //exceptionHandler.handle(e);
-            return List.of();
-        }
+    public Result<List<ServicePack>> getServicePacks() {
+        return errorHandler.call(serviceItemService::getServicePacks);
     }
 
-    public Optional<ServicePack> getServicePack(int id) {
-        try {
-            return serviceItemService.getServicePack(id);
-        } catch (Exception e) {
-            //exceptionHandler.handle(e);
-            return Optional.empty();
-        }
+    public Result<Optional<ServicePack>> getServicePack(int id) {
+        return errorHandler.call(() -> serviceItemService.getServicePack(id));
     }
 
-    public ServicePack updateServicePack(
+    public Result<ServicePack> updateServicePack(
             int servicePackId,
             ServicePack updatedServicePack
     ) {
-        try {
-            return serviceItemService.updateServicePack(
-                    servicePackId,
-                    updatedServicePack
-            );
-        } catch (Exception e) {
-            //exceptionHandler.handle(e);
-            return null;
-        }
+        return errorHandler.call(() -> serviceItemService.updateServicePack(
+                servicePackId,
+                updatedServicePack
+        ));
     }
 
-    public ServicePack createServicePack(String name, int... serviceItemIds) {
-        try {
-            return serviceItemService.createServicePack(name, serviceItemIds);
-        } catch (Exception e) {
-            //exceptionHandler.handle(e);
-            return null;
-        }
+    public Result<ServicePack> createServicePack(String name, int... serviceItemIds) {
+            return errorHandler.call(() -> serviceItemService.createServicePack(name, serviceItemIds));
     }
 
     public void deleteServicePack(int id) {
-        try {
-            serviceItemService.deleteServicePack(id);
-        } catch (Exception e) {
-            //exceptionHandler.handle(e);
-        }
+            errorHandler.run(() -> serviceItemService.deleteServicePack(id));
     }
 }
