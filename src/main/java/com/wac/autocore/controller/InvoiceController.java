@@ -13,39 +13,53 @@ public class InvoiceController {
 
     private final InvoiceService invoiceService;
     private final AccessGuard accessGuard;
+    private final ErrorHandler errorHandler;
 
-    public InvoiceController(InvoiceService invoiceService, AccessGuard accessGuard) {
+    public InvoiceController(InvoiceService invoiceService, AccessGuard accessGuard, ErrorHandler errorHandler) {
         this.invoiceService = invoiceService;
         this.accessGuard = accessGuard;
+        this.errorHandler = errorHandler;
     }
 
-    public List<Invoice> getInvoices() {
-        accessGuard.require(Permission.READ, "getInvoices");
-        return invoiceService.getInvoices();
+    public Result<List<Invoice>> getInvoices() {
+        return errorHandler.call(() -> {
+            accessGuard.require(Permission.READ, "getInvoices");
+            return invoiceService.getInvoices();
+        });
     }
 
-    public Optional<Invoice> getInvoice(int id) {
-        accessGuard.require(Permission.READ, "getInvoice");
-        return invoiceService.getInvoice(id);
+    public Result<Optional<Invoice>> getInvoice(int id) {
+        return errorHandler.call(() -> {
+            accessGuard.require(Permission.READ, "getInvoice");
+            return invoiceService.getInvoice(id);
+        });
     }
 
-    public List<Invoice> getUnpaidInvoices() {
-        accessGuard.require(Permission.READ, "getUnpaidInvoices");
-        return invoiceService.getUnpaidInvoices();
+    public Result<List<Invoice>> getUnpaidInvoices() {
+        return errorHandler.call(() -> {
+            accessGuard.require(Permission.READ, "getUnpaidInvoices");
+            return invoiceService.getUnpaidInvoices();
+        });
     }
 
-    public List<Invoice> getPaidInvoices() {
-        accessGuard.require(Permission.READ, "getPaidInvoices");
-        return invoiceService.getPaidInvoices();
+    public Result<List<Invoice>> getPaidInvoices() {
+        return errorHandler.call(() -> {
+            accessGuard.require(Permission.READ, "getPaidInvoices");
+            return invoiceService.getPaidInvoices();
+        });
     }
 
-    public List<WorkOrder> getWorkOrdersThatCanBeInvoiced() {
-        accessGuard.require(Permission.READ, "getWorkOrdersThatCanBeInvoiced");
-        return invoiceService.getWorkOrdersThatCanBeInvoiced();
+    public Result<List<WorkOrder>> getWorkOrdersThatCanBeInvoiced() {
+        return errorHandler.call(() -> {
+            accessGuard.require(Permission.READ, "getWorkOrdersThatCanBeInvoiced");
+            return invoiceService.getWorkOrdersThatCanBeInvoiced();
+        });
     }
 
-    public Invoice createInvoice(int workOrderId, String discountCode) {
-        accessGuard.require(Permission.MANAGE_INVOICES, "createInvoice");
-        return invoiceService.createInvoice(workOrderId, discountCode);
+    public Result<Invoice> createInvoice(int workOrderId, String discountCode) {
+        return errorHandler.call(() -> {
+            accessGuard.require(Permission.MANAGE_INVOICES, "createInvoice");
+            return invoiceService.createInvoice(workOrderId, discountCode);
+        });
     }
 }

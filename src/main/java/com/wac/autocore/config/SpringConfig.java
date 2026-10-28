@@ -115,13 +115,15 @@ public class SpringConfig {
     }
 
     @Bean
-    InvoiceController invoiceController(InvoiceService invoiceService, AccessGuard accessGuard) {
-        return new InvoiceController(invoiceService, accessGuard);
+    InvoiceController invoiceController(InvoiceService invoiceService, AccessGuard accessGuard,
+                                        ErrorHandler errorHandler) {
+        return new InvoiceController(invoiceService, accessGuard, errorHandler);
     }
 
     @Bean
-    PaymentController paymentController(PaymentService paymentService, AccessGuard accessGuard) {
-        return new PaymentController(paymentService, accessGuard);
+    PaymentController paymentController(PaymentService paymentService, AccessGuard accessGuard,
+                                        ErrorHandler errorHandler) {
+        return new PaymentController(paymentService, accessGuard, errorHandler);
     }
 
     @Bean

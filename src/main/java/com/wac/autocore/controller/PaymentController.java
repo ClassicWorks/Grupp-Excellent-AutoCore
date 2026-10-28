@@ -12,24 +12,32 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final AccessGuard accessGuard;
+    private final ErrorHandler errorHandler;
 
-    public PaymentController(PaymentService paymentService, AccessGuard accessGuard) {
+    public PaymentController(PaymentService paymentService, AccessGuard accessGuard, ErrorHandler errorHandler) {
         this.paymentService = paymentService;
         this.accessGuard = accessGuard;
+        this.errorHandler = errorHandler;
     }
 
-    public List<Payment> getPayments() {
-        accessGuard.require(Permission.READ, "getPayments");
-        return paymentService.getPayments();
+    public Result<List<Payment>> getPayments() {
+        return errorHandler.call(() -> {
+            accessGuard.require(Permission.READ, "getPayments");
+            return paymentService.getPayments();
+        });
     }
 
-    public Optional<Payment> getPayment(int id) {
-        accessGuard.require(Permission.READ, "getPayment");
-        return paymentService.getPayment(id);
+    public Result<Optional<Payment>> getPayment(int id) {
+        return errorHandler.call(() -> {
+            accessGuard.require(Permission.READ, "getPayment");
+            return paymentService.getPayment(id);
+        });
     }
 
-    public Payment processPayment(int invoiceId, String paymentType) {
-        accessGuard.require(Permission.MANAGE_PAYMENTS, "processPayment");
-        return paymentService.processPayment(invoiceId, paymentType);
+    public Result<Payment> processPayment(int invoiceId, String paymentType) {
+        return errorHandler.call(() -> {
+            accessGuard.require(Permission.MANAGE_PAYMENTS, "processPayment");
+            return paymentService.processPayment(invoiceId, paymentType);
+        });
     }
 }
