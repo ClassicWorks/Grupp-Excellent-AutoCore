@@ -1,5 +1,6 @@
 package com.wac.autocore.manager;
 
+import com.wac.autocore.controller.AppControllers;
 import com.wac.autocore.security.Authenticator;
 import com.wac.autocore.security.CurrentUserProvider;
 import com.wac.autocore.service.GarageSystem;
@@ -28,6 +29,7 @@ public class ViewManager {
 
     private Authenticator authenticator;
     private CurrentUserProvider currentUserProvider;
+    private AppControllers controllers;
 
     private ViewManager() {
 
@@ -63,6 +65,14 @@ public class ViewManager {
 
     public void setAuthenticator(Authenticator authenticator) {
         this.authenticator = authenticator;
+    }
+
+    public AppControllers getControllers() {
+        return controllers;
+    }
+
+    public void setControllers(AppControllers controllers) {
+        this.controllers = controllers;
     }
 
     public void setCurrentUserProvider(CurrentUserProvider currentUserProvider) {

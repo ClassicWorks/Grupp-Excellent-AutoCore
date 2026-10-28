@@ -1,7 +1,6 @@
 package com.wac.autocore.config;
 
-import com.wac.autocore.controller.InvoiceController;
-import com.wac.autocore.controller.PaymentController;
+import com.wac.autocore.controller.*;
 import com.wac.autocore.data.*;
 import com.wac.autocore.security.AccessGuard;
 import com.wac.autocore.security.Authenticator;
@@ -111,6 +110,11 @@ public class SpringConfig {
     }
 
     @Bean
+    ErrorHandler errorHandler() {
+        return new ErrorHandler();
+    }
+
+    @Bean
     InvoiceController invoiceController(InvoiceService invoiceService, AccessGuard accessGuard) {
         return new InvoiceController(invoiceService, accessGuard);
     }
@@ -118,5 +122,17 @@ public class SpringConfig {
     @Bean
     PaymentController paymentController(PaymentService paymentService, AccessGuard accessGuard) {
         return new PaymentController(paymentService, accessGuard);
+    }
+
+    @Bean
+    WorkOrderController workOrderController(WorkOrderService workOrderService, ErrorHandler errorHandler) {
+        return new WorkOrderController(workOrderService, errorHandler);
+    }
+
+    @Bean
+    AppControllers appControllers(WorkOrderController workOrderController,
+                                  InvoiceController invoiceController,
+                                  PaymentController paymentController) {
+        return new AppControllers(workOrderController, invoiceController, paymentController);
     }
 }

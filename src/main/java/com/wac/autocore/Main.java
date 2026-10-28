@@ -56,6 +56,7 @@ public class Main extends Application {
             viewManager.setGarageSystem(appContext.garageSystem());
             viewManager.setAuthenticator(appContext.authenticator());
             viewManager.setCurrentUserProvider(appContext.currentUserProvider());
+            viewManager.setControllers(appContext.controllers());
             viewManager.showLogin();
         });
         startup.setOnFailed(e -> {
