@@ -3,6 +3,7 @@ package com.wac.autocore;
 import com.wac.autocore.config.AppContext;
 import com.wac.autocore.config.ManualAppContext;
 import com.wac.autocore.config.SpringAppContext;
+import com.wac.autocore.controller.GlobalExceptionHandler;
 import com.wac.autocore.data.UserRepoImpl;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.security.PasswordHasher;
@@ -28,6 +29,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
+        GlobalExceptionHandler globalHandler = new GlobalExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler(globalHandler);
+        Thread.currentThread().setUncaughtExceptionHandler(globalHandler);
+
         boolean standalone = "standalone".equalsIgnoreCase(System.getenv("AUTOCORE_MODE"));
 
         ViewManager viewManager = ViewManager.getInstance();

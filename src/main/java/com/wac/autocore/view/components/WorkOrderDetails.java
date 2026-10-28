@@ -1,7 +1,6 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.exceptions.BusinessRuleException;
-import com.wac.autocore.exceptions.ValidationException;
+import com.wac.autocore.controller.ErrorHandler;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
@@ -28,6 +27,8 @@ public class WorkOrderDetails extends BorderPane {
     private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
     private final WorkOrder workOrder;
     private final Runnable onChanged;
+
+    private final ErrorHandler errorHandler = new ErrorHandler();
 
     public WorkOrderDetails(WorkOrder workOrder, Runnable onChanged) {
         this.workOrder = workOrder;
@@ -145,7 +146,8 @@ public class WorkOrderDetails extends BorderPane {
 
         mechanicComboBox.setOnAction(e -> {
             Mechanic selected = mechanicComboBox.getValue();
-            if (selected == workOrder.getMechanic()) {
+            Mechanic current = workOrder.getMechanic();
+            if (selected == null || (current != null && selected.getId() == current.getId())) {
                 return;
             }
             withErrorHandling(() -> garageSystem.updateWorkOrderMechanic(workOrder.getId(), selected.getId())).run();
@@ -250,14 +252,7 @@ public class WorkOrderDetails extends BorderPane {
 
     private Runnable withErrorHandling(Runnable action) {
         return () -> {
-            try {
-                action.run();
-            } catch (BusinessRuleException | ValidationException e) {
-                AppDialog.showError(
-                        LanguageManager.getString("workorder.dialog.error.title"),
-                        LanguageManager.getString("workorder.dialog.error.header"),
-                        e.getMessage());
-            }
+            errorHandler.run(action);
             onChanged.run();
         };
     }
