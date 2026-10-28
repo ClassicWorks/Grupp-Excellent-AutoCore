@@ -1,7 +1,7 @@
 package com.wac.autocore.view;
 
 import com.wac.autocore.manager.ViewManager;
-import com.wac.autocore.security.AppSession;
+import com.wac.autocore.security.CurrentUserProvider;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.ImageViewWithAltText;
@@ -32,7 +32,13 @@ public class SideNav {
     public static final String INVOICES = "invoices";
     public static final String PAYMENTS = "payments";
 
+    private final CurrentUserProvider currentUserProvider;
+
     private final Map<String, Button> navButtons = new HashMap<>();
+
+    public SideNav(CurrentUserProvider currentUserProvider) {
+        this.currentUserProvider = currentUserProvider;
+    }
 
     private VBox navBox;
     /**
@@ -110,7 +116,7 @@ public class SideNav {
                 paymentBtn);
 
         //Profile button, looks like the tabs. Click opens a menu with log out
-        String username = AppSession.getInstance().currentUser()
+        String username = currentUserProvider.currentUser()
                 .map(user -> user.username())
                 .orElse("");
 

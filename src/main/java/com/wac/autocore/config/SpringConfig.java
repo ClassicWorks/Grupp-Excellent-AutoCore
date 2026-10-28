@@ -1,13 +1,16 @@
 package com.wac.autocore.config;
 
 import com.wac.autocore.data.*;
-import com.wac.autocore.security.AppSession;
 import com.wac.autocore.security.Authenticator;
-import com.wac.autocore.security.DatabaseAuthenticator;
-import com.wac.autocore.security.PasswordHasher;
+import com.wac.autocore.security.CurrentUserProvider;
 import com.wac.autocore.service.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class SpringConfig {
@@ -30,11 +33,23 @@ public class SpringConfig {
     InvoiceRepo invoiceRepo() { return new InvoiceRepoImpl(); }
     @Bean PaymentRepo paymentRepo() { return new PaymentRepoImpl(); }
     @Bean UserRepo userRepo() { return new UserRepoImpl(); }
-    @Bean PasswordHasher passwordHasher() { return new PasswordHasher(); }
+    @Bean CurrentUserProvider currentUserProvider() { return new SpringUserProvider(); }
 
     @Bean
-    Authenticator authenticator(UserRepo userRepo, PasswordHasher passwordHasher) {
-        return new DatabaseAuthenticator(userRepo, AppSession.getInstance(), passwordHasher);
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    AuthenticationManager authenticationManager(UserRepo userRepo, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(new SpringUserDetailsService(userRepo));
+        provider.setPasswordEncoder(passwordEncoder);
+        return new ProviderManager(provider);
+    }
+
+    @Bean
+    Authenticator authenticator (AuthenticationManager authenticationManager) {
+        return new SpringAuthenticator(authenticationManager);
     }
 
     @Bean
