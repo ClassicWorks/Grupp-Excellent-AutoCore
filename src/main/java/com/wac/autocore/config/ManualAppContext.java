@@ -1,7 +1,6 @@
 package com.wac.autocore.config;
 
-import com.wac.autocore.controller.InvoiceController;
-import com.wac.autocore.controller.PaymentController;
+import com.wac.autocore.controller.*;
 import com.wac.autocore.data.*;
 import com.wac.autocore.security.*;
 import com.wac.autocore.service.*;
@@ -10,10 +9,10 @@ public class ManualAppContext implements AppContext {
 
     private final GarageSystem garageSystem;
     private final Authenticator authenticator;
-    private final InvoiceController invoiceController;
-    private final PaymentController paymentController;
+    private final AppControllers controllers;
 
     public ManualAppContext() {
+        // Repositories
         VehicleRepo vehicleRepo = new VehicleRepoImpl();
         CustomerRepo customerRepo = new CustomerRepoImpl();
         MechanicRepo mechanicRepo = new MechanicRepoImpl();
@@ -22,39 +21,36 @@ public class ManualAppContext implements AppContext {
         WorkOrderRepo workOrderRepo = new WorkOrderRepoImpl();
         ServicePackRepo servicePackRepo = new ServicePackRepoImpl();
 
+        // Services
+        CustomerService customerService = new CustomerService(customerRepo, vehicleRepo);
+        VehicleService vehicleService = new VehicleService(vehicleRepo, customerRepo, bookingRepo);
+        BookingService bookingService = new BookingService(vehicleRepo, bookingRepo);
+        WorkOrderService workOrderService = new WorkOrderService(bookingRepo, workOrderRepo, mechanicRepo, serviceItemRepo);
+        MechanicService mechanicService = new MechanicService(mechanicRepo, workOrderRepo);
+        ServiceItemService serviceItemService = new ServiceItemService(serviceItemRepo, servicePackRepo);
         InvoiceService invoiceService = new InvoiceService(new InvoiceRepoImpl(), workOrderRepo);
         PaymentService paymentService = new PaymentService(new PaymentRepoImpl(), invoiceService);
 
+        // Security
         AccessGuard accessGuard = new AccessGuard(AppSession.getInstance());
-        invoiceController = new InvoiceController(invoiceService, accessGuard);
-        paymentController = new PaymentController(paymentService, accessGuard);
-
-        garageSystem = new GarageSystem(
-                new CustomerService(customerRepo, vehicleRepo),
-                new VehicleService(vehicleRepo, customerRepo, bookingRepo),
-                new BookingService(vehicleRepo, bookingRepo),
-                new WorkOrderService(bookingRepo, workOrderRepo, mechanicRepo, serviceItemRepo),
-                new MechanicService(mechanicRepo, workOrderRepo),
-                new ServiceItemService(serviceItemRepo, servicePackRepo),
-                invoiceService,
-                paymentService);
-
         authenticator = new DatabaseAuthenticator(new UserRepoImpl(), AppSession.getInstance(), new PasswordHasher());
+
+        // Controllers
+        ErrorHandler errorHandler = new ErrorHandler();
+        controllers = new AppControllers(
+                new WorkOrderController(workOrderService, errorHandler),
+                new InvoiceController(invoiceService, accessGuard),
+                new PaymentController(paymentService, accessGuard)
+                );
+
+        // GarageSystem (Kvar tills vyer använder controllers)
+        garageSystem = new GarageSystem(customerService, vehicleService, bookingService, workOrderService,
+                mechanicService, serviceItemService, invoiceService, paymentService);
     }
 
     @Override
     public GarageSystem garageSystem() {
         return garageSystem;
-    }
-
-    @Override
-    public InvoiceController invoiceController() {
-        return invoiceController;
-    }
-
-    @Override
-    public PaymentController paymentController() {
-        return paymentController;
     }
 
     @Override
@@ -65,5 +61,10 @@ public class ManualAppContext implements AppContext {
     @Override
     public CurrentUserProvider currentUserProvider() {
         return AppSession.getInstance();
+    }
+
+    @Override
+    public AppControllers controllers() {
+        return controllers;
     }
 }

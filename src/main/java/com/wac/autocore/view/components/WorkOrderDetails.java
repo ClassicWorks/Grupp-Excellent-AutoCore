@@ -1,7 +1,8 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.controller.ErrorHandler;
+import java.util.function.Supplier;
 import com.wac.autocore.controller.Result;
+import com.wac.autocore.controller.WorkOrderController;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
@@ -29,7 +30,8 @@ public class WorkOrderDetails extends BorderPane {
     private final WorkOrder workOrder;
     private final Runnable onChanged;
 
-    private final ErrorHandler errorHandler = new ErrorHandler();
+    private final WorkOrderController workOrderController =
+            ViewManager.getInstance().getControllers().workOrders();
 
     public WorkOrderDetails(WorkOrder workOrder, Runnable onChanged) {
         this.workOrder = workOrder;
@@ -126,7 +128,7 @@ public class WorkOrderDetails extends BorderPane {
             if (selected == null || selected == workOrder.getType()) {
                 return;
             }
-            withErrorHandling(() -> garageSystem.updateWorkOrderType(workOrder.getId(), selected)).run();
+            perform(() -> workOrderController.updateType(workOrder.getId(), selected)).run();
         });
 
         return typeComboBox;
@@ -150,7 +152,7 @@ public class WorkOrderDetails extends BorderPane {
             if (selected == null || (current != null && selected.getId() == current.getId())) {
                 return;
             }
-            withErrorHandling(() -> garageSystem.updateWorkOrderMechanic(workOrder.getId(), selected.getId())).run();
+            perform(() -> workOrderController.updateMechanic(workOrder.getId(), selected.getId())).run();
         });
 
         return mechanicComboBox;
@@ -214,17 +216,17 @@ public class WorkOrderDetails extends BorderPane {
 
         if (status == WorkOrderStatus.DRAFT) {
             buttons.getChildren().add(createButton("workorder.confirm", "confirm-btn",
-                    withErrorHandling(() -> garageSystem.confirmWorkOrder(workOrder.getId()))));
+                    perform(() -> workOrderController.confirm(workOrder.getId()))));
         }
 
         if (status == WorkOrderStatus.CONFIRMED) {
             buttons.getChildren().add(createButton("workorder.start", "confirm-btn",
-                    withErrorHandling(() -> garageSystem.startWorkOrder(workOrder.getId()))));
+                    perform(() -> workOrderController.start(workOrder.getId()))));
         }
 
         if (status == WorkOrderStatus.IN_PROGRESS) {
             buttons.getChildren().add(createButton("workorder.complete", "confirm-btn",
-                    withErrorHandling(() -> garageSystem.completeWorkOrder(workOrder.getId()))));
+                    perform(() -> workOrderController.complete(workOrder.getId()))));
         }
 
         if (status == WorkOrderStatus.COMPLETED) {
@@ -250,9 +252,9 @@ public class WorkOrderDetails extends BorderPane {
         return button;
     }
 
-    private Runnable withErrorHandling(Runnable action) {
+    private Runnable perform(Supplier<Result<?>> action) {
         return () -> {
-            Result<Void> result = errorHandler.run(action);
+            Result<?> result = action.get();
             if (!result.isSuccess()) {
                 AppDialog.showErrorMessage(result.error());
             }
@@ -267,7 +269,7 @@ public class WorkOrderDetails extends BorderPane {
                 LanguageManager.getString("workorder.cancel.dialog.message"));
 
         if (confirmed) {
-            withErrorHandling(() -> garageSystem.cancelWorkOrder(workOrder.getId())).run();
+            perform(() -> workOrderController.cancel(workOrder.getId())).run();
         }
     }
 

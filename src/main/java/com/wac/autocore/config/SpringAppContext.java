@@ -1,5 +1,6 @@
 package com.wac.autocore.config;
 
+import com.wac.autocore.controller.AppControllers;
 import com.wac.autocore.controller.InvoiceController;
 import com.wac.autocore.controller.PaymentController;
 import com.wac.autocore.security.Authenticator;
@@ -28,16 +29,6 @@ public class SpringAppContext implements AppContext {
     }
 
     @Override
-    public InvoiceController invoiceController() {
-        return context.getBean(InvoiceController.class);
-    }
-
-    @Override
-    public PaymentController paymentController() {
-        return context.getBean(PaymentController.class);
-    }
-
-    @Override
     public void close() {
         context.close();
     }
@@ -50,5 +41,10 @@ public class SpringAppContext implements AppContext {
     @Override
     public CurrentUserProvider currentUserProvider() {
         return context.getBean(CurrentUserProvider.class);
+    }
+
+    @Override
+    public AppControllers controllers() {
+        return context.getBean(AppControllers.class);
     }
 }
