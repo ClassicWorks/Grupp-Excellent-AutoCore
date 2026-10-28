@@ -1,5 +1,6 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.exceptions.AutoCoreException;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,7 +22,7 @@ public class ImageViewWithAltText extends StackPane {
 
             }
 
-        } catch (IllegalArgumentException e) {
+        } catch (AutoCoreException e) {
             Label altLabel = new Label(altText);
             altLabel.getStyleClass().add("alt-label");
             this.getChildren().add(altLabel);

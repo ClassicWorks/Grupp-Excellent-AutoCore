@@ -1,5 +1,6 @@
 package com.wac.autocore.view;
 
+import com.wac.autocore.exceptions.AutoCoreException;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.ServicePack;
@@ -194,7 +195,7 @@ public class ShowServiceItemsView {
 
             fillServicePacks();
 
-        } catch (IllegalArgumentException e) {
+        } catch (AutoCoreException e) {
             AppDialog.showError(
                     LanguageManager.getString("servicePack.save.error.title"),
                     LanguageManager.getString("servicePack.save.error.message"),

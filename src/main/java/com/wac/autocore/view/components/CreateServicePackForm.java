@@ -1,5 +1,6 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.exceptions.AutoCoreException;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.ServicePack;
 import com.wac.autocore.service.GarageSystem;
@@ -215,7 +216,7 @@ public class CreateServicePackForm {
                         )
                 );
 
-            } catch (IllegalArgumentException ex) {
+            } catch (AutoCoreException ex) {
                 AppDialog.showError(
                         LanguageManager.getString("servicePack.form.error.title"),
                         LanguageManager.getString("servicePack.form.error.message"),
