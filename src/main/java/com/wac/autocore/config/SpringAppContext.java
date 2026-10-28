@@ -1,5 +1,6 @@
 package com.wac.autocore.config;
 
+import com.wac.autocore.security.Authenticator;
 import com.wac.autocore.service.GarageSystem;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -23,5 +24,10 @@ public class SpringAppContext implements AppContext {
     @Override
     public void close() {
         context.close();
+    }
+
+    @Override
+    public Authenticator authenticator() {
+        return context.getBean(Authenticator.class);
     }
 }

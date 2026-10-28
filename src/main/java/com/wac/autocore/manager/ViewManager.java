@@ -1,10 +1,6 @@
 package com.wac.autocore.manager;
 
-import com.wac.autocore.data.UserRepoImpl;
-import com.wac.autocore.security.AppSession;
 import com.wac.autocore.security.Authenticator;
-import com.wac.autocore.security.DatabaseAuthenticator;
-import com.wac.autocore.security.PasswordHasher;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.*;
@@ -29,8 +25,7 @@ public class ViewManager {
     private Runnable currentViewRefresher;
     private GarageSystem garageSystem;
 
-    private final Authenticator authenticator =
-            new DatabaseAuthenticator(new UserRepoImpl(), AppSession.getInstance(), new PasswordHasher());
+    private Authenticator authenticator;
 
     private ViewManager() {
 
@@ -63,6 +58,10 @@ public class ViewManager {
 
     public void setGarageSystem(GarageSystem garageSystem) {
         this.garageSystem = garageSystem;
+    }
+
+    public void setAuthenticator(Authenticator authenticator) {
+        this.authenticator = authenticator;
     }
 
     public void showView(Node view) {
