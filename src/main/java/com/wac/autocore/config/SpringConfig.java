@@ -1,6 +1,9 @@
 package com.wac.autocore.config;
 
+import com.wac.autocore.controller.InvoiceController;
+import com.wac.autocore.controller.PaymentController;
 import com.wac.autocore.data.*;
+import com.wac.autocore.security.AccessGuard;
 import com.wac.autocore.security.Authenticator;
 import com.wac.autocore.security.CurrentUserProvider;
 import com.wac.autocore.service.*;
@@ -100,5 +103,20 @@ public class SpringConfig {
                               InvoiceService invoiceService, PaymentService paymentService) {
         return new GarageSystem(customerService, vehicleService, bookingService, workOrderService,
                 mechanicService, serviceItemService, invoiceService, paymentService);
+    }
+
+    @Bean
+    AccessGuard accessGuard(CurrentUserProvider currentUserProvider) {
+        return new AccessGuard(currentUserProvider);
+    }
+
+    @Bean
+    InvoiceController invoiceController(InvoiceService invoiceService, AccessGuard accessGuard) {
+        return new InvoiceController(invoiceService, accessGuard);
+    }
+
+    @Bean
+    PaymentController paymentController(PaymentService paymentService, AccessGuard accessGuard) {
+        return new PaymentController(paymentService, accessGuard);
     }
 }

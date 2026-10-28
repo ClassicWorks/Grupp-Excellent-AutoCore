@@ -1,5 +1,7 @@
 package com.wac.autocore.config;
 
+import com.wac.autocore.controller.InvoiceController;
+import com.wac.autocore.controller.PaymentController;
 import com.wac.autocore.security.Authenticator;
 import com.wac.autocore.security.CurrentUserProvider;
 import com.wac.autocore.service.GarageSystem;
@@ -23,6 +25,16 @@ public class SpringAppContext implements AppContext {
     @Override
     public GarageSystem garageSystem() {
         return context.getBean(GarageSystem.class);
+    }
+
+    @Override
+    public InvoiceController invoiceController() {
+        return context.getBean(InvoiceController.class);
+    }
+
+    @Override
+    public PaymentController paymentController() {
+        return context.getBean(PaymentController.class);
     }
 
     @Override
