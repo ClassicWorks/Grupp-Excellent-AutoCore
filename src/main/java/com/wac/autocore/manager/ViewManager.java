@@ -1,7 +1,6 @@
 package com.wac.autocore.manager;
 
 import com.wac.autocore.controller.AppControllers;
-import com.wac.autocore.security.Authenticator;
 import com.wac.autocore.security.CurrentUserProvider;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
@@ -27,7 +26,6 @@ public class ViewManager {
     private Runnable currentViewRefresher;
     private GarageSystem garageSystem;
 
-    private Authenticator authenticator;
     private CurrentUserProvider currentUserProvider;
     private AppControllers controllers;
 
@@ -63,10 +61,6 @@ public class ViewManager {
         this.garageSystem = garageSystem;
     }
 
-    public void setAuthenticator(Authenticator authenticator) {
-        this.authenticator = authenticator;
-    }
-
     public AppControllers getControllers() {
         return controllers;
     }
@@ -85,8 +79,9 @@ public class ViewManager {
 
     public void showLogin() {
         rootLayout.setLeft(null);
-        showView(new LoginView(authenticator, this::onLoggedIn).show());
+        showView(new LoginView(controllers.login(), this::onLoggedIn).show());
     }
+
 
     private void onLoggedIn() {
         refreshSideNav();
@@ -94,7 +89,7 @@ public class ViewManager {
     }
 
     public void logout() {
-        authenticator.logout();
+        controllers.login().logout();
         currentViewRefresher = null;
         currentNav = null;
         showLogin();

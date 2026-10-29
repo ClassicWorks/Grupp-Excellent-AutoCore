@@ -127,6 +127,11 @@ public class SpringConfig {
     }
 
     @Bean
+    LoginController loginController(Authenticator authenticator) {
+        return new LoginController(authenticator);
+    }
+
+    @Bean
     WorkOrderController workOrderController(WorkOrderService workOrderService, ErrorHandler errorHandler) {
         return new WorkOrderController(workOrderService, errorHandler);
     }
@@ -146,7 +151,9 @@ public class SpringConfig {
                                   InvoiceController invoiceController,
                                   PaymentController paymentController,
                                   CustomerController customerController,
-                                  CatalogController catalogController) {
-        return new AppControllers(workOrderController, invoiceController, paymentController, customerController, catalogController);
+                                  CatalogController catalogController,
+                                  LoginController loginController) {
+        return new AppControllers(workOrderController, invoiceController, paymentController,
+                customerController, catalogController, loginController);
     }
 }
