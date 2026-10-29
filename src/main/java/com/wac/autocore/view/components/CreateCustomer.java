@@ -141,6 +141,7 @@ public class CreateCustomer {
                 emailBox,
                 buttonBox, errorLabel
         );
+
         ScrollPane scrollPane = new ScrollPane(root);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
