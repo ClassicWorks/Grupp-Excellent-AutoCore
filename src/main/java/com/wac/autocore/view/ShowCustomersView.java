@@ -1,5 +1,7 @@
 package com.wac.autocore.view;
 
+import com.wac.autocore.controller.CustomerController;
+import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.service.GarageSystem;
@@ -19,13 +21,19 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import java.util.List;
+
 public class ShowCustomersView {
     private final GarageSystem garageSystem;
+    private final CustomerController customerController;
+    private UiResultHandler resultHandler =  new UiResultHandler();
+
     private final VBox customersBox = new VBox();
     private GridPane mainContent;
 
     public ShowCustomersView() {
         garageSystem = ViewManager.getInstance().getGarageSystem();
+        customerController = ViewManager.getInstance().getControllers().customers();
     }
 
     public Parent show() {
@@ -58,31 +66,37 @@ public class ShowCustomersView {
     private void fillCustomers() {
         customersBox.getChildren().clear();
 
-        for (Customer customer : garageSystem.getCustomers()) {
-            CustomerCard customerCard = new CustomerCard(customer,
-                    c -> ViewManager.getInstance().showCreateVehiclePopup(c.getId())
-            );
-            customerCard.getStyleClass().add("clickable");
-            customerCard.setOnMouseClicked(e -> {
-
-                CustomerDetails customerDetails = new CustomerDetails(
-                        customer,
-                        this::fillCustomers,
-                        this::deleteCustomer);
-                customerDetails.setMaxHeight(Double.MAX_VALUE);
-
-                removeDetails();
-
-                mainContent.add(
-                        customerDetails,
-                        1, 0
+        Result<List<Customer>> customersResult = resultHandler.handle(() -> customerController.getCustomers());
+        if(customersResult.isSuccess()) {
+            for (Customer customer : customersResult.value()) {
+                CustomerCard customerCard = new CustomerCard(customer,
+                        c -> ViewManager.getInstance().showCreateVehiclePopup(c.getId())
                 );
+                customerCard.getStyleClass().add("clickable");
+                customerCard.setOnMouseClicked(e -> {
 
-                StylingUtil.setSelected(customerCard, "card");
+                    CustomerDetails customerDetails = new CustomerDetails(
+                            customer,
+                            this::fillCustomers,
+                            this::deleteCustomer);
+                    customerDetails.setMaxHeight(Double.MAX_VALUE);
 
-                GridPane.setVgrow(customerDetails, Priority.ALWAYS);
-            });
-            customersBox.getChildren().add(customerCard);
+                    removeDetails();
+
+                    mainContent.add(
+                            customerDetails,
+                            1, 0
+                    );
+
+                    StylingUtil.setSelected(customerCard, "card");
+
+                    GridPane.setVgrow(customerDetails, Priority.ALWAYS);
+                });
+                customersBox.getChildren().add(customerCard);
+            }
+        }else {
+            Label errorLabel = new Label(LanguageManager.getString("customer.error"));
+            errorLabel.getStyleClass().add("error-label");
         }
     }
 
@@ -93,15 +107,6 @@ public class ShowCustomersView {
     }
 
     private void deleteCustomer(int customerId) {
-        if (garageSystem.customerHasVehicles(customerId)) {
-            AppDialog.showError(
-                    LanguageManager.getString("customer.delete.title"),
-                    LanguageManager.getString("customer.delete.blocked.title"),
-                    LanguageManager.getString("customer.delete.blocked.message")
-            );
-            return;
-        }
-
         boolean deleteConfirmed = AppDialog.showConfirm(
                 LanguageManager.getString("customer.delete.title"),
                 String.format(
@@ -115,14 +120,18 @@ public class ShowCustomersView {
             return;
         }
 
-        if (!garageSystem.deleteCustomer(customerId)) {
+        Result<Boolean> result = resultHandler.handle(customerController.deleteCustomer(customerId));
+        if (!result.isSuccess()) {
+            return;
+        }
+        /*if (!garageSystem.deleteCustomer(customerId)) {
             AppDialog.showError(
                     LanguageManager.getString("customer.delete.title"),
                     LanguageManager.getString("customer.delete.failed"),
                     ""
             );
             return;
-        }
+        }*/
 
         removeDetails();
         fillCustomers();

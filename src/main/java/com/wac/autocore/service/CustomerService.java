@@ -94,9 +94,9 @@ public class CustomerService {
         if(phone != null && phone.trim().length() > 20)
             throw new InputNotValidException("Phone cannot be greater than 20 character.");
 
-        if(email != null) {
+        if(email != null && !email.isBlank()) {
             if (email.trim().length() > 50)
-                throw new InputNotValidException("Email cannot be longer than 20 characters.");
+                throw new InputNotValidException("Email cannot be longer than 50 characters.");
 
             if (!email.contains("@"))
                 throw new InputNotValidException("Wrong format om email");

@@ -132,9 +132,21 @@ public class SpringConfig {
     }
 
     @Bean
+    CustomerController customerController(CustomerService customerService, ErrorHandler errorHandler) {
+        return new CustomerController(customerService, errorHandler);
+    }
+
+    @Bean
+    CatalogController catalogController(ServiceItemService serviceItemService, ErrorHandler errorHandler) {
+        return new CatalogController(serviceItemService, errorHandler);
+    }
+
+    @Bean
     AppControllers appControllers(WorkOrderController workOrderController,
                                   InvoiceController invoiceController,
-                                  PaymentController paymentController) {
-        return new AppControllers(workOrderController, invoiceController, paymentController);
+                                  PaymentController paymentController,
+                                  CustomerController customerController,
+                                  CatalogController catalogController) {
+        return new AppControllers(workOrderController, invoiceController, paymentController, customerController, catalogController);
     }
 }
