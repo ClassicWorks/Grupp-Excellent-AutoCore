@@ -21,6 +21,10 @@ public class ManualAppContext implements AppContext {
         WorkOrderRepo workOrderRepo = new WorkOrderRepoImpl();
         ServicePackRepo servicePackRepo = new ServicePackRepoImpl();
 
+        // Security
+        AccessGuard accessGuard = new AccessGuard(AppSession.getInstance());
+        authenticator = new DatabaseAuthenticator(new UserRepoImpl(), AppSession.getInstance(), new PasswordHasher());
+
         // Services
         CustomerService customerService = new CustomerService(customerRepo, vehicleRepo);
         VehicleService vehicleService = new VehicleService(vehicleRepo, customerRepo, bookingRepo);
@@ -28,12 +32,8 @@ public class ManualAppContext implements AppContext {
         WorkOrderService workOrderService = new WorkOrderService(bookingRepo, workOrderRepo, mechanicRepo, serviceItemRepo);
         MechanicService mechanicService = new MechanicService(mechanicRepo, workOrderRepo);
         ServiceItemService serviceItemService = new ServiceItemService(serviceItemRepo, servicePackRepo);
-        InvoiceService invoiceService = new InvoiceService(new InvoiceRepoImpl(), workOrderRepo);
-        PaymentService paymentService = new PaymentService(new PaymentRepoImpl(), invoiceService);
-
-        // Security
-        AccessGuard accessGuard = new AccessGuard(AppSession.getInstance());
-        authenticator = new DatabaseAuthenticator(new UserRepoImpl(), AppSession.getInstance(), new PasswordHasher());
+        InvoiceService invoiceService = new InvoiceService(new InvoiceRepoImpl(), workOrderRepo, accessGuard);
+        PaymentService paymentService = new PaymentService(new PaymentRepoImpl(), invoiceService, accessGuard);
 
         // Controllers
         ErrorHandler errorHandler = new ErrorHandler();

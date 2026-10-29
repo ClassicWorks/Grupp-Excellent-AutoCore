@@ -6,6 +6,8 @@ import com.wac.autocore.exceptions.InvoiceNotFoundException;
 import com.wac.autocore.exceptions.StatusNotValidException;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.Payment;
+import com.wac.autocore.security.AccessGuard;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.service.payment.PaymentMethod;
 import com.wac.autocore.service.payment.PaymentMethodFactory;
 
@@ -15,13 +17,16 @@ import java.util.Optional;
 public class PaymentService {
     private final PaymentRepo paymentRepo;
     private final InvoiceService invoiceService;
+    private final AccessGuard accessGuard;
 
-    public PaymentService(PaymentRepo paymentRepo, InvoiceService invoiceService) {
+    public PaymentService(PaymentRepo paymentRepo, InvoiceService invoiceService, AccessGuard accessGuard) {
         this.paymentRepo = paymentRepo;
         this.invoiceService = invoiceService;
+        this.accessGuard = accessGuard;
     }
 
     public List<Payment> getPayments() {
+        accessGuard.require(Permission.READ, "getPayments");
         List<Payment> payments = paymentRepo.getAll();
         if (payments.isEmpty()) {
             System.out.println("No payments found.");
@@ -30,6 +35,7 @@ public class PaymentService {
     }
 
     public Optional<Payment> getPayment(int id) {
+        accessGuard.require(Permission.READ, "getPayment");
         return paymentRepo.get(id);
     }
 
@@ -47,6 +53,8 @@ public class PaymentService {
      * @throws InputNotValidException   if the provided paymentType is invalid or unsupported
      */
     public Payment processPayment(int invoiceId, String paymentType) {
+        accessGuard.require(Permission.MANAGE_PAYMENTS, "processPayment");
+
         Invoice invoice = invoiceService.getInvoice(invoiceId)
                 .orElseThrow(() -> new InvoiceNotFoundException(invoiceId));
 
