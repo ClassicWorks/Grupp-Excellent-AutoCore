@@ -5,7 +5,6 @@ import com.wac.autocore.model.ServicePack;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -17,19 +16,15 @@ import java.util.function.Consumer;
 
 public class ServicePackDetails extends BorderPane{
     private ServicePack servicePack;
-    private List<ServiceItem> allServiceItems;
 
     private Label errorLabel;
     private TextField nameField;
-    private VBox currentServicesRows;
-    private ComboBox<ServiceItem> serviceComboBox;
 
     public ServicePackDetails(ServicePack servicePack,
                               List<ServiceItem> allServiceItems,
                               Consumer<ServicePack> onSave,
                               Consumer<Integer> onDelete){
         this.servicePack = servicePack;
-        this.allServiceItems = allServiceItems;
 
         errorLabel = new Label("");
         errorLabel.getStyleClass().add("error-label");

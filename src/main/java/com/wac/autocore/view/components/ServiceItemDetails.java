@@ -1,10 +1,12 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.controller.CatalogController;
+import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.ServiceItem;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
+import com.wac.autocore.view.UiResultHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -19,7 +21,8 @@ public class ServiceItemDetails extends BorderPane {
 
     private final TextField priceField = new TextField();
     private final Label errorLabel = new Label();
-    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
+    private final CatalogController catalogController = ViewManager.getInstance().getControllers().catalog();
+    private final UiResultHandler uiResultHandler = new UiResultHandler();
     private final Runnable onSaved;
 
     public ServiceItemDetails(ServiceItem serviceItem, Runnable onSaved) {
@@ -114,13 +117,14 @@ public class ServiceItemDetails extends BorderPane {
                 return;
             }
 
-            ServiceItem updated = garageSystem.updateServiceItemPrice(serviceItem.getId(), newPrice);
-            if (updated == null) {
+            Result<ServiceItem> updatedResult = uiResultHandler.handle(
+                    catalogController.updateServiceItemPrice(serviceItem.getId(), newPrice)
+            );
+            if (!updatedResult.isSuccess()) {
                 errorLabel.setText(LanguageManager.getString("service.error.saveFailed"));
                 return;
             }
 
-            //TODO dialogbox
             errorLabel.getStyleClass().add("success");
             errorLabel.setText(LanguageManager.getString("service.saved"));
             onSaved.run();

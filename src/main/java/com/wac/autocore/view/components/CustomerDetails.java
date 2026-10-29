@@ -1,9 +1,11 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.controller.CustomerController;
+import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.view.UiResultHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -17,7 +19,8 @@ public class CustomerDetails extends BorderPane {
 
     private final Customer customer;
     private final Runnable onSaved;
-    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
+    private final CustomerController customerController = ViewManager.getInstance().getControllers().customers();
+    private final UiResultHandler uiResultHandler = new UiResultHandler();
 
     private final TextField nameField = new TextField();
     private final TextField phoneField = new TextField();
@@ -110,13 +113,13 @@ public class CustomerDetails extends BorderPane {
                 return;
             }
 
-            Customer updated = garageSystem.updateCustomer(
+            Result<Customer> updatedResult = uiResultHandler.handle(customerController.updateCustomer(
                     customer.getId(),
                     nameField.getText().trim(),
                     phoneField.getText().trim(),
-                    emailField.getText().trim());
+                    emailField.getText().trim()));
 
-            if (updated == null) {
+            if (!updatedResult.isSuccess()) {
                 errorLabel.setText(LanguageManager.getString("customer.error.saveFailed"));
                 return;
             }

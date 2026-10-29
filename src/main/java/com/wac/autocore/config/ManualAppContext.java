@@ -40,7 +40,9 @@ public class ManualAppContext implements AppContext {
         controllers = new AppControllers(
                 new WorkOrderController(workOrderService, errorHandler),
                 new InvoiceController(invoiceService, accessGuard, errorHandler),
-                new PaymentController(paymentService, accessGuard, errorHandler)
+                new PaymentController(paymentService, accessGuard, errorHandler),
+                new CustomerController(customerService, errorHandler),
+                new CatalogController(serviceItemService, errorHandler)
                 );
 
         // GarageSystem (Kvar tills vyer använder controllers)

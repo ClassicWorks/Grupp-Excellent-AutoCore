@@ -260,7 +260,7 @@ public class ViewManager {
     }
     public void showCreateServicePackPopup(){
         Stage popup = new Stage();
-        Parent content = new CreateServicePackForm(garageSystem, popup).show();
+        Parent content = new CreateServicePackForm(popup).show();
 
         showPopup(popup, LanguageManager.getString("servicePack.form.title"), content, this::showServices);
 
