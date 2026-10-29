@@ -1,6 +1,7 @@
 package com.wac.autocore.view;
 
-import com.wac.autocore.security.Authenticator;
+import com.wac.autocore.controller.LoginController;
+import com.wac.autocore.controller.Result;
 import com.wac.autocore.util.LanguageManager;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -11,11 +12,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 public class LoginView {
-    private final Authenticator authenticator;
+    private final LoginController loginController;
     private final Runnable onLoginSuccess;
 
-    public LoginView(Authenticator authenticator, Runnable onLoginSuccess) {
-        this.authenticator = authenticator;
+    public LoginView(LoginController loginController, Runnable onLoginSuccess) {
+        this.loginController = loginController;
         this.onLoginSuccess = onLoginSuccess;
     }
 
@@ -38,20 +39,14 @@ public class LoginView {
 
         loginBtn.setOnAction(e -> {
             errorLabel.setText("");
-            String username = usernameField.getText().trim();
-            String password = passwordField.getText();
 
-            if (username.isEmpty() || password.isEmpty()) {
-                errorLabel.setText(LanguageManager.getString("login.error.empty"));
-                return;
-            }
+            Result<Void> result = loginController.login(usernameField.getText(), passwordField.getText());
+            passwordField.clear();
 
-            if (authenticator.login(username, password)) {
-                passwordField.clear();
+            if (result.isSuccess()) {
                 onLoginSuccess.run();
             } else {
-                passwordField.clear();
-                errorLabel.setText(LanguageManager.getString("login.error.invalid"));
+                errorLabel.setText(result.error());
             }
         });
 
