@@ -125,7 +125,6 @@ public class ServiceItemDetails extends BorderPane {
                 return;
             }
 
-            //TODO dialogbox
             errorLabel.getStyleClass().add("success");
             errorLabel.setText(LanguageManager.getString("service.saved"));
             onSaved.run();
