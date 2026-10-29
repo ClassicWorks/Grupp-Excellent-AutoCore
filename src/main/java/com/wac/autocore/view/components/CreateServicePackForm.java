@@ -19,6 +19,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -54,18 +55,21 @@ public class CreateServicePackForm {
 
         Label title = new Label(LanguageManager.getString("servicePack.form.title"));
         title.getStyleClass().add("form-title");
+        Text explanation = new Text(LanguageManager.getString("servicePack.form.explanation"));
+        explanation.getStyleClass().add("form-explanation");
+        VBox headerBox = new VBox(title, explanation);
 
-        Label nameLabel = new Label(LanguageManager.getString("servicePack.details.name.label"));
+        Label nameLabel = new Label(LanguageManager.getString("servicePack.details.name.label") + "(*)");
         nameLabel.getStyleClass().add("form-field-label");
 
         nameField = new TextField();
-        nameField.setPromptText("Name for the pack");
+        nameField.setPromptText(LanguageManager.getString("servicePack.form.name.prompt"));
 
         VBox nameBox = new VBox(nameLabel, nameField);
         nameBox.getStyleClass().add("form-field-container");
 
         // Show current services in pack
-        Label chosenServicesLabel = new Label(LanguageManager.getString("servicePack.details.services.label"));
+        Label chosenServicesLabel = new Label(LanguageManager.getString("servicePack.details.services.label") + "(*)");
         chosenServicesLabel.getStyleClass().add("form-field-label");
 
         chosenServicesRows = new VBox();
@@ -85,7 +89,7 @@ public class CreateServicePackForm {
         btnContainer.getStyleClass().add("btn-container");
 
         VBox formContainer = new VBox(
-                title,
+                headerBox,
                 nameBox,
                 currentServicesContainer,
                 addServiceSection,

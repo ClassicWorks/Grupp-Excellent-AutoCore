@@ -13,6 +13,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class CreateCustomer {
@@ -38,7 +39,12 @@ public class CreateCustomer {
                 ? LanguageManager.getString("customer.form.title.edit")
                 : LanguageManager.getString("customer.form.title.create"));
         title.getStyleClass().add("form-title");
-        Label explanation = new Label(LanguageManager.getString("customer.form.explanation"));
+        Text explanation = new Text(LanguageManager.getString("customer.form.explanation"));
+        explanation.getStyleClass().add("form-explanation");
+        explanation.wrappingWidthProperty().bind(
+                root.widthProperty()
+                        .subtract(50)
+        );
         VBox headerBox = new VBox(title, explanation);
 
         Label nameLabel = new Label(LanguageManager.getString("customer.form.name") + " (*)");

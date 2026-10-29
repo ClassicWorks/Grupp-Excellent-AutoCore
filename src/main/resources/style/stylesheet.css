@@ -44,7 +44,7 @@
 
 /* TODO
     invoice-popup
-
+*/
 /*------------
      Text
 --------------*/
@@ -52,7 +52,6 @@
 Label, Text, .hyperlink{
     -fx-font-family: "IBM Plex Sans", sans-serif;
     -fx-font-size: 14px;
-
 }
 Label{
     -fx-text-fill:-fx-dark-ink;
@@ -89,6 +88,11 @@ Text{
     -fx-font-family: "Space Grotesk", sans-serif;
     -fx-font-weight: 600;
     -fx-font-size: 20px;
+}
+
+.form-explanation {
+    -fx-font-family: "IBM Plex Mono", monospace;
+    -fx-fill: -fx-muted-ink;
 }
 
 .form-field-label{

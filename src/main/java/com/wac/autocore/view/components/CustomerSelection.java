@@ -47,7 +47,7 @@ public class CustomerSelection extends VBox {
         searchBox.getStyleClass().add("form-field-container");
         HBox.setHgrow(searchField, Priority.ALWAYS);
 
-        this.getChildren().addAll(label, searchBox, customerResults, selectedCustomerLabel);
+        this.getChildren().addAll(searchBox, customerResults, selectedCustomerLabel);
     }
 
 

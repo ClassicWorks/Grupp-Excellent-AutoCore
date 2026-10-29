@@ -176,6 +176,7 @@ public class CreateBookingForm {
         Label title = new Label(LanguageManager.getString("booking.form.title"));
         title.getStyleClass().add("form-title");
         Label explanation = new Label(LanguageManager.getString("booking.form.explanation"));
+        explanation.getStyleClass().add("form-explanation");
 
         return new VBox(title, explanation);
     }
@@ -237,7 +238,7 @@ public class CreateBookingForm {
     }
 
     private VBox getDescriptionBox() {
-        Label descriptionLabel = new Label((LanguageManager.getString("booking.form.description")));
+        Label descriptionLabel = new Label(LanguageManager.getString("booking.form.description") + "(*)");
         descriptionLabel.getStyleClass().add("form-field-label");
 
         descriptionField.setPrefRowCount(3);

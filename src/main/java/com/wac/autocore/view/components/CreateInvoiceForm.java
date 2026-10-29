@@ -32,6 +32,7 @@ public class CreateInvoiceForm {
         Label title = new Label(LanguageManager.getString("invoice.form.title"));
         title.getStyleClass().add("form-title");
         Label explanation = new Label(LanguageManager.getString("invoice.form.explanation"));
+        explanation.getStyleClass().add("form-explanation");
         VBox headerBox = new VBox(title, explanation);
 
         Label errorLabel = new Label();
