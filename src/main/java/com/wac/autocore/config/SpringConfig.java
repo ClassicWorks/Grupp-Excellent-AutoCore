@@ -86,13 +86,15 @@ public class SpringConfig {
     }
 
     @Bean
-    InvoiceService invoiceService(InvoiceRepo invoiceRepo, WorkOrderRepo workOrderRepo) {
-        return new InvoiceService(invoiceRepo, workOrderRepo);
+    InvoiceService invoiceService(InvoiceRepo invoiceRepo, WorkOrderRepo workOrderRepo,
+                                  AccessGuard accessGuard) {
+        return new InvoiceService(invoiceRepo, workOrderRepo, accessGuard);
     }
 
     @Bean
-    PaymentService paymentService(PaymentRepo paymentRepo, InvoiceService invoiceService) {
-        return new PaymentService(paymentRepo, invoiceService);
+    PaymentService paymentService(PaymentRepo paymentRepo, InvoiceService invoiceService,
+                                  AccessGuard accessGuard) {
+        return new PaymentService(paymentRepo, invoiceService, accessGuard);
     }
 
     @Bean
