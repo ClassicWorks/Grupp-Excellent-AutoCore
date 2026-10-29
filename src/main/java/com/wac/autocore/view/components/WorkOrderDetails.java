@@ -6,7 +6,6 @@ import com.wac.autocore.controller.WorkOrderController;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
-import com.wac.autocore.service.WorkOrderService;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
@@ -72,10 +71,10 @@ public class WorkOrderDetails extends BorderPane {
 
 
         VBox info = new VBox(
-                new FormFieldContainer("workorder.details.vehicle", vehicleLabel, false),
-                new FormFieldContainer("workorder.details.customer", customerLink, false),
-                new FormFieldContainer("workorder.type.label", createTypeNode(), false),
-                new FormFieldContainer("workorder.details.mechanic", createMechanicNode(), workOrder.getStatus().canTransitionTo(WorkOrderStatus.IN_PROGRESS))
+                new FormFieldContainer(LanguageManager.getString("workorder.details.vehicle"), vehicleLabel, false),
+                new FormFieldContainer(LanguageManager.getString("workorder.details.customer"), customerLink, false),
+                new FormFieldContainer(LanguageManager.getString("workorder.type.label"), createTypeNode(), false),
+                new FormFieldContainer(LanguageManager.getString("workorder.details.mechanic"), createMechanicNode(), workOrder.getStatus().canTransitionTo(WorkOrderStatus.IN_PROGRESS))
         );
 
         if (booking != null) {
@@ -86,8 +85,8 @@ public class WorkOrderDetails extends BorderPane {
             descriptionLabel.setWrapText(true);
 
             info.getChildren().addAll(
-                    new FormFieldContainer("workorder.details.date", dateLabel, false),
-                    new FormFieldContainer("workorder.details.description", descriptionLabel, false)
+                    new FormFieldContainer(LanguageManager.getString("workorder.details.date"), dateLabel, false),
+                    new FormFieldContainer(LanguageManager.getString("workorder.details.description"), descriptionLabel, false)
             );
         }else {
             Label noBookingError = new Label(LanguageManager.getString("workorder.details.noBooking"));
