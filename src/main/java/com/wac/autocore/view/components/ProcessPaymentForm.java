@@ -37,6 +37,13 @@ public class ProcessPaymentForm {
         Label title = new Label(LanguageManager.getString("payment.form.title"));
         title.getStyleClass().add("form-title");
 
+        Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
+        explanation.setWrapText(true);
+        explanation.setMinWidth(0);
+        explanation.getStyleClass().add("form-explanation");
+
+        VBox headerBox = new VBox(title, explanation);
+
         Label errorLabel = new Label();
         errorLabel.getStyleClass().add("error-label");
 
@@ -48,32 +55,35 @@ public class ProcessPaymentForm {
             errorLabel.setText(invoicesResult.error());
         }
 
+        //Invoice
         ObservableList<Invoice> invoiceItems = FXCollections.observableArrayList(unpaidInvoices);
 
         ComboBox<Invoice> invoiceComboBox = new ComboBox<>(invoiceItems);
         invoiceComboBox.setPromptText(LanguageManager.getString("payment.form.invoice.prompt"));
         invoiceComboBox.setConverter(ComboBoxLabels.invoice());
 
-        VBox invoiceBox = new VBox(invoiceComboBox);
-        invoiceBox.getStyleClass().add("form-field-container");
+        VBox invoiceBox = new FormFieldContainer(LanguageManager.getString("payment.form.invoice.label"), invoiceComboBox, true);
 
-
+        //Payment type
         ObservableList<String> paymentTypes = FXCollections.observableArrayList("CARD", "SWISH", "CASH");
 
         ComboBox<String> paymentTypeComboBox = new ComboBox<>(paymentTypes);
         paymentTypeComboBox.setPromptText(LanguageManager.getString("payment.form.type.prompt"));
         paymentTypeComboBox.setConverter(ComboBoxLabels.paymentType());
 
-        VBox paymentTypeBox = new VBox(paymentTypeComboBox);
-        paymentTypeBox.getStyleClass().add("form-field-container");
+        VBox paymentTypeBox = new FormFieldContainer(LanguageManager.getString("payment.form.type.label"), paymentTypeComboBox, true);
 
-
+        //Buttons
         Button processBtn = new Button(LanguageManager.getString("payment.form.submit"));
         processBtn.getStyleClass().add("confirm-btn");
 
         Button cancelBtn = new Button(LanguageManager.getString("payment.form.cancel"));
         cancelBtn.getStyleClass().add("cancel-btn");
 
+        processBtn.disableProperty().bind(
+                invoiceComboBox.valueProperty().isNull()
+                    .or(paymentTypeComboBox.valueProperty().isNull())
+        );
 
         processBtn.setOnAction(e -> {
             errorLabel.setText("");
@@ -115,7 +125,7 @@ public class ProcessPaymentForm {
 
 
         root.getChildren().addAll(
-                title,
+                headerBox,
                 invoiceBox,
                 paymentTypeBox,
                 buttonBox,

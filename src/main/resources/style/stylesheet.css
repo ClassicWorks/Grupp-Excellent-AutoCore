@@ -91,7 +91,6 @@ Text{
 }
 
 .form-explanation {
-    -fx-font-family: "IBM Plex Mono", monospace;
     -fx-text-fill: -fx-muted-ink;
 }
 
