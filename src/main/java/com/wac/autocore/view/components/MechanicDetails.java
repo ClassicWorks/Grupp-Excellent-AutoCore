@@ -31,28 +31,20 @@ public class MechanicDetails extends BorderPane {
         Label idLabel = new Label(String.format(LanguageManager.getString("mechanic.id"), mechanic.getId()));
         idLabel.getStyleClass().addAll("details-title");
 
-        Label nameLabel = new Label(LanguageManager.getString("mechanic.name"));
-        nameLabel.getStyleClass().add("form-field-label");
+        Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
+        explanation.setWrapText(true);
+        explanation.setMaxWidth(Double.MAX_VALUE);
+        explanation.getStyleClass().add("form-explanation");
 
         nameField.setText(mechanic.getName());
-
-        VBox nameBox = new VBox(nameLabel, nameField);
-        nameBox.getStyleClass().add("form-field-container");
-
-        Label phoneLabel = new Label(LanguageManager.getString("mechanic.phone"));
-        phoneLabel.getStyleClass().add("form-field-label");
+        VBox nameBox = new FormFieldContainer(LanguageManager.getString("mechanic.name"), nameField, true);
 
         phoneField.setText(mechanic.getPhone());
-
-        VBox phoneBox = new VBox(phoneLabel, phoneField);
-        phoneBox.getStyleClass().add("form-field-container");
-
-        Label specializationLabel = new Label(LanguageManager.getString("mechanic.specialization"));
-        specializationLabel.getStyleClass().add("form-field-label");
+        VBox phoneBox = new FormFieldContainer(LanguageManager.getString("mechanic.phone"), phoneField, false);
 
         specializationField.setText(mechanic.getSpecialization());
-        VBox specializationBox = new VBox(specializationLabel, specializationField);
-        specializationBox.getStyleClass().add("form-field-container");
+        VBox specializationBox = new FormFieldContainer(
+                LanguageManager.getString("mechanic.specialization"), specializationField, false);
 
         Label availabilityLabel = new Label(String.format(
                 LanguageManager.getString("mechanic.status"),
@@ -66,6 +58,7 @@ public class MechanicDetails extends BorderPane {
 
 
         VBox fields = new VBox(
+                explanation,
                 nameBox,
                 phoneBox,
                 specializationBox,

@@ -18,6 +18,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -56,7 +57,7 @@ public class EditWorkOrderItemsForm {
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToHeight(false);
         return scrollPane;
     }
 
@@ -74,7 +75,14 @@ public class EditWorkOrderItemsForm {
         Label title = new Label(String.format(
                 LanguageManager.getString("workorder.edit.title"), workOrder.getId()));
         title.getStyleClass().add("form-title");
-        content.getChildren().add(title);
+
+        Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
+        explanation.setWrapText(true);
+        explanation.setMinWidth(0);
+        explanation.getStyleClass().add("form-explanation");
+
+        VBox headerBox = new VBox(title, explanation);
+        content.getChildren().add(headerBox);
 
         if (!workOrder.getStatus().canEdit()) {
             content.getChildren().addAll(
@@ -84,11 +92,9 @@ public class EditWorkOrderItemsForm {
         }
 
         //Show all the current service items
-        Label currentServicesLabel = new Label(LanguageManager.getString("workorder.edit.currentServices"));
-        currentServicesLabel.getStyleClass().add("form-field-label");
-
-        VBox currentServiceBox = new VBox(currentServicesLabel);
-        currentServiceBox.getStyleClass().add("form-field-container");
+        VBox currentServiceRows = new VBox();
+        VBox currentServiceBox = new FormFieldContainer(
+                LanguageManager.getString("workorder.edit.currentServices"), currentServiceRows, false);
 
         List<WorkOrderItem> keptItems = workOrder.getItems().stream()
                 .filter(item -> !removedItemIds.contains(item.getId()))
@@ -96,10 +102,10 @@ public class EditWorkOrderItemsForm {
 
         boolean isLastItem = keptItems.size() + addedServices.size() <= 1;
         for (WorkOrderItem item : keptItems) {
-            currentServiceBox.getChildren().add(createItemRow(item, isLastItem));
+            currentServiceRows.getChildren().add(createItemRow(item, isLastItem));
         }
         for (ServiceItem addedService : addedServices) {
-            currentServiceBox.getChildren().add(createAddedRow(addedService, isLastItem));
+            currentServiceRows.getChildren().add(createAddedRow(addedService, isLastItem));
         }
         content.getChildren().add(currentServiceBox);
 
@@ -124,6 +130,9 @@ public class EditWorkOrderItemsForm {
         Label nameLabel = new Label(ValueLabels.serviceName(item.getServiceItem().getName()));
         Label priceLabel = new Label(String.format("%.0f kr", item.getPriceAtOrder()));
 
+        nameLabel.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(nameLabel, Priority.ALWAYS);
+
         Button removeBtn = new Button(LanguageManager.getString("workorder.edit.remove"));
         removeBtn.setDisable(isLastItem);
         removeBtn.getStyleClass().add("destroy-btn");
@@ -131,6 +140,7 @@ public class EditWorkOrderItemsForm {
             removedItemIds.add(item.getId());
             refresh();
         });
+
 
         HBox row = new HBox(10, nameLabel, priceLabel, removeBtn);
         row.setAlignment(Pos.CENTER_LEFT);
@@ -175,13 +185,9 @@ public class EditWorkOrderItemsForm {
             refresh();
         });
 
-        Label addLabel = new Label(LanguageManager.getString("workorder.edit.addService"));
-        addLabel.getStyleClass().add("form-field-label");
-
         HBox comboBoxContainer = new HBox(10, serviceComboBox, addBtn);
-        VBox container = new VBox(addLabel, comboBoxContainer);
-        container.getStyleClass().add("form-field-container");
-        return container;
+        return new FormFieldContainer(
+                LanguageManager.getString("workorder.edit.addService"), comboBoxContainer, false);
     }
 
     private Node createAddPackSection() {
@@ -200,13 +206,9 @@ public class EditWorkOrderItemsForm {
             refresh();
         });
 
-        Label addPackLabel = new Label(LanguageManager.getString("workorder.pack.label"));
-        addPackLabel.getStyleClass().add("form-field-label");
-
         HBox comboBoxContainer = new HBox(10, packComboBox, addPackBtn);
-        VBox container = new VBox(addPackLabel, comboBoxContainer);
-        container.getStyleClass().add("form-field-container");
-        return container;
+        return new FormFieldContainer(
+                LanguageManager.getString("workorder.pack.label"), comboBoxContainer, false);
     }
 
     private void addService(ServiceItem serviceItem) {

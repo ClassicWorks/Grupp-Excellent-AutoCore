@@ -6,6 +6,7 @@ import com.wac.autocore.controller.WorkOrderController;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.service.WorkOrderService;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
@@ -71,10 +72,10 @@ public class WorkOrderDetails extends BorderPane {
 
 
         VBox info = new VBox(
-                createFormFieldContainer("workorder.details.vehicle", vehicleLabel),
-                createFormFieldContainer("workorder.details.customer", customerLink),
-                createFormFieldContainer("workorder.type.label", createTypeNode()),
-                createFormFieldContainer("workorder.details.mechanic", createMechanicNode())
+                new FormFieldContainer("workorder.details.vehicle", vehicleLabel, false),
+                new FormFieldContainer("workorder.details.customer", customerLink, false),
+                new FormFieldContainer("workorder.type.label", createTypeNode(), false),
+                new FormFieldContainer("workorder.details.mechanic", createMechanicNode(), workOrder.getStatus().canTransitionTo(WorkOrderStatus.IN_PROGRESS))
         );
 
         if (booking != null) {
@@ -85,8 +86,8 @@ public class WorkOrderDetails extends BorderPane {
             descriptionLabel.setWrapText(true);
 
             info.getChildren().addAll(
-                    createFormFieldContainer("workorder.details.date", dateLabel),
-                    createFormFieldContainer("workorder.details.description", descriptionLabel)
+                    new FormFieldContainer("workorder.details.date", dateLabel, false),
+                    new FormFieldContainer("workorder.details.description", descriptionLabel, false)
             );
         }else {
             Label noBookingError = new Label(LanguageManager.getString("workorder.details.noBooking"));
@@ -98,18 +99,6 @@ public class WorkOrderDetails extends BorderPane {
 
         info.getStyleClass().add("details-container");
         return info;
-    }
-
-    private VBox createFormFieldContainer(String key, Node content) {
-        VBox vehicleInfo = new VBox(createFieldLabel(key), content);
-        vehicleInfo.getStyleClass().add("form-field-container");
-        return vehicleInfo;
-    }
-
-    private Label createFieldLabel(String key) {
-        Label label = new Label(LanguageManager.getString(key));
-        label.getStyleClass().add("form-field-label");
-        return label;
     }
 
     private Node createTypeNode() {
@@ -196,7 +185,7 @@ public class WorkOrderDetails extends BorderPane {
         grid.add(totalPriceLabel, 2, row);
 
 
-        return new VBox(createFieldLabel("workorder.serviceItems"), grid);
+        return new FormFieldContainer(LanguageManager.getString("workorder.serviceItems"), grid, false);
     }
 
     private String formatAmount(double amount) {
@@ -274,7 +263,6 @@ public class WorkOrderDetails extends BorderPane {
     }
 
     private void rebook() {
-        //Möjlighet för dto? Då kan felhantering ske i GarageSystem
         Booking booking = workOrder.getBooking();
         if (booking == null) {
             AppDialog.showError(

@@ -13,7 +13,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class CreateCustomer {
@@ -39,34 +38,25 @@ public class CreateCustomer {
                 ? LanguageManager.getString("customer.form.title.edit")
                 : LanguageManager.getString("customer.form.title.create"));
         title.getStyleClass().add("form-title");
-        Text explanation = new Text(LanguageManager.getString("customer.form.explanation"));
+
+        Label explanation = new Label(LanguageManager.getString("customer.form.explanation"));
+        explanation.setWrapText(true);
+        explanation.setMinWidth(0);
         explanation.getStyleClass().add("form-explanation");
-        explanation.wrappingWidthProperty().bind(
-                root.widthProperty()
-                        .subtract(50)
-        );
+
         VBox headerBox = new VBox(title, explanation);
 
-        Label nameLabel = new Label(LanguageManager.getString("customer.form.name") + " (*)");
-        nameLabel.getStyleClass().add("form-field-label");
         TextField nameField = new TextField();
         nameField.setPromptText(LanguageManager.getString("customer.form.name.prompt"));
-        VBox nameBox = new VBox(nameLabel, nameField);
-        nameBox.getStyleClass().add("form-field-container");
+        VBox nameBox = new FormFieldContainer(LanguageManager.getString("customer.form.name"), nameField, true);
 
-        Label phoneLabel = new Label(LanguageManager.getString("customer.form.phone"));
-        phoneLabel.getStyleClass().add("form-field-label");
         TextField phoneField = new TextField();
         phoneField.setPromptText(LanguageManager.getString("customer.form.phone.prompt"));
-        VBox phoneBox = new VBox(phoneLabel, phoneField);
-        phoneBox.getStyleClass().add("form-field-container");
+        VBox phoneBox = new FormFieldContainer(LanguageManager.getString("customer.form.phone"), phoneField, false);
 
-        Label emailLabel = new Label(LanguageManager.getString("customer.form.email"));
-        emailLabel.getStyleClass().add("form-field-label");
         TextField emailField = new TextField();
         emailField.setPromptText(LanguageManager.getString("customer.form.email.prompt"));
-        VBox emailBox = new VBox(emailLabel, emailField);
-        emailBox.getStyleClass().add("form-field-container");
+        VBox emailBox = new FormFieldContainer(LanguageManager.getString("customer.form.email"), emailField, false);
 
         if (editMode) {
             nameField.setText(customer.getName());
@@ -150,7 +140,7 @@ public class CreateCustomer {
 
         ScrollPane scrollPane = new ScrollPane(root);
         scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToHeight(false);
 
         return scrollPane;
     }

@@ -35,46 +35,28 @@ public class ServiceItemDetails extends BorderPane {
         );
         nameLabel.getStyleClass().add("details-title");
 
-        Label descriptionFieldLabel = new Label(LanguageManager.getString("service.description"));
-        descriptionFieldLabel.getStyleClass().add("form-field-label");
+        Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
+        explanation.setWrapText(true);
+        explanation.setMaxWidth(Double.MAX_VALUE);
+        explanation.getStyleClass().add("form-explanation");
 
         Label descriptionLabel = new Label(ValueLabels.serviceDescription(serviceItem.getName(), serviceItem.getDescription()));
         descriptionLabel.setWrapText(true);
-
-        VBox descriptionBox = new VBox(
-                descriptionFieldLabel,
-                descriptionLabel
-        );
-        descriptionBox.getStyleClass().add("form-field-container");
-
-
-        Label timeFieldLabel = new Label(LanguageManager.getString("service.estimatedTime"));
-        timeFieldLabel.getStyleClass().add("form-field-label");
+        VBox descriptionBox = new FormFieldContainer(
+                LanguageManager.getString("service.description"), descriptionLabel, false);
 
         Label timeLabel = new Label(String.format(LanguageManager.getString("service.minutes"), serviceItem.getEstimatedMinutes()));
-
-        VBox timeBox = new VBox(
-                timeFieldLabel,
-                timeLabel
-        );
-        timeBox.getStyleClass().add("form-field-container");
-
-
-        Label priceFieldLabel = new Label(LanguageManager.getString("service.price"));
-        priceFieldLabel.getStyleClass().add("form-field-label");
+        VBox timeBox = new FormFieldContainer(
+                LanguageManager.getString("service.estimatedTime"), timeLabel, false);
 
         priceField.setText(String.valueOf(serviceItem.getPrice()));
-
-        VBox priceBox = new VBox(
-                priceFieldLabel,
-                priceField
-        );
-        priceBox.getStyleClass().add("form-field-container");
+        VBox priceBox = new FormFieldContainer(LanguageManager.getString("service.price"), priceField, true);
 
 
         errorLabel.getStyleClass().add("error-label");
 
         VBox fields = new VBox(
+                explanation,
                 descriptionBox,
                 timeBox,
                 priceBox,

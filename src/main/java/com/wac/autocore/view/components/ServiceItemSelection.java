@@ -159,18 +159,10 @@ public class ServiceItemSelection extends VBox{
             refreshServiceItems();
         });
 
-        Label addLabel = new Label(
-                LanguageManager.getString("servicePack.addService.label")
-        );
-        addLabel.getStyleClass().add("form-field-label");
-
         HBox comboBoxContainer = new HBox(serviceComboBox, addBtn);
         comboBoxContainer.getStyleClass().add("row");
-
-        VBox container = new VBox(addLabel, comboBoxContainer);
-        container.getStyleClass().add("form-field-container");
-
-        return container;
+        return new FormFieldContainer(
+                LanguageManager.getString("servicePack.addService.label"), comboBoxContainer, false);
     }
 
     private VBox createAddPackSection() {
@@ -194,14 +186,9 @@ public class ServiceItemSelection extends VBox{
             refreshServiceItems();
         });
 
-        Label addPackLabel = new Label(LanguageManager.getString("workorder.pack.label"));
-        addPackLabel.getStyleClass().add("form-field-label");
-
         HBox comboBoxContainer = new HBox(packComboBox, addPackBtn);
         comboBoxContainer.getStyleClass().add("row");
-
-        VBox container = new VBox(addPackLabel, comboBoxContainer);
-        container.getStyleClass().add("form-field-container");
-        return container;
+        return new FormFieldContainer(
+                LanguageManager.getString("workorder.pack.label"), comboBoxContainer, false);
     }
 }
