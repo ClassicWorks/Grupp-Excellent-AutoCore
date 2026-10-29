@@ -5,6 +5,8 @@ import com.wac.autocore.data.WorkOrderRepo;
 import com.wac.autocore.exceptions.StatusNotValidException;
 import com.wac.autocore.exceptions.WorkOrderNotFoundException;
 import com.wac.autocore.model.*;
+import com.wac.autocore.security.AccessGuard;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.service.discount.Discount;
 import com.wac.autocore.service.discount.DiscountCodes;
 import com.wac.autocore.service.discount.PercentageDiscount;
@@ -20,13 +22,16 @@ public class InvoiceService {
 
     private final InvoiceRepo invoiceRepo;
     private final WorkOrderRepo workOrderRepo;
+    private final AccessGuard accessGuard;
 
-    public InvoiceService(InvoiceRepo invoiceRepo, WorkOrderRepo workOrderRepo) {
+    public InvoiceService(InvoiceRepo invoiceRepo, WorkOrderRepo workOrderRepo, AccessGuard accessGuard) {
         this.invoiceRepo = invoiceRepo;
         this.workOrderRepo = workOrderRepo;
+        this.accessGuard = accessGuard;
     }
 
     public List<Invoice> getInvoices() {
+        accessGuard.require(Permission.READ, "getInvoices");
         List<Invoice> invoices = invoiceRepo.getAll();
         if (invoices.isEmpty()) {
             System.out.println("No invoices found.");
@@ -35,18 +40,22 @@ public class InvoiceService {
     }
 
     public Optional<Invoice> getInvoice(int id) {
+        accessGuard.require(Permission.READ, "getInvoice");
         return invoiceRepo.get(id);
     }
 
     public List<Invoice> getUnpaidInvoices() {
+        accessGuard.require(Permission.READ, "getUnpaidInvoices");
         return invoiceRepo.findByPayed(false);
     }
 
     public List<Invoice> getPaidInvoices() {
+        accessGuard.require(Permission.READ, "getPaidInvoices");
         return invoiceRepo.findByPayed(true);
     }
 
     public List<WorkOrder> getWorkOrdersThatCanBeInvoiced() {
+        accessGuard.require(Permission.READ, "getWorkOrdersThatCanBeInvoiced");
         return workOrderRepo.getCompletedWorkOrdersWithoutInvoices().stream()
                 .filter(workOrder -> workOrder.getType() != WorkOrderType.WARRANTY)
                 .collect(Collectors.toList());
@@ -62,6 +71,8 @@ public class InvoiceService {
      * @throws StatusNotValidException if the work order cannot be invoiced due to its current status
      */
     public Invoice createInvoice(int workOrderId, String discountCode) {
+        accessGuard.require(Permission.MANAGE_INVOICES, "createInvoice");
+
         WorkOrder workOrder = workOrderRepo.getWithItems(workOrderId)
                 .orElseThrow(() -> new WorkOrderNotFoundException(workOrderId));
 
