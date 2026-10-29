@@ -14,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -131,7 +132,9 @@ public class ProcessPaymentForm {
                 buttonBox,
                 errorLabel
         );
-
-        return root;
+        ScrollPane scrollPane = new ScrollPane(root);
+        scrollPane.setFitToHeight(false);
+        scrollPane.setFitToWidth(true);
+        return scrollPane;
     }
 }
