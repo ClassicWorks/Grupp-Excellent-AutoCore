@@ -1,12 +1,14 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.exceptions.AutoCoreException;
+import com.wac.autocore.controller.CatalogController;
+import com.wac.autocore.controller.Result;
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.ServicePack;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
+import com.wac.autocore.view.UiResultHandler;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,20 +25,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CreateServicePackForm {
-    private final GarageSystem garageSystem;
+    private final CatalogController catalogController;
+    private final UiResultHandler uiResultHandler;
     private final Stage popupStage;
     private List<ServiceItem> allServiceItems;
-    private ObservableList<ServiceItem> chosenItems;
+    private ObservableList<ServiceItem> chosenItems = FXCollections.observableArrayList();
     private Label errorLabel;
     private TextField nameField;
     private VBox chosenServicesRows;
     private ComboBox<ServiceItem> serviceComboBox;
 
-    public CreateServicePackForm(GarageSystem garageSystem, Stage popupStage) {
-        this.garageSystem = garageSystem;
+    public CreateServicePackForm(Stage popupStage) {
+        catalogController = ViewManager.getInstance().getControllers().catalog();
+        uiResultHandler = new UiResultHandler();
         this.popupStage = popupStage;
-        allServiceItems = garageSystem.getServiceItems();
-        chosenItems = FXCollections.observableArrayList();
+
+        Result<List<ServiceItem>> result = uiResultHandler.handle(catalogController.getServiceItems());
+        if(!result.isSuccess()) {
+            popupStage.close();
+            return;
+        }
+        allServiceItems = result.value();
     }
 
     public Parent show(){
@@ -199,12 +208,13 @@ public class CreateServicePackForm {
                         .or(Bindings.isEmpty(chosenItems))
         );
         saveBtn.setOnAction(e -> {
-            try {
-                ServicePack savedServicePack = garageSystem.createServicePack(
-                        nameField.getText(),
-                        chosenItems.stream().mapToInt(ServiceItem::getId).toArray()
-                );
+            Result<ServicePack> savedServicePackResult = uiResultHandler.handle(catalogController.createServicePack(
+                    nameField.getText(),
+                    chosenItems.stream().mapToInt(ServiceItem::getId).toArray()
+            ));
 
+            if(savedServicePackResult.isSuccess()){
+                ServicePack savedServicePack = savedServicePackResult.value();
                 popupStage.close();
                 AppDialog.showInformation(
                         LanguageManager.getString("servicePack.form.success.title"),
@@ -214,13 +224,6 @@ public class CreateServicePackForm {
                                 savedServicePack.getName(),
                                 savedServicePack.getServiceItems().size()
                         )
-                );
-
-            } catch (AutoCoreException ex) {
-                AppDialog.showError(
-                        LanguageManager.getString("servicePack.form.error.title"),
-                        LanguageManager.getString("servicePack.form.error.message"),
-                        ex.getMessage()
                 );
             }
         });

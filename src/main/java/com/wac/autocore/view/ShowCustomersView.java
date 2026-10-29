@@ -4,7 +4,6 @@ import com.wac.autocore.controller.CustomerController;
 import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.AppDialog;
@@ -24,7 +23,6 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 
 public class ShowCustomersView {
-    private final GarageSystem garageSystem;
     private final CustomerController customerController;
     private UiResultHandler resultHandler =  new UiResultHandler();
 
@@ -32,7 +30,6 @@ public class ShowCustomersView {
     private GridPane mainContent;
 
     public ShowCustomersView() {
-        garageSystem = ViewManager.getInstance().getGarageSystem();
         customerController = ViewManager.getInstance().getControllers().customers();
     }
 
@@ -66,7 +63,7 @@ public class ShowCustomersView {
     private void fillCustomers() {
         customersBox.getChildren().clear();
 
-        Result<List<Customer>> customersResult = resultHandler.handle(() -> customerController.getCustomers());
+        Result<List<Customer>> customersResult = resultHandler.handle(customerController.getCustomers());
         if(customersResult.isSuccess()) {
             for (Customer customer : customersResult.value()) {
                 CustomerCard customerCard = new CustomerCard(customer,

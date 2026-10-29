@@ -1,9 +1,11 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.controller.CustomerController;
+import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.view.UiResultHandler;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,7 +16,9 @@ import javafx.stage.Stage;
 
 public class CreateCustomer {
 
-    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
+    private final CustomerController customerController = ViewManager.getInstance().getControllers().customers();
+    private final UiResultHandler uiResultHandler = new UiResultHandler();
+
     private final Stage popupStage;
     private final Customer customer;
 
@@ -73,6 +77,8 @@ public class CreateCustomer {
 
         submitBtn.disableProperty().bind(
                 nameField.textProperty().isEmpty()
+                        .or(phoneField.textProperty().isEmpty()
+                                .and(emailField.textProperty().isEmpty()))
         );
 
         submitBtn.setOnAction(e -> {
@@ -80,7 +86,7 @@ public class CreateCustomer {
 
             String nameValue = nameField.getText().trim();
 
-            if (nameValue.isEmpty()) {
+            if (nameValue.isBlank()) {
                 errorLabel.setText(LanguageManager.getString("customer.form.error.nameRequired"));
                 return;
             }
@@ -88,25 +94,34 @@ public class CreateCustomer {
             String phoneValue = phoneField.getText().trim();
             String emailValue = emailField.getText().trim();
 
+            if(phoneValue.isBlank() && emailValue.isBlank()){
+                errorLabel.setText(LanguageManager.getString("customer.form.error.phoneOrEmailRequired"));
+                return;
+            }
+
             if (editMode) {
                 customer.setName(nameValue);
                 customer.setPhone(phoneValue);
                 customer.setEmail(emailValue);
                 popupStage.close();
             } else {
-                Customer savedCustomer = garageSystem.createCustomer(nameValue, phoneValue, emailValue);
-                popupStage.close();
-
-                boolean createVehicle = AppDialog.showConfirm(
-                        LanguageManager.getString("customer.form.dialog.success.title"),
-                        LanguageManager.getString("customer.create.vehicle.prompt"),
-                        String.format(
-                                LanguageManager.getString("customer.create.vehicle.message"),
-                                savedCustomer.getId()
-                        )
+                Result<Customer> savedCustomerResult = uiResultHandler.handle(
+                        customerController.createCustomer(nameValue, phoneValue, emailValue)
                 );
-                if(createVehicle){
-                    ViewManager.getInstance().showCreateVehiclePopup(savedCustomer.getId());
+                if(savedCustomerResult.isSuccess()){
+                    popupStage.close();
+
+                    boolean createVehicle = AppDialog.showConfirm(
+                            LanguageManager.getString("customer.form.dialog.success.title"),
+                            LanguageManager.getString("customer.create.vehicle.prompt"),
+                            String.format(
+                                    LanguageManager.getString("customer.create.vehicle.message"),
+                                    savedCustomerResult.value().getId()
+                            )
+                    );
+                    if(createVehicle){
+                        ViewManager.getInstance().showCreateVehiclePopup(savedCustomerResult.value().getId());
+                    }
                 }
             }
         });

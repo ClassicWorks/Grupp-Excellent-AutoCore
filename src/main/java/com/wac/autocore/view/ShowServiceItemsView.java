@@ -1,10 +1,10 @@
 package com.wac.autocore.view;
 
-import com.wac.autocore.exceptions.AutoCoreException;
+import com.wac.autocore.controller.CatalogController;
+import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.ServicePack;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.*;
 import com.wac.autocore.view.components.kanban.KanbanColumn;
@@ -20,10 +20,12 @@ import javafx.scene.layout.*;
 import java.util.List;
 
 public class ShowServiceItemsView {
-    private final GarageSystem garageSystem;
+    private final CatalogController catalogController;
+    private final UiResultHandler uiResultHandler;
 
     public ShowServiceItemsView() {
-        garageSystem = ViewManager.getInstance().getGarageSystem();
+        catalogController = ViewManager.getInstance().getControllers().catalog();
+        uiResultHandler = new UiResultHandler();
     }
 
     private VBox serviceItemsBox;
@@ -47,11 +49,13 @@ public class ShowServiceItemsView {
         detailPanel = new VBox();
 
         serviceItemsBox = new VBox();
+        serviceItemsBox.getStyleClass().add("card-container");
         fillServiceItems();
 
         BorderPane servicePackColumnHeader = getServicePackColumnHeader();
 
         servicePackBox = new VBox();
+        servicePackBox.getStyleClass().add("card-container");
         fillServicePacks();
 
         ScrollPane serviceItemsColumn = new ScrollPane(serviceItemsBox);
@@ -74,21 +78,21 @@ public class ShowServiceItemsView {
     }
 
     private void fillServiceItems() {
-        serviceItemsBox.getStyleClass().add("card-container");
-        List<ServiceItem> serviceItems = garageSystem.getServiceItems();
+        Result<List<ServiceItem>> serviceItemsResult = uiResultHandler.handle(catalogController.getServiceItems());
         serviceItemsBox.getChildren().clear();
 
-        if (serviceItems.isEmpty()) {
+        if(!serviceItemsResult.isSuccess() || serviceItemsResult.value().isEmpty()){
             Label errorLabel = new Label(LanguageManager.getString("services.empty"));
             errorLabel.getStyleClass().add("error-label");
             serviceItemsBox.getChildren().add(errorLabel);
         }
 
-
-        for (ServiceItem serviceItem : serviceItems) {
+        for (ServiceItem serviceItem : serviceItemsResult.value()) {
             ServiceItemCard card = new ServiceItemCard(serviceItem, s ->
             {
-                ServiceItemDetails details = new ServiceItemDetails(s, () -> fillServiceItems());
+                ServiceItemDetails details = new ServiceItemDetails(s,
+                        () -> {fillServiceItems(); fillServicePacks();}
+                );
                 VBox.setVgrow(details, Priority.ALWAYS);
                 detailPanel.getChildren().setAll(
                         details);
@@ -119,34 +123,40 @@ public class ShowServiceItemsView {
     }
 
     private void fillServicePacks() {
-        servicePackBox.getStyleClass().add("card-container");
-        List<ServicePack> servicePacks = garageSystem.getServicePacks();
+        Result<List<ServicePack>> servicePacksResult = uiResultHandler.handle(catalogController.getServicePacks());
+        Result<List<ServiceItem>> serviceItemsResult = uiResultHandler.handle(catalogController.getServiceItems());
         servicePackBox.getChildren().clear();
 
-        if (servicePacks.isEmpty()) {
+        if (!servicePacksResult.isSuccess() || servicePacksResult.value().isEmpty()) {
             Label errorLabel = new Label(LanguageManager.getString("services.empty"));
             errorLabel.getStyleClass().add("error-label");
             servicePackBox.getChildren().add(errorLabel);
+            return;
         }
 
-
-        for (ServicePack servicePack : servicePacks) {
+        for (ServicePack servicePack : servicePacksResult.value()) {
             ServicePackCard card = new ServicePackCard(servicePack);
 
-            card.setOnMouseClicked(e -> {
-                ServicePackDetails servicePackDetails = new ServicePackDetails(servicePack,
-                        garageSystem.getServiceItems(),
-                        s -> saveServicePack(s),
-                        id -> deleteServicePack(id));
-                VBox.setVgrow(servicePackDetails, Priority.ALWAYS);
+            if(serviceItemsResult.isSuccess()) {
+                card.setOnMouseClicked(e -> {
+                    ServicePackDetails servicePackDetails = new ServicePackDetails(servicePack,
+                            serviceItemsResult.value(),
+                            s -> saveServicePack(s),
+                            id -> deleteServicePack(id));
+                    VBox.setVgrow(servicePackDetails, Priority.ALWAYS);
 
-                //TODO när man trycker på Tjänst och sedan servicepaket ser båda ut att vara valda
-                StylingUtil.setSelected(card, "card");
+                    //TODO när man trycker på Tjänst och sedan servicepaket ser båda ut att vara valda
+                    StylingUtil.setSelected(card, "card");
 
 
-                detailPanel.getChildren().setAll(servicePackDetails);
-            });
-            card.getStyleClass().add("clickable");
+                    detailPanel.getChildren().setAll(servicePackDetails);
+                });
+                card.getStyleClass().add("clickable");
+            }else {
+                Label errorLabel = new Label(LanguageManager.getString("services.notEditable"));
+                errorLabel.getStyleClass().add("error-label");
+                servicePackBox.getChildren().addFirst(errorLabel);
+            }
             servicePackBox.getChildren().add(card);
         }
     }
@@ -162,46 +172,43 @@ public class ShowServiceItemsView {
         );
 
         if (deleteConfirmed) {
-            garageSystem.deleteServicePack(servicePackId);
+            Result<Void> result = uiResultHandler.handle(catalogController.deleteServicePack(servicePackId));
 
-            AppDialog.showInformation(
-                    LanguageManager.getString("servicePack.delete.success.title"),
-                    LanguageManager.getString("servicePack.delete.success.message"),
-                    ""
-            );
+            if(result.isSuccess()) {
+                AppDialog.showInformation(
+                        LanguageManager.getString("servicePack.delete.success.title"),
+                        LanguageManager.getString("servicePack.delete.success.message"),
+                        ""
+                );
 
-            detailPanel.getChildren().clear();
-            fillServicePacks();
+                detailPanel.getChildren().clear();
+                fillServicePacks();
+            }
         }
     }
 
     private void saveServicePack(ServicePack servicePack) {
-        try {
-            ServicePack savedServicePack =
-                    garageSystem.updateServicePack(
-                            servicePack.getId(),
-                            servicePack
-                    );
+            Result<ServicePack> savedServicePackResult =
+                    uiResultHandler.handle(
+                            catalogController.updateServicePack(
+                                servicePack.getId(),
+                                servicePack
+                    ));
 
-            AppDialog.showInformation(
-                    LanguageManager.getString("servicePack.save.success.title"),
-                    LanguageManager.getString("servicePack.save.success.message"),
-                    String.format(
-                            LanguageManager.getString("servicePack.save.success.details"),
-                            savedServicePack.getName(),
-                            savedServicePack.getServiceItems().size()
-                    )
-            );
+            if(savedServicePackResult.isSuccess()) {
+                ServicePack savedServicePack = savedServicePackResult.value();
+                AppDialog.showInformation(
+                        LanguageManager.getString("servicePack.save.success.title"),
+                        LanguageManager.getString("servicePack.save.success.message"),
+                        String.format(
+                                LanguageManager.getString("servicePack.save.success.details"),
+                                savedServicePack.getName(),
+                                savedServicePack.getServiceItems().size()
+                        )
+                );
 
-            fillServicePacks();
-
-        } catch (AutoCoreException e) {
-            AppDialog.showError(
-                    LanguageManager.getString("servicePack.save.error.title"),
-                    LanguageManager.getString("servicePack.save.error.message"),
-                    e.getMessage()
-            );
-        }
+                fillServicePacks();
+            }
     }
 
     private Node getHeader() {

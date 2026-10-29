@@ -63,7 +63,7 @@ public class CatalogController {
             return errorHandler.call(() -> serviceItemService.createServicePack(name, serviceItemIds));
     }
 
-    public void deleteServicePack(int id) {
-            errorHandler.run(() -> serviceItemService.deleteServicePack(id));
+    public Result<Void> deleteServicePack(int id) {
+            return errorHandler.run(() -> serviceItemService.deleteServicePack(id));
     }
 }
