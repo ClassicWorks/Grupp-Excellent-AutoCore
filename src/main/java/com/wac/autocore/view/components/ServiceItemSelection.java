@@ -49,13 +49,11 @@ public class ServiceItemSelection extends VBox{
         this.onError = onError;
 
         // Show current chosen services
-        Label chosenServicesLabel = new Label(LanguageManager.getString("servicePack.details.services.label"));
-        chosenServicesLabel.getStyleClass().add("form-field-label");
 
         chosenServicesRows = new VBox();
         chosenServicesRows.getStyleClass().add("row-container");
 
-        VBox currentServicesContainer = new VBox(chosenServicesLabel, chosenServicesRows);
+        VBox currentServicesContainer = new VBox( chosenServicesRows);
         VBox addServiceSection = createAddServiceSection();
 
         //Get and set Service items

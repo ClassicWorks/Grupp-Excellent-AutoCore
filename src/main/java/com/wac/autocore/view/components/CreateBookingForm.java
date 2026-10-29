@@ -28,13 +28,11 @@ public class CreateBookingForm {
     private final GarageSystem garageSystem;
     private final Stage popupStage;
 
-    private final ObjectProperty<Vehicle> selectedVehicle =
-            new SimpleObjectProperty<>();
-    private ObservableList<ServiceItem> selectedItems;
+    private final ObjectProperty<Vehicle> selectedVehicle = new SimpleObjectProperty<>();
+    private ObservableList<ServiceItem> selectedItems = FXCollections.observableArrayList();
 
 
     private final VBox vehicleResults = new VBox();
-    private final VBox bookingInformation = new VBox();
 
     private final TextArea descriptionField = new TextArea();
     private final ComboBox<WorkOrderType> typeComboBox = new ComboBox<>();
@@ -44,8 +42,7 @@ public class CreateBookingForm {
     public CreateBookingForm(Stage popupStage, GarageSystem garageSystem) {
         this.popupStage = popupStage;
         this.garageSystem = garageSystem;
-        selectedItems = FXCollections.observableArrayList();
-    }
+            }
 
     /**
      * User chooses customer and vehicle and services
@@ -82,12 +79,15 @@ public class CreateBookingForm {
 
         } else {
             //Else search for customer and vehicle
+            Label customerLabel = new Label(LanguageManager.getString("customer.select.choose") + " (*)");
+            customerLabel.getStyleClass().add("form-field-label");
             CustomerSelection customerSelection = new CustomerSelection(
                     garageSystem,
                     this::showVehiclesOfCustomer);
             customerSelection.getStyleClass().addAll("form-field-container");
+            customerSelection.getChildren().addFirst(customerLabel);
 
-            Label selectVehicleLabel = new Label(LanguageManager.getString("booking.form.selectVehicle"));
+            Label selectVehicleLabel = new Label(LanguageManager.getString("booking.form.selectVehicle") + " (*)");
             selectVehicleLabel.getStyleClass().add("form-field-label");
             vehicleResults.getStyleClass().addAll("card-container", "compact");
             VBox vehicleSelection = new VBox(selectVehicleLabel, vehicleResults);
@@ -115,13 +115,14 @@ public class CreateBookingForm {
             ));
         }
 
+        Label selectServicesLabel = new Label(LanguageManager.getString("booking.form.selectServices"));
+        selectServicesLabel.getStyleClass().add("form-field-label");
         ServiceItemSelection serviceItemSelection = new ServiceItemSelection(
                 selectedItems,
                 garageSystem.getServiceItems(),
                 garageSystem.getServicePacks(),
                 error -> errorLabel.setText(errorLabel.getText() + error));
-
-
+        serviceItemSelection.getChildren().addFirst(selectServicesLabel);
 
         HBox actionButtons = createActionButtons();
         actionButtons.getStyleClass().add("btn-container");
@@ -171,10 +172,12 @@ public class CreateBookingForm {
         return vehicleCard;
     }
 
-    private Label createTitle() {
+    private Node createTitle() {
         Label title = new Label(LanguageManager.getString("booking.form.title"));
         title.getStyleClass().add("form-title");
-        return title;
+        Label explanation = new Label(LanguageManager.getString("booking.form.explanation"));
+
+        return new VBox(title, explanation);
     }
 
     // =========================================================
