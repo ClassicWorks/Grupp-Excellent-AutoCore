@@ -1,8 +1,9 @@
 package com.wac.autocore.view;
 
+import com.wac.autocore.controller.MechanicController;
+import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Mechanic;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.AppDialog;
 import com.wac.autocore.view.components.MechanicCard;
@@ -21,12 +22,13 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 
 public class ShowMechanicsView {
-    private final GarageSystem garageSystem;
+    private final MechanicController mechanicController;
+    private final UiResultHandler resultHandler = new UiResultHandler();
     private final VBox detailPanel = new VBox();
     private final VBox mechanicsBox = new VBox();
 
     public ShowMechanicsView() {
-        garageSystem = ViewManager.getInstance().getGarageSystem();
+        mechanicController = ViewManager.getInstance().getControllers().mechanics();
     }
 
     public Parent show() {
@@ -60,7 +62,11 @@ public class ShowMechanicsView {
     private void fillMechanics() {
         mechanicsBox.getChildren().clear();
 
-        List<Mechanic> mechanics = garageSystem.getMechanics();
+        Result<List<Mechanic>> result = resultHandler.handle(mechanicController.getMechanics());
+        if (!result.isSuccess()) {
+            return;
+        }
+        List<Mechanic> mechanics = result.value();
 
         if (mechanics.isEmpty()) {
             Label errorLabel = new Label(LanguageManager.getString("mechanics.empty"));
@@ -82,7 +88,13 @@ public class ShowMechanicsView {
     }
 
     private void deleteMechanic(int mechanicId) {
-        if (garageSystem.mechanicHasUncompletedWorkOrders(mechanicId)) {
+        Result<Boolean> blockedResult =
+                resultHandler.handle(mechanicController.mechanicHasUncompletedWorkOrders(mechanicId));
+        if (!blockedResult.isSuccess()) {
+            return;
+        }
+
+        if (blockedResult.value()) {
             AppDialog.showError(
                     LanguageManager.getString("mechanic.delete.title"),
                     LanguageManager.getString("mechanic.delete.blocked.title"),
@@ -104,7 +116,12 @@ public class ShowMechanicsView {
             return;
         }
 
-        if (!garageSystem.deleteMechanic(mechanicId)) {
+        Result<Boolean> deleteResult = resultHandler.handle(mechanicController.deleteMechanic(mechanicId));
+        if (!deleteResult.isSuccess()) {
+            return;
+        }
+
+        if (!deleteResult.value()) {
             AppDialog.showError(
                     LanguageManager.getString("mechanic.delete.title"),
                     LanguageManager.getString("mechanic.delete.failed"),
