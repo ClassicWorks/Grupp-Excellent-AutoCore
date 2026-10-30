@@ -29,8 +29,6 @@ public class CustomerSelection extends VBox {
     }
 
     private void createCustomerSelection() {
-        Label label = new Label(LanguageManager.getString("customer.select.choose"));
-        label.getStyleClass().add("form-field-label");
         TextField searchField = new TextField("");
         searchField.setPromptText(LanguageManager.getString("customer.select.searchPrompt"));
 
@@ -49,7 +47,7 @@ public class CustomerSelection extends VBox {
         searchBox.getStyleClass().add("form-field-container");
         HBox.setHgrow(searchField, Priority.ALWAYS);
 
-        this.getChildren().addAll(label, searchBox, customerResults, selectedCustomerLabel);
+        this.getChildren().addAll(searchBox, customerResults, selectedCustomerLabel);
     }
 
 

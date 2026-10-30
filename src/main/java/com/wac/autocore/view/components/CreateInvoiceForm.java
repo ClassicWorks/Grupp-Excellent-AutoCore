@@ -9,10 +9,7 @@ import com.wac.autocore.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -35,6 +32,13 @@ public class CreateInvoiceForm {
         Label title = new Label(LanguageManager.getString("invoice.form.title"));
         title.getStyleClass().add("form-title");
 
+        Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
+        explanation.setWrapText(true);
+        explanation.setMinWidth(0);
+        explanation.getStyleClass().add("form-explanation");
+
+        VBox headerBox = new VBox(title, explanation);
+
         Label errorLabel = new Label();
         errorLabel.getStyleClass().add("error-label");
 
@@ -46,26 +50,30 @@ public class CreateInvoiceForm {
             errorLabel.setText(workOrdersResult.error());
         }
 
+        //Chose workOrder
         ObservableList<WorkOrder> workOrderItems = FXCollections.observableArrayList(availableWorkOrders);
 
         ComboBox<WorkOrder> workOrderComboBox = new ComboBox<>(workOrderItems);
         workOrderComboBox.setPromptText(LanguageManager.getString("invoice.form.workorder.prompt"));
         workOrderComboBox.setConverter(ComboBoxLabels.workOrder());
+        VBox workOrderBox = new FormFieldContainer(
+                LanguageManager.getString("invoice.form.workorder.label"), workOrderComboBox, true);
 
-        VBox workOrderBox = new VBox(workOrderComboBox);
-        workOrderBox.getStyleClass().add("form-field-container");
-
+        //Discount code
         TextField discountCodeField = new TextField();
         discountCodeField.setPromptText(LanguageManager.getString("invoice.form.discount.prompt"));
-
-        VBox discountBox = new VBox(discountCodeField);
-        discountBox.getStyleClass().add("form-field-container");
+        VBox discountBox = new FormFieldContainer(
+                LanguageManager.getString("invoice.form.discount.label"), discountCodeField, false);
 
         Button createBtn = new Button(LanguageManager.getString("invoice.form.submit"));
         createBtn.getStyleClass().add("confirm-btn");
 
         Button cancelBtn = new Button(LanguageManager.getString("invoice.form.cancel"));
         cancelBtn.getStyleClass().add("cancel-btn");
+
+        createBtn.disableProperty().bind(
+                workOrderComboBox.valueProperty().isNull()
+        );
 
         createBtn.setOnAction(e -> {
             errorLabel.setText("");
@@ -93,13 +101,17 @@ public class CreateInvoiceForm {
         buttonBox.getStyleClass().add("btn-container");
 
         root.getChildren().addAll(
-                title,
+                headerBox,
                 workOrderBox,
                 discountBox,
                 buttonBox,
                 errorLabel
         );
 
-        return root;
+        ScrollPane scrollPane = new ScrollPane(root);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(false);
+
+        return scrollPane;
     }
 }

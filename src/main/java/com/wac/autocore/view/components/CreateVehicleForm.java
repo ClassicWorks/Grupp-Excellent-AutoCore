@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -58,37 +59,43 @@ public class CreateVehicleForm {
         Label title = new Label(LanguageManager.getString("vehicle.form.title"));
         title.getStyleClass().add("form-title");
 
-        Label customerLabel = new Label(LanguageManager.getString("vehicle.form.customer.label"));
-        customerLabel.getStyleClass().add("form-field-label");
+        Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
+        explanation.setWrapText(true);
+        explanation.setMinWidth(0);
+        explanation.getStyleClass().add("form-explanation");
+
+        VBox headerBox = new VBox(title,explanation);
 
         ObjectProperty<Customer> selectedCustomer = new SimpleObjectProperty<>();
         VBox customerBox;
         if(preselectedCustomer == null){
             CustomerSelection customerSelection = new CustomerSelection(garageSystem,
                     selectedCustomer::set);
-            customerBox = new VBox(customerSelection);
+            customerBox = new FormFieldContainer(
+                    LanguageManager.getString("vehicle.form.customer.label"), customerSelection, true);
         } else {
             selectedCustomer.set(preselectedCustomer);
             CustomerCard customerCard = new CustomerCard(preselectedCustomer);
             customerCard.getStyleClass().addAll("compact");
-            customerBox = new VBox(customerCard);
+            customerBox = new FormFieldContainer(
+                    LanguageManager.getString("vehicle.form.customer.label"), customerCard, false);
         }
 
         TextField regField = new TextField();
         regField.setPromptText(LanguageManager.getString("vehicle.form.regNumber.prompt"));
-        VBox regBox = getFormFieldContainer("vehicle.form.regNumber.label", regField);
+        VBox regBox = new FormFieldContainer(LanguageManager.getString("vehicle.form.regNumber.label"), regField, true);
 
         TextField brandField = new TextField();
         brandField.setPromptText(LanguageManager.getString("vehicle.form.brand.prompt"));
-        VBox brandBox = getFormFieldContainer("vehicle.form.brand.label", brandField);
+        VBox brandBox = new FormFieldContainer(LanguageManager.getString("vehicle.form.brand.label"), brandField, true);
 
         TextField modelField = new TextField();
         modelField.setPromptText(LanguageManager.getString("vehicle.form.model.prompt"));
-        VBox modelBox = getFormFieldContainer("vehicle.form.model.label", modelField);
+        VBox modelBox = new FormFieldContainer(LanguageManager.getString("vehicle.form.model.label"), modelField, true);
 
         TextField yearField = new TextField();
         yearField.setPromptText(LanguageManager.getString("vehicle.form.year.prompt"));
-        VBox yearBox = getFormFieldContainer("vehicle.form.year.label", yearField);
+        VBox yearBox = new FormFieldContainer(LanguageManager.getString("vehicle.form.year.label"), yearField, true);
 
         Label errorLabel = new Label();
         errorLabel.getStyleClass().add("error-label");
@@ -141,7 +148,7 @@ public class CreateVehicleForm {
         buttonBox.getStyleClass().add("btn-container");
 
         root.getChildren().addAll(
-                title,
+                headerBox,
                 customerBox,
                 regBox,
                 brandBox,
@@ -151,15 +158,10 @@ public class CreateVehicleForm {
                 buttonBox
         );
 
-        return root;
-    }
-
-    private static VBox getFormFieldContainer(String key, TextField field) {
-        Label yearLabel = new Label(LanguageManager.getString(key));
-        yearLabel.getStyleClass().add("form-field-label");
-        VBox yearBox = new VBox(yearLabel, field);
-        yearBox.getStyleClass().add("form-field-container");
-        return yearBox;
+        ScrollPane scrollPane = new ScrollPane(root);
+        scrollPane.setFitToHeight(false);
+        scrollPane.setFitToWidth(true);
+        return scrollPane;
     }
 
     private boolean createVehicle(String registrationNumber, String brand, String model, int year, Customer selectedCustomer, Label errorLabel) {

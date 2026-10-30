@@ -31,15 +31,16 @@ public class ServicePackDetails extends BorderPane{
 
         Label title = createTitle(ValueLabels.servicePackName(servicePack.getName()));
 
+        Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
+        explanation.setWrapText(true);
+        explanation.setMaxWidth(Double.MAX_VALUE);
+        explanation.getStyleClass().add("form-explanation");
+
         Label idLabel = new Label(String.format("ID: %d", servicePack.getId()));
 
-        Label nameLabel = new Label(LanguageManager.getString("servicePack.details.name.label"));
-        nameLabel.getStyleClass().add("form-field-label");
-
         nameField = new TextField(servicePack.getName());
-
-        VBox nameBox = new VBox(nameLabel, nameField);
-        nameBox.getStyleClass().add("form-field-container");
+        VBox nameBox = new FormFieldContainer(
+                LanguageManager.getString("servicePack.details.name.label"), nameField, true);
 
         // ServiceItemSelection
         ServiceItemSelection serviceItemSelection = new ServiceItemSelection(
@@ -47,8 +48,12 @@ public class ServicePackDetails extends BorderPane{
                 allServiceItems,
                 errorMessage -> errorLabel.setText(errorMessage)
         );
+        Label serviceItemselectionLabel = new Label(LanguageManager.getString("servicePack.details.services.label"));
+        serviceItemselectionLabel.getStyleClass().add("form-field-label");
+        serviceItemSelection.getChildren().addFirst(serviceItemselectionLabel);
 
         VBox detailsContainer = new VBox(
+                explanation,
                 idLabel,
                 nameBox,
                 serviceItemSelection,

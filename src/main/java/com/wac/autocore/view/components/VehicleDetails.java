@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.util.function.Consumer;
@@ -148,45 +149,26 @@ public class VehicleDetails extends BorderPane {
         modelField.setText(vehicle.getModel());
         yearField.setText(Integer.toString(vehicle.getYear()));
 
-        Label registrationLabel = new Label(LanguageManager.getString("vehicle.regNumber"));
-        registrationLabel.getStyleClass().add("form-field-label");
+        Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
+        explanation.setWrapText(true);
+        explanation.setMinWidth(0);
+        explanation.getStyleClass().add("form-explanation");
 
-        VBox registrationBox =
-                new VBox(registrationLabel, registrationNumber);
-        registrationBox.getStyleClass().add("form-field-container");
-
-
-        Label brandLabel = new Label(LanguageManager.getString("vehicle.brand"));
-        brandLabel.getStyleClass().add("form-field-label");
-
-        VBox brandBox =
-                new VBox(brandLabel, brandField);
-        brandBox.getStyleClass().add("form-field-container");
-
-
-        Label modelLabel = new Label(LanguageManager.getString("vehicle.model"));
-        modelLabel.getStyleClass().add("form-field-label");
-
-        VBox modelBox =
-                new VBox(modelLabel, modelField);
-        modelBox.getStyleClass().add("form-field-container");
-
-
-        Label yearLabel = new Label(LanguageManager.getString("vehicle.year"));
-        yearLabel.getStyleClass().add("form-field-label");
-
-        VBox yearBox =
-                new VBox(yearLabel, yearField);
-        yearBox.getStyleClass().add("form-field-container");
-
+        VBox registrationBox = new FormFieldContainer(
+                LanguageManager.getString("vehicle.regNumber"), registrationNumber, true);
+        VBox brandBox = new FormFieldContainer(LanguageManager.getString("vehicle.brand"), brandField, true);
+        VBox modelBox = new FormFieldContainer(LanguageManager.getString("vehicle.model"), modelField, true);
+        VBox yearBox = new FormFieldContainer(LanguageManager.getString("vehicle.year"), yearField, true);
 
         VBox vehicleFields = new VBox(
                 vehicleIdLabel,
+                explanation,
                 registrationBox,
                 brandBox,
                 modelBox,
                 yearBox
         );
+
         vehicleFields.getStyleClass().add("form-container");
 
 
@@ -194,6 +176,11 @@ public class VehicleDetails extends BorderPane {
                 vehicleIcon,
                 vehicleFields
         );
+        /*vehicleFields.setMinWidth(0);
+        vehicleFields.setMaxWidth(Double.MAX_VALUE);
+
+        HBox.setHgrow(vehicleFields, Priority.ALWAYS);
+        vehicleBox.setMaxWidth(Double.MAX_VALUE);*/
 
         vehicleBox.setAlignment(Pos.CENTER_LEFT);
 

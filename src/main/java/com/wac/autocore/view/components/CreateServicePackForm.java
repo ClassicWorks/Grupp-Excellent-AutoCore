@@ -54,24 +54,22 @@ public class CreateServicePackForm {
 
         Label title = new Label(LanguageManager.getString("servicePack.form.title"));
         title.getStyleClass().add("form-title");
-
-        Label nameLabel = new Label(LanguageManager.getString("servicePack.details.name.label"));
-        nameLabel.getStyleClass().add("form-field-label");
+        Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
+        explanation.setWrapText(true);
+        explanation.setMinWidth(0);
+        explanation.getStyleClass().add("form-explanation");
+        VBox headerBox = new VBox(title, explanation);
 
         nameField = new TextField();
-        nameField.setPromptText("Name for the pack");
-
-        VBox nameBox = new VBox(nameLabel, nameField);
-        nameBox.getStyleClass().add("form-field-container");
+        nameField.setPromptText(LanguageManager.getString("servicePack.form.name.prompt"));
+        VBox nameBox = new FormFieldContainer(
+                LanguageManager.getString("servicePack.details.name.label"), nameField, true);
 
         // Show current services in pack
-        Label chosenServicesLabel = new Label(LanguageManager.getString("servicePack.details.services.label"));
-        chosenServicesLabel.getStyleClass().add("form-field-label");
-
         chosenServicesRows = new VBox();
         chosenServicesRows.getStyleClass().add("row-container");
-
-        VBox currentServicesContainer = new VBox(chosenServicesLabel, chosenServicesRows);
+        VBox currentServicesContainer = new FormFieldContainer(
+                LanguageManager.getString("servicePack.details.services.label"), chosenServicesRows, true);
         VBox addServiceSection = createAddServiceSection();
 
         //Get and set Service items
@@ -85,16 +83,17 @@ public class CreateServicePackForm {
         btnContainer.getStyleClass().add("btn-container");
 
         VBox formContainer = new VBox(
-                title,
+                headerBox,
                 nameBox,
                 currentServicesContainer,
                 addServiceSection,
                 btnContainer
         );
         formContainer.getStyleClass().add("form-container");
+        explanation.prefWidthProperty().bind(formContainer.widthProperty().subtract(40));
 
         ScrollPane scrollPane = new ScrollPane(formContainer);
-        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToHeight(false);
         scrollPane.setFitToWidth(true);
         return scrollPane;
     }
@@ -186,18 +185,10 @@ public class CreateServicePackForm {
             refreshServiceItems();
         });
 
-        Label addLabel = new Label(
-                LanguageManager.getString("servicePack.addService.label")
-        );
-        addLabel.getStyleClass().add("form-field-label");
-
         HBox comboBoxContainer = new HBox(serviceComboBox, addBtn);
         comboBoxContainer.getStyleClass().add("row");
-
-        VBox container = new VBox(addLabel, comboBoxContainer);
-        container.getStyleClass().add("form-field-container");
-
-        return container;
+        return new FormFieldContainer(
+                LanguageManager.getString("servicePack.addService.label"), comboBoxContainer, false);
     }
 
     private Button createSaveBtn() {

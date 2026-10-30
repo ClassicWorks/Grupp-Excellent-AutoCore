@@ -4,7 +4,6 @@ import com.wac.autocore.model.Payment;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class PaymentCard extends VBox {

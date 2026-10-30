@@ -1,16 +1,20 @@
 package com.wac.autocore.view;
 
 import com.wac.autocore.manager.ViewManager;
-import com.wac.autocore.model.*;
+import com.wac.autocore.model.WorkOrder;
+import com.wac.autocore.model.WorkOrderStatus;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
+import com.wac.autocore.view.components.WorkOrderCard;
 import com.wac.autocore.view.components.WorkOrderDetails;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
-import com.wac.autocore.util.LanguageManager;
-import com.wac.autocore.view.components.WorkOrderCard;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 import java.util.List;
 

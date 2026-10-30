@@ -2,9 +2,9 @@ package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
-import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.StylingUtil;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -28,13 +28,11 @@ public class CreateBookingForm {
     private final GarageSystem garageSystem;
     private final Stage popupStage;
 
-    private final ObjectProperty<Vehicle> selectedVehicle =
-            new SimpleObjectProperty<>();
-    private ObservableList<ServiceItem> selectedItems;
+    private final ObjectProperty<Vehicle> selectedVehicle = new SimpleObjectProperty<>();
+    private ObservableList<ServiceItem> selectedItems = FXCollections.observableArrayList();
 
 
     private final VBox vehicleResults = new VBox();
-    private final VBox bookingInformation = new VBox();
 
     private final TextArea descriptionField = new TextArea();
     private final ComboBox<WorkOrderType> typeComboBox = new ComboBox<>();
@@ -44,8 +42,7 @@ public class CreateBookingForm {
     public CreateBookingForm(Stage popupStage, GarageSystem garageSystem) {
         this.popupStage = popupStage;
         this.garageSystem = garageSystem;
-        selectedItems = FXCollections.observableArrayList();
-    }
+            }
 
     /**
      * User chooses customer and vehicle and services
@@ -85,15 +82,20 @@ public class CreateBookingForm {
             CustomerSelection customerSelection = new CustomerSelection(
                     garageSystem,
                     this::showVehiclesOfCustomer);
-            customerSelection.getStyleClass().addAll("form-field-container");
+            VBox customerBox = new FormFieldContainer(
+                    LanguageManager.getString("customer.select.choose"),
+                    customerSelection,
+                    true
+            );
 
-            Label selectVehicleLabel = new Label(LanguageManager.getString("booking.form.selectVehicle"));
-            selectVehicleLabel.getStyleClass().add("form-field-label");
             vehicleResults.getStyleClass().addAll("card-container", "compact");
-            VBox vehicleSelection = new VBox(selectVehicleLabel, vehicleResults);
-            vehicleSelection.getStyleClass().add("form-field-container");
+            VBox vehicleSelection = new FormFieldContainer(
+                    LanguageManager.getString("booking.form.selectVehicle"),
+                    vehicleResults,
+                    true
+            );
 
-            vehicleContainer = new VBox(customerSelection, vehicleSelection);
+            vehicleContainer = new VBox(customerBox, vehicleSelection);
         }
 
         VBox mechanicBox = getMechanicBox();
@@ -115,13 +117,14 @@ public class CreateBookingForm {
             ));
         }
 
+        Label selectServicesLabel = new Label(LanguageManager.getString("booking.form.selectServices"));
+        selectServicesLabel.getStyleClass().add("form-field-label");
         ServiceItemSelection serviceItemSelection = new ServiceItemSelection(
                 selectedItems,
                 garageSystem.getServiceItems(),
                 garageSystem.getServicePacks(),
                 error -> errorLabel.setText(errorLabel.getText() + error));
-
-
+        serviceItemSelection.getChildren().addFirst(selectServicesLabel);
 
         HBox actionButtons = createActionButtons();
         actionButtons.getStyleClass().add("btn-container");
@@ -141,7 +144,7 @@ public class CreateBookingForm {
 
         ScrollPane scrollPane = new ScrollPane(layout);
         scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToHeight(false);
         return scrollPane;
     }
 
@@ -171,10 +174,18 @@ public class CreateBookingForm {
         return vehicleCard;
     }
 
-    private Label createTitle() {
+    private Node createTitle() {
         Label title = new Label(LanguageManager.getString("booking.form.title"));
         title.getStyleClass().add("form-title");
-        return title;
+        VBox headerBox = new VBox(title);
+
+        Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
+        explanation.setWrapText(true);
+        explanation.setMinWidth(0);
+        explanation.getStyleClass().add("form-explanation");
+        headerBox.getChildren().add(explanation);
+
+        return headerBox;
     }
 
     // =========================================================
@@ -211,14 +222,13 @@ public class CreateBookingForm {
     // =========================================================
 
     private VBox getMechanicBox() {
-        Label mechanicLabel = new Label(LanguageManager.getString("booking.form.mechanicOptional"));
-        mechanicLabel.getStyleClass().add("form-field-label");
-
         mechanicComboBox = createMechanicComboBox();
 
-        VBox mechanicBox = new VBox(mechanicLabel, mechanicComboBox);
-        mechanicBox.getStyleClass().add("form-field-container");
-        return mechanicBox;
+        return new FormFieldContainer(
+                LanguageManager.getString("booking.form.mechanicOptional"),
+                mechanicComboBox,
+                false
+        );
     }
 
     private ComboBox<Mechanic> createMechanicComboBox() {
@@ -234,26 +244,24 @@ public class CreateBookingForm {
     }
 
     private VBox getDescriptionBox() {
-        Label descriptionLabel = new Label((LanguageManager.getString("booking.form.description")));
-        descriptionLabel.getStyleClass().add("form-field-label");
-
         descriptionField.setPrefRowCount(3);
-        VBox descriptionBox = new VBox(descriptionLabel, descriptionField);
-        descriptionBox.getStyleClass().add("form-field-container");
-        return descriptionBox;
+        return new FormFieldContainer(
+                LanguageManager.getString("booking.form.description"),
+                descriptionField,
+                true
+        );
     }
 
     private VBox getTypeBox() {
-        Label typeLabel = new Label(LanguageManager.getString("workorder.type.label"));
-        typeLabel.getStyleClass().add("form-field-label");
-
         typeComboBox.getItems().setAll(WorkOrderType.values());
         typeComboBox.setPromptText(LanguageManager.getString("workorder.type.prompt"));
         typeComboBox.setConverter(ComboBoxLabels.workOrderType());
 
-        VBox typeBox = new VBox(typeLabel, typeComboBox);
-        typeBox.getStyleClass().add("form-field-container");
-        return typeBox;
+        return new FormFieldContainer(
+                LanguageManager.getString("workorder.type.label"),
+                typeComboBox,
+                true
+        );
     }
 
     // =========================================================

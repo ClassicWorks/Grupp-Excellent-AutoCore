@@ -3,6 +3,7 @@ package com.wac.autocore.view;
 import com.wac.autocore.controller.LoginController;
 import com.wac.autocore.controller.Result;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.view.components.FormFieldContainer;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -25,10 +26,12 @@ public class LoginView {
         title.getStyleClass().add("form-title");
 
         TextField usernameField = new TextField();
-        usernameField.setPromptText(LanguageManager.getString("login.username"));
+        usernameField.setPromptText(LanguageManager.getString("login.username.prompt"));
+        VBox usernameBox = new FormFieldContainer(LanguageManager.getString("login.username.label"), usernameField, false);
 
         PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText(LanguageManager.getString("login.password"));
+        passwordField.setPromptText(LanguageManager.getString("login.password.prompt"));
+        VBox passwordBox = new FormFieldContainer(LanguageManager.getString("login.password.label"), passwordField, false);
 
         Label errorLabel = new Label();
         errorLabel.getStyleClass().add("error-label");
@@ -50,7 +53,12 @@ public class LoginView {
             }
         });
 
-        VBox form = new VBox(title, usernameField, passwordField, loginBtn, errorLabel);
+        VBox form = new VBox(
+                title,
+                usernameBox,
+                passwordBox,
+                loginBtn,
+                errorLabel);
         form.getStyleClass().add("form-container");
         form.setMaxWidth(350);
 
