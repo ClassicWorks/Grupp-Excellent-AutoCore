@@ -4,6 +4,7 @@ import com.wac.autocore.controller.PaymentController;
 import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Payment;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.PaymentCard;
 import javafx.scene.Node;
@@ -57,13 +58,15 @@ public class ShowPaymentsView {
         BorderPane header = new BorderPane();
         Label title = new Label(LanguageManager.getString("payments.title"));
         title.getStyleClass().add("page-title");
-
-        Button processPaymentBtn = new Button(LanguageManager.getString("payments.create"));
-        processPaymentBtn.getStyleClass().add("confirm-btn");
-
         header.setCenter(title);
-        header.setRight(processPaymentBtn);
-        processPaymentBtn.setOnAction(e -> ViewManager.getInstance().showProcessPaymentPopup());
+
+        boolean canManagePayments = ViewManager.getInstance().getAccessGuard().has(Permission.MANAGE_PAYMENTS);
+        if (canManagePayments) {
+            Button processPaymentBtn = new Button(LanguageManager.getString("payments.create"));
+            processPaymentBtn.getStyleClass().add("confirm-btn");
+            processPaymentBtn.setOnAction(e -> ViewManager.getInstance().showProcessPaymentPopup());
+            header.setRight(processPaymentBtn);
+        }
         return header;
     }
 }

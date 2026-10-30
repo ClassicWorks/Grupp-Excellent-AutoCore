@@ -4,6 +4,7 @@ import com.wac.autocore.controller.InvoiceController;
 import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Invoice;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.InvoiceCard;
 import com.wac.autocore.view.components.kanban.KanbanColumn;
@@ -100,13 +101,15 @@ public class ShowInvoicesView {
         BorderPane header = new BorderPane();
         Label title = new Label(LanguageManager.getString("invoices.title"));
         title.getStyleClass().addAll("page-title");
-
-        Button createInvoiceBtn = new Button(LanguageManager.getString("invoices.create"));
-        createInvoiceBtn.getStyleClass().addAll("confirm-btn");
-
         header.setCenter(title);
-        header.setRight(createInvoiceBtn);
-        createInvoiceBtn.setOnAction(e -> ViewManager.getInstance().showCreateInvoicePopup());
+
+        boolean canManageInvoices = ViewManager.getInstance().getAccessGuard().has(Permission.MANAGE_INVOICES);
+        if (canManageInvoices) {
+            Button createInvoiceBtn = new Button(LanguageManager.getString("invoices.create"));
+            createInvoiceBtn.getStyleClass().addAll("confirm-btn");
+            createInvoiceBtn.setOnAction(e -> ViewManager.getInstance().showCreateInvoicePopup());
+            header.setRight(createInvoiceBtn);
+        }
         return header;
     }
 }

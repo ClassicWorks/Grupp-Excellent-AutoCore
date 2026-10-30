@@ -234,6 +234,7 @@ public class ViewManager {
     }
 
     public void showProcessPaymentPopup() {
+        accessGuard.require(Permission.MANAGE_PAYMENTS, "ViewManager.showProcessPaymentPopup");
         Stage popup = new Stage();
         Parent content = new ProcessPaymentForm(popup).show();
 
@@ -241,6 +242,7 @@ public class ViewManager {
     }
 
     public void showCreateInvoicePopup() {
+        accessGuard.require(Permission.MANAGE_INVOICES, "ViewManager.showCreateInvoicePopup");
         Stage popup = new Stage();
         Parent content = new CreateInvoiceForm(popup).show();
 
