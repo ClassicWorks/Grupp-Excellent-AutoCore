@@ -5,6 +5,8 @@ import com.wac.autocore.controller.VehicleController;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
+import com.wac.autocore.security.AccessGuard;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.UiResultHandler;
@@ -24,6 +26,8 @@ public class VehicleDetails extends BorderPane {
     private final VehicleController vehicleController = ViewManager.getInstance().getControllers().vehicles();
     private final UiResultHandler uiResultHandler = new UiResultHandler();
     private final Runnable onSaved;
+    private final boolean canEdit;
+    private final boolean canBook;
 
     private Vehicle vehicle;
     private Customer vehicleOwner;
@@ -41,6 +45,9 @@ public class VehicleDetails extends BorderPane {
 
 
     public VehicleDetails(Vehicle vehicle, Customer vehicleOwner, Runnable onSaved, Consumer<Integer> onDelete) {
+        AccessGuard accessGuard = ViewManager.getInstance().getAccessGuard();
+        this.canEdit = accessGuard.has(Permission.MANAGE_VEHICLES);
+        this.canBook = accessGuard.has(Permission.MANAGE_WORK_ORDERS);
         this.vehicle = vehicle;
         this.vehicleOwner = vehicleOwner;
         this.onSaved = onSaved;
@@ -56,19 +63,27 @@ public class VehicleDetails extends BorderPane {
         );
         mainContent.getStyleClass().add("details-container");
 
-        HBox confirmingButtons = new HBox(
-                createSaveBtn(),
-                createBookVehicleBtn()
-        );
-        confirmingButtons.getStyleClass().add("btn-container");
-
-        HBox destructiveButtons = new HBox(createDeleteBtn(onDelete));
-        destructiveButtons.getStyleClass().add("btn-container");
-
-        BorderPane actionableButtons = new BorderPane(null, null, destructiveButtons, null, confirmingButtons);
-
         this.setCenter(mainContent);
-        this.setBottom(actionableButtons);
+
+        if (canEdit || canBook) {
+            HBox confirmingButtons = new HBox();
+            if (canEdit) {
+                confirmingButtons.getChildren().add(createSaveBtn());
+            }
+            if (canBook) {
+                confirmingButtons.getChildren().add(createBookVehicleBtn());
+            }
+            confirmingButtons.getStyleClass().add("btn-container");
+
+            HBox destructiveButtons = new HBox();
+            if (canEdit) {
+                destructiveButtons.getChildren().add(createDeleteBtn(onDelete));
+            }
+            destructiveButtons.getStyleClass().add("btn-container");
+
+            BorderPane actionableButtons = new BorderPane(null, null, destructiveButtons, null, confirmingButtons);
+            this.setBottom(actionableButtons);
+        }
     }
 
     private void updateCustomerSection() {
@@ -76,15 +91,6 @@ public class VehicleDetails extends BorderPane {
 
         Label notificationLabel = new Label();
         notificationLabel.getStyleClass().add("error-label");
-
-        ImageViewWithAltText editIcon = new ImageViewWithAltText(
-                "/imgs/pen-to-square-solid.png", 20, 20,
-                LanguageManager.getString("image.pen-to-square-solid")
-        );
-
-        Button editCustomerBtn = new Button(LanguageManager.getString("vehicle.editCustomer"), editIcon);
-        editCustomerBtn.getStyleClass().add("confirm-btn");
-        editCustomerBtn.setOnAction(e -> showCustomerSelection());
 
         if (vehicleOwner != null) {
             customerInfo.setText(String.format(
@@ -102,7 +108,19 @@ public class VehicleDetails extends BorderPane {
         }
 
         VBox customerText = new VBox(customerName, customerInfo, notificationLabel);
-        customerEditableBox.getChildren().setAll(customerText, editCustomerBtn);
+        customerEditableBox.getChildren().setAll(customerText);
+
+        if (canEdit) {
+            ImageViewWithAltText editIcon = new ImageViewWithAltText(
+                    "/imgs/pen-to-square-solid.png", 20, 20,
+                    LanguageManager.getString("image.pen-to-square-solid")
+            );
+
+            Button editCustomerBtn = new Button(LanguageManager.getString("vehicle.editCustomer"), editIcon);
+            editCustomerBtn.getStyleClass().add("confirm-btn");
+            editCustomerBtn.setOnAction(e -> showCustomerSelection());
+            customerEditableBox.getChildren().add(editCustomerBtn);
+        }
 
         Label customerLabel = new Label(LanguageManager.getString("vehicle.owner"));
         customerLabel.getStyleClass().add("form-field-label");
@@ -139,25 +157,42 @@ public class VehicleDetails extends BorderPane {
         modelField.setText(vehicle.getModel());
         yearField.setText(Integer.toString(vehicle.getYear()));
 
-        Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
-        explanation.setWrapText(true);
-        explanation.setMinWidth(0);
-        explanation.getStyleClass().add("form-explanation");
+        Label registrationLabel = new Label(vehicle.getRegistrationNumber());
+        Label brandLabel = new Label(vehicle.getBrand());
+        Label modelLabel = new Label(vehicle.getModel());
+        Label yearLabel = new Label(Integer.toString(vehicle.getYear()));
 
         VBox registrationBox = new FormFieldContainer(
-                LanguageManager.getString("vehicle.regNumber"), registrationNumber, true);
-        VBox brandBox = new FormFieldContainer(LanguageManager.getString("vehicle.brand"), brandField, true);
-        VBox modelBox = new FormFieldContainer(LanguageManager.getString("vehicle.model"), modelField, true);
-        VBox yearBox = new FormFieldContainer(LanguageManager.getString("vehicle.year"), yearField, true);
+                LanguageManager.getString("vehicle.regNumber"),
+                canEdit ? registrationNumber : registrationLabel,
+                canEdit);
+        VBox brandBox = new FormFieldContainer(
+                LanguageManager.getString("vehicle.brand"),
+                canEdit ? brandField : brandLabel,
+                canEdit);
+        VBox modelBox = new FormFieldContainer(
+                LanguageManager.getString("vehicle.model"),
+                canEdit ? modelField : modelLabel,
+                canEdit);
+        VBox yearBox = new FormFieldContainer(
+                LanguageManager.getString("vehicle.year"),
+                canEdit ? yearField : yearLabel,
+                canEdit);
 
         VBox vehicleFields = new VBox(
                 vehicleIdLabel,
-                explanation,
                 registrationBox,
                 brandBox,
                 modelBox,
                 yearBox
         );
+        if (canEdit) {
+            Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
+            explanation.setWrapText(true);
+            explanation.setMinWidth(0);
+            explanation.getStyleClass().add("form-explanation");
+            vehicleFields.getChildren().add(1, explanation);
+        }
 
         vehicleFields.getStyleClass().add("form-container");
 
@@ -166,11 +201,6 @@ public class VehicleDetails extends BorderPane {
                 vehicleIcon,
                 vehicleFields
         );
-        /*vehicleFields.setMinWidth(0);
-        vehicleFields.setMaxWidth(Double.MAX_VALUE);
-
-        HBox.setHgrow(vehicleFields, Priority.ALWAYS);
-        vehicleBox.setMaxWidth(Double.MAX_VALUE);*/
 
         vehicleBox.setAlignment(Pos.CENTER_LEFT);
 

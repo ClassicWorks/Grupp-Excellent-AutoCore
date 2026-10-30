@@ -214,12 +214,14 @@ public class ViewManager {
     }
 
     public void showCreateVehiclePopup() {
+        accessGuard.require(Permission.MANAGE_VEHICLES, "ViewManager.showCreateVehiclePopup");
         Stage popup = new Stage();
         Parent content = new CreateVehicleForm(garageSystem, popup).show();
         showPopup(popup, LanguageManager.getString("vehicle.form.title"), content, this::showVehicles);
     }
 
     public void showCreateVehiclePopup(int customerId) {
+        accessGuard.require(Permission.MANAGE_VEHICLES, "ViewManager.showCreateVehiclePopup(customerId)");
         Stage popup = new Stage();
         Parent content = new CreateVehicleForm(garageSystem, popup).show(customerId);
         showPopup(popup, LanguageManager.getString("vehicle.form.title"), content, null);
