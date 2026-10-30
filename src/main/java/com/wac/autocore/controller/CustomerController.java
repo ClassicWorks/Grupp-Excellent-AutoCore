@@ -2,7 +2,6 @@ package com.wac.autocore.controller;
 
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.service.CustomerService;
-import com.wac.autocore.service.ServiceItemService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +24,7 @@ public class CustomerController {
     }
 
     public Result<List<Customer>> getCustomerMatching(String query) {
-        return errorHandler.call(() -> customerService.getCustomerMatching(query));
+        return errorHandler.call(() -> customerService.getCustomersMatching(query));
     }
 
     public Result<Customer> createCustomer(

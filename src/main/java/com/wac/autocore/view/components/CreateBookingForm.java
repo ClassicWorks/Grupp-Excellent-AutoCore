@@ -79,9 +79,7 @@ public class CreateBookingForm {
 
         } else {
             //Else search for customer and vehicle
-            CustomerSelection customerSelection = new CustomerSelection(
-                    garageSystem,
-                    this::showVehiclesOfCustomer);
+            CustomerSelection customerSelection = new CustomerSelection(this::showVehiclesOfCustomer);
             VBox customerBox = new FormFieldContainer(
                     LanguageManager.getString("customer.select.choose"),
                     customerSelection,

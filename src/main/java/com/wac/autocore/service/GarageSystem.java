@@ -35,10 +35,6 @@ public class GarageSystem {
         this.paymentService = paymentService;
     }
 
-    public void showCustomers() {
-        customerService.showCustomers();
-    }
-
     public List<Customer> getCustomers() {
         return customerService.getCustomers();
     }
@@ -49,7 +45,7 @@ public class GarageSystem {
 
 
     public List<Customer> getCustomerMatching(String query) {
-        return customerService.getCustomerMatching(query);
+        return customerService.getCustomersMatching(query);
     }
 
     public void showVehicles() {

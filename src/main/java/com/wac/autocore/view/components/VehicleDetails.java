@@ -12,7 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.util.function.Consumer;
@@ -68,17 +67,10 @@ public class VehicleDetails extends BorderPane {
     }
 
     private void updateCustomerSection() {
-        ImageViewWithAltText customerIcon = new ImageViewWithAltText(
-                "/imgs/user-solid.png", 20, 20,
-                LanguageManager.getString("image.user-solid")
-        );
-
-        Label customerLabel = new Label(LanguageManager.getString("vehicle.owner"));
-        customerLabel.getStyleClass().add("form-field-label");
+        customerName = new CustomerHyperLink(vehicleOwner);
 
         Label notificationLabel = new Label();
         notificationLabel.getStyleClass().add("error-label");
-        VBox customerText = new VBox(customerName, customerInfo, notificationLabel);
 
         ImageViewWithAltText editIcon = new ImageViewWithAltText(
                 "/imgs/pen-to-square-solid.png", 20, 20,
@@ -89,15 +81,7 @@ public class VehicleDetails extends BorderPane {
         editCustomerBtn.getStyleClass().add("confirm-btn");
         editCustomerBtn.setOnAction(e -> showCustomerSelection());
 
-        customerEditableBox.getChildren().setAll(customerIcon, customerText, editCustomerBtn);
-
-
         if (vehicleOwner != null) {
-            customerName.setText(vehicleOwner.getName());
-            customerName.setOnAction(e ->
-                    System.out.println("Should call on ViewManager.getInstance().showCustomers(customer.getId())")
-            );
-
             customerInfo.setText(String.format(
                     LanguageManager.getString("vehicle.customerInfo"),
                     vehicleOwner.getEmail(),
@@ -108,20 +92,21 @@ public class VehicleDetails extends BorderPane {
                 notificationLabel.setText(LanguageManager.getString("vehicle.ownerChangedNotice"));
             }
         } else {
-            customerName.setText(LanguageManager.getString("customer.none.connected"));
-            customerName.setOnAction(null);
             notificationLabel.setText(LanguageManager.getString("customer.none.connected"));
             customerInfo.setText("");
         }
 
+        VBox customerText = new VBox(customerName, customerInfo, notificationLabel);
+        customerEditableBox.getChildren().setAll(customerText, editCustomerBtn);
+
+        Label customerLabel = new Label(LanguageManager.getString("vehicle.owner"));
+        customerLabel.getStyleClass().add("form-field-label");
         customerSection.getChildren().setAll(customerLabel, customerEditableBox);
         customerSection.getStyleClass().add("form-field-container");
     }
 
     private void showCustomerSelection(){
-        CustomerSelection customerSelection = new CustomerSelection(
-                garageSystem,
-                customer -> vehicleOwner = customer
+        CustomerSelection customerSelection = new CustomerSelection(customer -> vehicleOwner = customer
         );
 
         Button changeCustomerBtn = new Button(LanguageManager.getString("vehicle.setCustomer"));

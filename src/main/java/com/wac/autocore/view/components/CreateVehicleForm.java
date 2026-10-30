@@ -69,8 +69,7 @@ public class CreateVehicleForm {
         ObjectProperty<Customer> selectedCustomer = new SimpleObjectProperty<>();
         VBox customerBox;
         if(preselectedCustomer == null){
-            CustomerSelection customerSelection = new CustomerSelection(garageSystem,
-                    selectedCustomer::set);
+            CustomerSelection customerSelection = new CustomerSelection(selectedCustomer::set);
             customerBox = new FormFieldContainer(
                     LanguageManager.getString("vehicle.form.customer.label"), customerSelection, true);
         } else {

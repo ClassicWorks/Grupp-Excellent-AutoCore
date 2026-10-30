@@ -55,8 +55,8 @@ public class SpringConfig {
     }
 
     @Bean
-    CustomerService customerService(CustomerRepo customerRepo, VehicleRepo vehicleRepo) {
-        return new CustomerService(customerRepo, vehicleRepo);
+    CustomerService customerService(CustomerRepo customerRepo, VehicleRepo vehicleRepo, AccessGuard accessGuard) {
+        return new CustomerService(customerRepo, vehicleRepo, accessGuard);
     }
 
     @Bean
