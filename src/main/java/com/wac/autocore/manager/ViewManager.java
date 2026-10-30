@@ -3,6 +3,7 @@ package com.wac.autocore.manager;
 import com.wac.autocore.controller.AppControllers;
 import com.wac.autocore.security.AccessGuard;
 import com.wac.autocore.security.CurrentUserProvider;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.*;
@@ -128,15 +129,6 @@ public class ViewManager {
         }
     }
 
-
-    /*
-     * Byt ut placeholder-metoder (Labels) mot riktig view allt eftersom de byggs.
-     * Exempel: showView(new CustomerView().show());
-     *
-     * showView(node) sig ska INTE ändras, den tar emot vilken Node som helst,
-     * oavsett om det är en Label eller en färdig view.
-     */
-
     public void showCustomers() {
         currentViewRefresher = this::showCustomers;
         selectNav(SideNav.CUSTOMERS);
@@ -234,6 +226,7 @@ public class ViewManager {
     }
 
     public void showCreateCustomerPopup() {
+        accessGuard.require(Permission.MANAGE_CUSTOMERS, "ViewManager.showCreateCustomerPopup");
         Stage popup = new Stage();
         Parent content = new CreateCustomer(popup, null).show();
 
