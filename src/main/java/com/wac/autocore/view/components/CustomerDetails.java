@@ -4,6 +4,8 @@ import com.wac.autocore.controller.CustomerController;
 import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
+import com.wac.autocore.security.AccessGuard;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.UiResultHandler;
 import javafx.scene.control.Button;
@@ -19,7 +21,7 @@ public class CustomerDetails extends BorderPane {
 
     private final Customer customer;
     private final Runnable onSaved;
-    private final CustomerController customerController = ViewManager.getInstance().getControllers().customers();
+    private final CustomerController customerController;
     private final UiResultHandler uiResultHandler = new UiResultHandler();
 
     private final TextField nameField = new TextField();
@@ -27,26 +29,40 @@ public class CustomerDetails extends BorderPane {
     private final TextField emailField = new TextField();
     private final Label errorLabel = new Label();
 
+    //read -> labels istället för fält
     public CustomerDetails(Customer customer, Runnable onSaved, Consumer<Integer> onDelete) {
+        customerController = ViewManager.getInstance().getControllers().customers();
+        AccessGuard accessGuard = ViewManager.getInstance().getAccessGuard();
+        boolean canEdit = accessGuard.has(Permission.MANAGE_CUSTOMERS);
         this.customer = customer;
         this.onSaved = onSaved;
 
         Label idLabel = new Label(String.format(LanguageManager.getString("customer.id"), customer.getId()));
         idLabel.getStyleClass().add("details-title");
 
-        Label explanation = new Label(LanguageManager.getString("customer.form.explanation"));
-        explanation.setWrapText(true);
-        explanation.setMaxWidth(Double.MAX_VALUE);
-        explanation.getStyleClass().add("form-explanation");
-
         nameField.setText(customer.getName());
-        VBox nameBox = new FormFieldContainer(LanguageManager.getString("customer.name"), nameField, true);
+        Label nameLabel = new Label(customer.getName());
+        VBox nameBox = new FormFieldContainer(
+                LanguageManager.getString("customer.name"),
+                canEdit ? nameField : nameLabel,
+                canEdit
+        );
 
         phoneField.setText(customer.getPhone());
-        VBox phoneBox = new FormFieldContainer(LanguageManager.getString("customer.phone"), phoneField, false);
+        Label phoneLabel = new Label(customer.getPhone());
+        VBox phoneBox = new FormFieldContainer(
+                LanguageManager.getString("customer.phone"),
+                canEdit ? phoneField : phoneLabel,
+                false
+        );
 
         emailField.setText(customer.getEmail());
-        VBox emailBox = new FormFieldContainer(LanguageManager.getString("customer.email"), emailField, false);
+        Label emailLabel = new Label(customer.getEmail());
+        VBox emailBox = new FormFieldContainer(
+                LanguageManager.getString("customer.email"),
+                canEdit ?  emailField : emailLabel,
+                false
+        );
 
 
         Label vipLabel = new Label(
@@ -63,26 +79,34 @@ public class CustomerDetails extends BorderPane {
 
 
         VBox fields = new VBox(
-                explanation,
+                //explanation,
                 nameBox,
                 phoneBox,
                 emailBox,
                 vipBox,
                 errorLabel
         );
+        if (canEdit) {
+            Label explanation = new Label(LanguageManager.getString("customer.form.explanation"));
+            explanation.setWrapText(true);
+            explanation.getStyleClass().add("form-explanation");
+            fields.getChildren().addFirst(explanation);
+        }
         fields.getStyleClass().add("details-container");
 
-        HBox confirmingButtons = new HBox(createSaveBtn());
-        confirmingButtons.getStyleClass().add("btn-container");
+        if(canEdit) {
+            HBox confirmingButtons = new HBox(createSaveBtn());
+            confirmingButtons.getStyleClass().add("btn-container");
 
-        HBox destructiveButtons = new HBox(createDeleteBtn(onDelete));
-        destructiveButtons.getStyleClass().add("btn-container");
+            HBox destructiveButtons = new HBox(createDeleteBtn(onDelete));
+            destructiveButtons.getStyleClass().add("btn-container");
 
-        BorderPane actionableButtons = new BorderPane(null, null, destructiveButtons, null, confirmingButtons);
+            BorderPane actionableButtons = new BorderPane(null, null, destructiveButtons, null, confirmingButtons);
+            this.setBottom(actionableButtons);
+        }
 
         this.setTop(idLabel);
         this.setCenter(fields);
-        this.setBottom(actionableButtons);
     }
 
     private Button createSaveBtn() {

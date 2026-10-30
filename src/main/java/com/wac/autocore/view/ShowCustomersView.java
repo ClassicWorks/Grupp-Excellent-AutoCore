@@ -4,6 +4,7 @@ import com.wac.autocore.controller.CustomerController;
 import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.AppDialog;
@@ -24,13 +25,15 @@ import java.util.List;
 
 public class ShowCustomersView {
     private final CustomerController customerController;
-    private UiResultHandler resultHandler =  new UiResultHandler();
+    private final UiResultHandler resultHandler =  new UiResultHandler();
+    private final boolean canEditCustomer;
 
     private final VBox customersBox = new VBox();
     private GridPane mainContent;
 
     public ShowCustomersView() {
         customerController = ViewManager.getInstance().getControllers().customers();
+        canEditCustomer = ViewManager.getInstance().getAccessGuard().has(Permission.MANAGE_CUSTOMERS);
     }
 
     public Parent show() {
@@ -66,9 +69,16 @@ public class ShowCustomersView {
         Result<List<Customer>> customersResult = resultHandler.handle(customerController.getCustomers());
         if(customersResult.isSuccess()) {
             for (Customer customer : customersResult.value()) {
-                CustomerCard customerCard = new CustomerCard(customer,
-                        c -> ViewManager.getInstance().showCreateVehiclePopup(c.getId())
-                );
+                //If user can manage customer use CustomerCard with button
+                CustomerCard customerCard;
+                if(canEditCustomer) {
+                    customerCard = new CustomerCard(
+                            customer,
+                            c -> ViewManager.getInstance().showCreateVehiclePopup(c.getId())
+                    );
+                }else {
+                    customerCard = new CustomerCard(customer);
+                }
                 customerCard.getStyleClass().add("clickable");
                 customerCard.setOnMouseClicked(e -> {
 
@@ -121,14 +131,6 @@ public class ShowCustomersView {
         if (!result.isSuccess()) {
             return;
         }
-        /*if (!garageSystem.deleteCustomer(customerId)) {
-            AppDialog.showError(
-                    LanguageManager.getString("customer.delete.title"),
-                    LanguageManager.getString("customer.delete.failed"),
-                    ""
-            );
-            return;
-        }*/
 
         removeDetails();
         fillCustomers();
@@ -138,11 +140,14 @@ public class ShowCustomersView {
         BorderPane headerPane = new BorderPane();
         Label title = new Label(LanguageManager.getString("customers.title"));
         title.getStyleClass().setAll("page-title");
-        Button createCustomerBtn = new Button(LanguageManager.getString("customers.create"));
-        createCustomerBtn.getStyleClass().addAll("confirm-btn");
-        createCustomerBtn.setOnAction(e -> ViewManager.getInstance().showCreateCustomerPopup());
         headerPane.setCenter(title);
-        headerPane.setRight(createCustomerBtn);
+
+        if(canEditCustomer) {
+            Button createCustomerBtn = new Button(LanguageManager.getString("customers.create"));
+            createCustomerBtn.getStyleClass().addAll("confirm-btn");
+            createCustomerBtn.setOnAction(e -> ViewManager.getInstance().showCreateCustomerPopup());
+            headerPane.setRight(createCustomerBtn);
+        }
         return headerPane;
     }
 }

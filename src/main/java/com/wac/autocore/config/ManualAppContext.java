@@ -10,6 +10,7 @@ public class ManualAppContext implements AppContext {
     private final GarageSystem garageSystem;
     private final Authenticator authenticator;
     private final AppControllers controllers;
+    private final AccessGuard accessGuard;
 
     public ManualAppContext() {
         // Repositories
@@ -22,7 +23,7 @@ public class ManualAppContext implements AppContext {
         ServicePackRepo servicePackRepo = new ServicePackRepoImpl();
 
         // Security
-        AccessGuard accessGuard = new AccessGuard(AppSession.getInstance());
+        accessGuard = new AccessGuard(AppSession.getInstance());
         authenticator = new DatabaseAuthenticator(new UserRepoImpl(), AppSession.getInstance(), new PasswordHasher());
 
         // Services
@@ -66,6 +67,11 @@ public class ManualAppContext implements AppContext {
     @Override
     public CurrentUserProvider currentUserProvider() {
         return AppSession.getInstance();
+    }
+
+    @Override
+    public AccessGuard accessGuard() {
+        return accessGuard;
     }
 
     @Override
