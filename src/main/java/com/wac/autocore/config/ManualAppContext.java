@@ -26,12 +26,12 @@ public class ManualAppContext implements AppContext {
         authenticator = new DatabaseAuthenticator(new UserRepoImpl(), AppSession.getInstance(), new PasswordHasher());
 
         // Services
-        CustomerService customerService = new CustomerService(customerRepo, vehicleRepo);
+        CustomerService customerService = new CustomerService(customerRepo, vehicleRepo, accessGuard);
         VehicleService vehicleService = new VehicleService(vehicleRepo, customerRepo, bookingRepo);
         BookingService bookingService = new BookingService(vehicleRepo, bookingRepo);
         WorkOrderService workOrderService = new WorkOrderService(bookingRepo, workOrderRepo, mechanicRepo, serviceItemRepo);
         MechanicService mechanicService = new MechanicService(mechanicRepo, workOrderRepo);
-        ServiceItemService serviceItemService = new ServiceItemService(serviceItemRepo, servicePackRepo);
+        ServiceItemService serviceItemService = new ServiceItemService(serviceItemRepo, servicePackRepo, accessGuard);
         InvoiceService invoiceService = new InvoiceService(new InvoiceRepoImpl(), workOrderRepo, accessGuard);
         PaymentService paymentService = new PaymentService(new PaymentRepoImpl(), invoiceService, accessGuard);
 

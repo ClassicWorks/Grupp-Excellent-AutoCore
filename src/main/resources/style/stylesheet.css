@@ -60,6 +60,10 @@ Text{
     -fx-fill: -fx-dark-ink;
 }
 
+Label.is-selected{
+    -fx-font-weight: 700;
+}
+
 .page-title{
     -fx-font-family: "Space Grotesk", sans-serif;
     -fx-font-size: 28px;

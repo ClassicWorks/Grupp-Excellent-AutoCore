@@ -35,10 +35,6 @@ public class GarageSystem {
         this.paymentService = paymentService;
     }
 
-    public void showCustomers() {
-        customerService.showCustomers();
-    }
-
     public List<Customer> getCustomers() {
         return customerService.getCustomers();
     }
@@ -47,13 +43,8 @@ public class GarageSystem {
         return customerService.getCustomer(id);
     }
 
-
     public List<Customer> getCustomerMatching(String query) {
-        return customerService.getCustomerMatching(query);
-    }
-
-    public void showVehicles() {
-        vehicleService.showVehicles();
+        return customerService.getCustomersMatching(query);
     }
 
     public List<Vehicle> getVehicles() {
@@ -68,20 +59,12 @@ public class GarageSystem {
         return vehicleService.getCustomersVehicle(customerId);
     }
 
-    public void showBookings() {
-        bookingService.showBookings();
-    }
-
     public List<Booking> getBookings() {
         return bookingService.getBookings();
     }
 
     public Optional<Booking> getBooking(int id){
         return bookingService.getBooking(id);
-    }
-
-    public void showServiceItems() {
-        serviceItemService.showServiceItems();
     }
 
     public List<ServiceItem> getServiceItems() {
@@ -91,7 +74,6 @@ public class GarageSystem {
     public List<ServiceItem> getServiceItemsByIds(List<Integer> serviceIds) {
         return serviceItemService.getServiceItemsByIds(serviceIds);
     }
-
 
     public List<Integer> getMissingIds(List<Integer> lookingForIds, List<ServiceItem> serviceList) {
         return serviceItemService.getMissingIds(lookingForIds, serviceList);
@@ -142,10 +124,6 @@ public class GarageSystem {
         return mechanicService.deleteMechanic(mechanicId);
     }
 
-    public void showServicePacks() {
-        serviceItemService.showServicePacks();
-    }
-
     public List<ServicePack> getServicePacks() {
         return serviceItemService.getServicePacks();
     }
@@ -162,10 +140,6 @@ public class GarageSystem {
         serviceItemService.deleteServicePack(id);
     }
 
-    public void showMechanics() {
-        mechanicService.showMechanics();
-    }
-
     public List<Mechanic> getMechanics() {
         return mechanicService.getMechanics();
     }
@@ -176,10 +150,6 @@ public class GarageSystem {
 
     public Optional<Mechanic> getMechanic(int id){
         return mechanicService.getMechanic(id);
-    }
-
-    public void showWorkOrders() {
-        workOrderService.showWorkOrders();
     }
 
     public List<WorkOrder> getWorkOrders() {
@@ -204,10 +174,6 @@ public class GarageSystem {
 
     public Optional<WorkOrder> getWorkOrder(int id){
         return workOrderService.getWorkOrder(id);
-    }
-
-    public void showInvoices(){
-        invoiceService.showInvoices();
     }
 
     public List<Invoice> getInvoices() {

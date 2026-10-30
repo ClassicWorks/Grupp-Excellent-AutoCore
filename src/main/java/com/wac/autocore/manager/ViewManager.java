@@ -1,6 +1,7 @@
 package com.wac.autocore.manager;
 
 import com.wac.autocore.controller.AppControllers;
+import com.wac.autocore.security.AccessGuard;
 import com.wac.autocore.security.CurrentUserProvider;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
@@ -27,6 +28,7 @@ public class ViewManager {
     private GarageSystem garageSystem;
 
     private CurrentUserProvider currentUserProvider;
+    private AccessGuard accessGuard;
     private AppControllers controllers;
 
     private ViewManager() {
@@ -71,6 +73,14 @@ public class ViewManager {
 
     public void setCurrentUserProvider(CurrentUserProvider currentUserProvider) {
         this.currentUserProvider = currentUserProvider;
+    }
+
+    public void setAccessGuard(AccessGuard accessGuard){
+        this.accessGuard = accessGuard;
+    }
+
+    public AccessGuard getAccessGuard(){
+        return accessGuard;
     }
 
     public void showView(Node view) {

@@ -55,8 +55,8 @@ public class SpringConfig {
     }
 
     @Bean
-    CustomerService customerService(CustomerRepo customerRepo, VehicleRepo vehicleRepo) {
-        return new CustomerService(customerRepo, vehicleRepo);
+    CustomerService customerService(CustomerRepo customerRepo, VehicleRepo vehicleRepo, AccessGuard accessGuard) {
+        return new CustomerService(customerRepo, vehicleRepo, accessGuard);
     }
 
     @Bean
@@ -81,8 +81,8 @@ public class SpringConfig {
     }
 
     @Bean
-    ServiceItemService serviceItemService(ServiceItemRepo serviceItemRepo, ServicePackRepo servicePackRepo) {
-        return new ServiceItemService(serviceItemRepo, servicePackRepo);
+    ServiceItemService serviceItemService(ServiceItemRepo serviceItemRepo, ServicePackRepo servicePackRepo, AccessGuard accessGuard) {
+        return new ServiceItemService(serviceItemRepo, servicePackRepo, accessGuard);
     }
 
     @Bean

@@ -1,8 +1,11 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.controller.CustomerController;
+import com.wac.autocore.controller.Result;
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.view.UiResultHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -14,14 +17,15 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class CustomerSelection extends VBox {
-    private final GarageSystem garageSystem;
+    private final CustomerController customerController;
+    private final UiResultHandler uiResultHandler = new UiResultHandler();
     private final Consumer<Customer> onCustomerSelected;
     private final VBox customerResults = new VBox();
     private final Label selectedCustomerLabel = new Label();
 
-    public CustomerSelection(GarageSystem garageSystem, Consumer<Customer> onCustomerSelected) {
-        this.garageSystem = garageSystem;
+    public CustomerSelection( Consumer<Customer> onCustomerSelected) {
         this.onCustomerSelected = onCustomerSelected;
+        this.customerController = ViewManager.getInstance().getControllers().customers();
 
         this.getStyleClass().addAll("form-field-container");
 
@@ -32,7 +36,7 @@ public class CustomerSelection extends VBox {
         TextField searchField = new TextField("");
         searchField.setPromptText(LanguageManager.getString("customer.select.searchPrompt"));
 
-        selectedCustomerLabel.setStyle(selectedCustomerLabel.getStyle() + " -fx-font-weight: 700;");
+        selectedCustomerLabel.getStyleClass().add("is-selected");
 
         searchField.setOnAction(event ->
                 updateCustomerResults(searchField.getText())
@@ -54,17 +58,20 @@ public class CustomerSelection extends VBox {
     private void updateCustomerResults(String query) {
         customerResults.getChildren().clear();
 
-        List<Customer> customerMatch = garageSystem.getCustomerMatching(query);
+        Result<List<Customer>> customerMatchResult = uiResultHandler.handle(customerController.getCustomerMatching(query));
 
-        //Add different styling to even and uneven customers
-        for(int i = 0; i < customerMatch.size(); i++){
-            HBox rowOfCustomer = createCustomerResult(customerMatch.get(i));
-            String rowStyle = i % 2 == 0
-                    ? "row-even"
-                    : "row-odd";
+        if(customerMatchResult.isSuccess()) {
+            List<Customer> customerMatch = customerMatchResult.value();
+            //Add different styling to even and uneven customers
+            for (int i = 0; i < customerMatch.size(); i++) {
+                HBox rowOfCustomer = createCustomerResult(customerMatch.get(i));
+                String rowStyle = i % 2 == 0
+                        ? "row-even"
+                        : "row-odd";
 
-            rowOfCustomer.getStyleClass().add(rowStyle);
-            customerResults.getChildren().add(rowOfCustomer);
+                rowOfCustomer.getStyleClass().add(rowStyle);
+                customerResults.getChildren().add(rowOfCustomer);
+            }
         }
     }
 
