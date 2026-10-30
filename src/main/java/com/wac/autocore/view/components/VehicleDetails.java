@@ -1,10 +1,13 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.controller.Result;
+import com.wac.autocore.controller.VehicleController;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.view.UiResultHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
@@ -19,6 +22,8 @@ import java.util.function.Consumer;
 
 public class VehicleDetails extends BorderPane {
     private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
+    private final VehicleController vehicleController = ViewManager.getInstance().getControllers().vehicles();
+    private final UiResultHandler uiResultHandler = new UiResultHandler();
     private final Runnable onSaved;
 
     private Vehicle vehicle;
@@ -215,21 +220,20 @@ public class VehicleDetails extends BorderPane {
                 return;
             }
 
-            Vehicle updated = garageSystem.updateVehicle(
+            Result<Vehicle> result = uiResultHandler.handle(vehicleController.updateVehicle(
                     vehicle.getId(),
                     registrationNumber.getText().trim(),
                     brandField.getText().trim(),
                     modelField.getText().trim(),
                     Integer.parseInt(yearField.getText().trim()),
-                    vehicleOwner == null ? null : vehicleOwner.getId()
-            );
+                    vehicleOwner == null ? 0 : vehicleOwner.getId()
+            ));
 
-            if (updated == null) {
-                errorLabel.setText(LanguageManager.getString("vehicle.error.saveFailed"));
+            if (!result.isSuccess()) {
                 return;
             }
 
-            vehicle = updated;
+            vehicle = result.value();
             updateCustomerSection();
 
             errorLabel.getStyleClass().add("success");

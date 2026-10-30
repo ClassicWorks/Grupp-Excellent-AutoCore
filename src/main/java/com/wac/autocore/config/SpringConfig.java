@@ -103,6 +103,11 @@ public class SpringConfig {
     }
 
     @Bean
+    VehicleController vehicleController(VehicleService vehicleService, ErrorHandler errorHandler) {
+        return new VehicleController(vehicleService, errorHandler);
+    }
+
+    @Bean
     GarageSystem garageSystem(CustomerService customerService, VehicleService vehicleService,
                               BookingService bookingService, WorkOrderService workOrderService,
                               MechanicService mechanicService, ServiceItemService serviceItemService,
@@ -160,8 +165,10 @@ public class SpringConfig {
                                   CustomerController customerController,
                                   CatalogController catalogController,
                                   LoginController loginController,
-                                  MechanicController mechanicController) {
+                                  MechanicController mechanicController,
+                                  VehicleController vehicleController) {
         return new AppControllers(workOrderController, invoiceController, paymentController,
-                customerController, catalogController, loginController, mechanicController);
+                customerController, catalogController, loginController,
+                mechanicController, vehicleController);
     }
 }

@@ -1,9 +1,10 @@
 package com.wac.autocore.view;
 
+import com.wac.autocore.controller.Result;
+import com.wac.autocore.controller.VehicleController;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.AppDialog;
@@ -20,13 +21,16 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import java.util.List;
+
 public class ShowVehicleView {
-    private final GarageSystem garageSystem;
+    private final VehicleController vehicleController;
+    private final UiResultHandler resultHandler = new UiResultHandler();
     private final VBox vehiclesBox = new VBox();
     private final VBox detailsContainer = new VBox();
 
     public ShowVehicleView() {
-        garageSystem = ViewManager.getInstance().getGarageSystem();
+        vehicleController = ViewManager.getInstance().getControllers().vehicles();
     }
 
     public Parent show(){
@@ -75,8 +79,13 @@ public class ShowVehicleView {
     private void fillVehicles() {
         vehiclesBox.getChildren().clear();
 
+        Result<List<Vehicle>> result = resultHandler.handle(vehicleController.getVehicles());
+        if (!result.isSuccess()) {
+            return;
+        }
+
         //Show details of car
-        for (Vehicle vehicle : garageSystem.getVehicles()){
+        for (Vehicle vehicle : result.value()){
             Customer customer = vehicle.getCustomer();
             VehicleCard vehicleCard = new VehicleCard(vehicle, customer,
                     v -> ViewManager.getInstance().showCreateBooking(v.getId())
@@ -99,7 +108,12 @@ public class ShowVehicleView {
     }
 
     private void deleteVehicle(int vehicleId) {
-        if (garageSystem.vehicleHasBookings(vehicleId)) {
+        Result<Boolean> blockedResult = resultHandler.handle(vehicleController.vehicleHasBookings(vehicleId));
+        if (!blockedResult.isSuccess()) {
+            return;
+        }
+
+        if (blockedResult.value()) {
             AppDialog.showError(
                     LanguageManager.getString("vehicle.delete.title"),
                     LanguageManager.getString("vehicle.delete.blocked.title"),
@@ -121,7 +135,12 @@ public class ShowVehicleView {
             return;
         }
 
-        if (!garageSystem.deleteVehicle(vehicleId)) {
+        Result<Boolean> deleteResult = resultHandler.handle(vehicleController.deleteVehicle(vehicleId));
+        if (!deleteResult.isSuccess()) {
+            return;
+        }
+
+        if (!deleteResult.value()) {
             AppDialog.showError(
                     LanguageManager.getString("vehicle.delete.title"),
                     LanguageManager.getString("vehicle.delete.failed"),
