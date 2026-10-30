@@ -1,10 +1,13 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.controller.Result;
+import com.wac.autocore.controller.VehicleController;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.view.UiResultHandler;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Parent;
@@ -23,6 +26,8 @@ public class CreateVehicleForm {
 
     private final GarageSystem garageSystem;
     private final Stage popupStage;
+    private final VehicleController vehicleController = ViewManager.getInstance().getControllers().vehicles();
+    private final UiResultHandler uiResultHandler = new UiResultHandler();
 
     public CreateVehicleForm(GarageSystem garageSystem, Stage popUpStage) {
         this.garageSystem = garageSystem;
@@ -164,25 +169,19 @@ public class CreateVehicleForm {
     }
 
     private boolean createVehicle(String registrationNumber, String brand, String model, int year, Customer selectedCustomer, Label errorLabel) {
-        //Maybe specific checks
-
-        Vehicle vehicle = garageSystem.createVehicle(
+        Result<Vehicle> result = uiResultHandler.handle(vehicleController.createVehicle(
                 registrationNumber,
                 brand,
                 model,
                 year,
                 selectedCustomer.getId()
-        );
+        ));
 
-        if (vehicle == null) {
-            //TODO what would be wrong? GarageSystem need checks and then handle with try/catch and AppDialog
-            AppDialog.showError(
-                    LanguageManager.getString("vehicle.form.error.failed"),
-                    LanguageManager.getString("vehicle.form.error.failed"),
-                    LanguageManager.getString("vehicle.form.error.failed")
-            );
+        if (!result.isSuccess()) {
             return false;
         }
+        Vehicle vehicle = result.value();
+
         boolean createBooking = AppDialog.showConfirm(
                 LanguageManager.getString("vehicle.create.success.title"),
                 LanguageManager.getString("vehicle.create.booking.prompt"),
