@@ -2,9 +2,7 @@ package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.util.LanguageManager;
-import javafx.scene.Cursor;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.function.Consumer;

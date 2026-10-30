@@ -4,16 +4,21 @@ import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.service.GarageSystem;
+import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.AppDialog;
-import com.wac.autocore.view.components.kanban.KanbanGrid;
-import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.VehicleCard;
 import com.wac.autocore.view.components.VehicleDetails;
+import com.wac.autocore.view.components.kanban.KanbanGrid;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 public class ShowVehicleView {
     private final GarageSystem garageSystem;

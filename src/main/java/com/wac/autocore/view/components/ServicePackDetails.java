@@ -49,6 +49,7 @@ public class ServicePackDetails extends BorderPane{
                 errorMessage -> errorLabel.setText(errorMessage)
         );
         Label serviceItemselectionLabel = new Label(LanguageManager.getString("servicePack.details.services.label"));
+        serviceItemselectionLabel.getStyleClass().add("form-field-label");
         serviceItemSelection.getChildren().addFirst(serviceItemselectionLabel);
 
         VBox detailsContainer = new VBox(

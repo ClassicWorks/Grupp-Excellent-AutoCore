@@ -2,9 +2,9 @@ package com.wac.autocore.view.components;
 
 import com.wac.autocore.model.*;
 import com.wac.autocore.service.GarageSystem;
-import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
+import com.wac.autocore.util.StylingUtil;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;

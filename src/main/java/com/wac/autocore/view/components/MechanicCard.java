@@ -6,7 +6,6 @@ import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.util.ValueLabels;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
