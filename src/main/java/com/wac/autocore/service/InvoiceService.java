@@ -165,20 +165,4 @@ public class InvoiceService {
 
         return Math.min(discount, amount);
     }
-
-    /**
-     * Prints all invoices, for debugging and testing purposes.
-     */
-    public void showInvoices(){
-        System.out.println();
-        System.out.println("=== INVOICES ===");
-
-        if (invoiceRepo.getAll().isEmpty()) {
-            System.out.println("No services found.");
-            return;
-        }
-
-        for (Invoice invo : invoiceRepo.getAll()) {
-            System.out.println(invo);
-        }    }
 }

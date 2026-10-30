@@ -60,11 +60,6 @@ public class SpringConfig {
     }
 
     @Bean
-    VehicleService vehicleService(VehicleRepo vehicleRepo, CustomerRepo customerRepo, BookingRepo bookingRepo) {
-        return new VehicleService(vehicleRepo, customerRepo, bookingRepo);
-    }
-
-    @Bean
     BookingService bookingService(VehicleRepo vehicleRepo, BookingRepo bookingRepo) {
         return new BookingService(vehicleRepo, bookingRepo);
     }
@@ -73,11 +68,6 @@ public class SpringConfig {
     WorkOrderService workOrderService(BookingRepo bookingRepo, WorkOrderRepo workOrderRepo,
                                       MechanicRepo mechanicRepo, ServiceItemRepo serviceItemRepo) {
         return new WorkOrderService(bookingRepo, workOrderRepo, mechanicRepo, serviceItemRepo);
-    }
-
-    @Bean
-    MechanicService mechanicService(MechanicRepo mechanicRepo, WorkOrderRepo workOrderRepo) {
-        return new MechanicService(mechanicRepo, workOrderRepo);
     }
 
     @Bean
@@ -98,13 +88,15 @@ public class SpringConfig {
     }
 
     @Bean
-    MechanicController mechanicController(MechanicService mechanicService, ErrorHandler errorHandler) {
-        return new MechanicController(mechanicService, errorHandler);
+    VehicleService vehicleService(VehicleRepo vehicleRepo, CustomerRepo customerRepo, BookingRepo bookingRepo,
+                                  AccessGuard accessGuard) {
+        return new VehicleService(vehicleRepo, customerRepo, bookingRepo, accessGuard);
     }
 
     @Bean
-    VehicleController vehicleController(VehicleService vehicleService, ErrorHandler errorHandler) {
-        return new VehicleController(vehicleService, errorHandler);
+    MechanicService mechanicService(MechanicRepo mechanicRepo, WorkOrderRepo workOrderRepo,
+                                    AccessGuard accessGuard) {
+        return new MechanicService(mechanicRepo, workOrderRepo, accessGuard);
     }
 
     @Bean
@@ -136,6 +128,16 @@ public class SpringConfig {
     PaymentController paymentController(PaymentService paymentService, AccessGuard accessGuard,
                                         ErrorHandler errorHandler) {
         return new PaymentController(paymentService, accessGuard, errorHandler);
+    }
+
+    @Bean
+    MechanicController mechanicController(MechanicService mechanicService, ErrorHandler errorHandler) {
+        return new MechanicController(mechanicService, errorHandler);
+    }
+
+    @Bean
+    VehicleController vehicleController(VehicleService vehicleService, ErrorHandler errorHandler) {
+        return new VehicleController(vehicleService, errorHandler);
     }
 
     @Bean

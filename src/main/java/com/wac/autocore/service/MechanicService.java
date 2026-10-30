@@ -7,6 +7,8 @@ import com.wac.autocore.exceptions.InputNotValidException;
 import com.wac.autocore.exceptions.MechanicNotFoundException;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.model.WorkOrder;
+import com.wac.autocore.security.AccessGuard;
+import com.wac.autocore.security.Permission;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,27 +16,16 @@ import java.util.Optional;
 public class MechanicService {
     private final MechanicRepo mechanicRepo;
     private final WorkOrderRepo workOrderRepo;
+    private final AccessGuard accessGuard;
 
-    public MechanicService(MechanicRepo mechanicRepo, WorkOrderRepo workOrderRepo) {
+    public MechanicService(MechanicRepo mechanicRepo, WorkOrderRepo workOrderRepo, AccessGuard accessGuard) {
         this.mechanicRepo = mechanicRepo;
         this.workOrderRepo = workOrderRepo;
-    }
-
-    public void showMechanics() {
-        System.out.println();
-        System.out.println("=== MECHANICS ===");
-
-        if (mechanicRepo.getAll().isEmpty()) {
-            System.out.println("No mechanics found.");
-            return;
-        }
-
-        for (Mechanic mechanic : mechanicRepo.getAll()) {
-            System.out.println(mechanic);
-        }
+        this.accessGuard = accessGuard;
     }
 
     public List<Mechanic> getMechanics() {
+        accessGuard.require(Permission.READ, "getMechanics");
         List<Mechanic> mechanics = mechanicRepo.getAll();
         if (mechanics.isEmpty()) {
             System.out.println("No mechanics found.");
@@ -44,6 +35,7 @@ public class MechanicService {
     }
 
     public List<Mechanic> getAvailableMechanics() {
+        accessGuard.require(Permission.READ, "getAvailableMechanics");
         List<Mechanic> mechanics = mechanicRepo.getAllAvailable();
         if (mechanics.isEmpty()) {
             System.out.println("No available mechanics found.");
@@ -53,6 +45,7 @@ public class MechanicService {
     }
 
     public Optional<Mechanic> getMechanic(int id){
+        accessGuard.require(Permission.READ, "getMechanic");
         return mechanicRepo.get(id);
     }
 
@@ -68,6 +61,8 @@ public class MechanicService {
      * @throws MechanicNotFoundException if no mechanic is found with the given mechanicId
      */
     public Mechanic updateMechanic(int mechanicId, String name, String phone, String specialization) {
+        accessGuard.require(Permission.MANAGE_MECHANICS, "updateMechanic");
+
         if (name == null || name.trim().isEmpty() || name.trim().length() > 50) {
             throw new InputNotValidException("Mechanic name cannot be empty or longer than 50 characters.");
         }
@@ -88,6 +83,7 @@ public class MechanicService {
     }
 
     public boolean mechanicHasUncompletedWorkOrders(int mechanicId) {
+        accessGuard.require(Permission.READ, "mechanicHasUncompletedWorkOrders");
         return workOrderRepo.mechanicHasUncompletedWorkOrders(mechanicId);
     }
 
@@ -104,6 +100,8 @@ public class MechanicService {
     //TODO implementera UnitOfWork då när man tar bort en mekaniker ska den koppla bort den från existerande
     // workOrders (som ej är klar/avbrutna)
     public boolean deleteMechanic(int mechanicId) {
+        accessGuard.require(Permission.MANAGE_MECHANICS, "deleteMechanic");
+
         if (mechanicRepo.get(mechanicId).isEmpty()) {
             throw new MechanicNotFoundException(mechanicId);
         }

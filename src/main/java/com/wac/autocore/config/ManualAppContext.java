@@ -28,10 +28,10 @@ public class ManualAppContext implements AppContext {
 
         // Services
         CustomerService customerService = new CustomerService(customerRepo, vehicleRepo, accessGuard);
-        VehicleService vehicleService = new VehicleService(vehicleRepo, customerRepo, bookingRepo);
+        VehicleService vehicleService = new VehicleService(vehicleRepo, customerRepo, bookingRepo, accessGuard);
         BookingService bookingService = new BookingService(vehicleRepo, bookingRepo);
         WorkOrderService workOrderService = new WorkOrderService(bookingRepo, workOrderRepo, mechanicRepo, serviceItemRepo);
-        MechanicService mechanicService = new MechanicService(mechanicRepo, workOrderRepo);
+        MechanicService mechanicService = new MechanicService(mechanicRepo, workOrderRepo, accessGuard);
         ServiceItemService serviceItemService = new ServiceItemService(serviceItemRepo, servicePackRepo, accessGuard);
         InvoiceService invoiceService = new InvoiceService(new InvoiceRepoImpl(), workOrderRepo, accessGuard);
         PaymentService paymentService = new PaymentService(new PaymentRepoImpl(), invoiceService, accessGuard);
