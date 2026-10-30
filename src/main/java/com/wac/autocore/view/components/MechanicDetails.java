@@ -4,6 +4,8 @@ import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Mechanic;
 import com.wac.autocore.controller.MechanicController;
 import com.wac.autocore.controller.Result;
+import com.wac.autocore.security.AccessGuard;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.view.UiResultHandler;
 import com.wac.autocore.util.LanguageManager;
 import javafx.scene.control.Button;
@@ -28,26 +30,37 @@ public class MechanicDetails extends BorderPane {
     private final Label errorLabel = new Label();
 
     public MechanicDetails(Mechanic mechanic, Runnable onSaved, Consumer<Integer> onDelete) {
+        AccessGuard accessGuard = ViewManager.getInstance().getAccessGuard();
+        boolean canEdit = accessGuard.has(Permission.MANAGE_MECHANICS);
         this.mechanic = mechanic;
         this.onSaved = onSaved;
 
         Label idLabel = new Label(String.format(LanguageManager.getString("mechanic.id"), mechanic.getId()));
         idLabel.getStyleClass().addAll("details-title");
 
-        Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
-        explanation.setWrapText(true);
-        explanation.setMaxWidth(Double.MAX_VALUE);
-        explanation.getStyleClass().add("form-explanation");
-
         nameField.setText(mechanic.getName());
-        VBox nameBox = new FormFieldContainer(LanguageManager.getString("mechanic.name"), nameField, true);
+        Label nameLabel = new Label(mechanic.getName());
+        VBox nameBox = new FormFieldContainer(
+                LanguageManager.getString("mechanic.name"),
+                canEdit ? nameField : nameLabel,
+                canEdit
+        );
 
         phoneField.setText(mechanic.getPhone());
-        VBox phoneBox = new FormFieldContainer(LanguageManager.getString("mechanic.phone"), phoneField, false);
+        Label phoneLabel = new Label(mechanic.getPhone());
+        VBox phoneBox = new FormFieldContainer(
+                LanguageManager.getString("mechanic.phone"),
+                canEdit ? phoneField : phoneLabel,
+                false
+        );
 
         specializationField.setText(mechanic.getSpecialization());
+        Label specializationLabel = new Label(mechanic.getSpecialization());
         VBox specializationBox = new FormFieldContainer(
-                LanguageManager.getString("mechanic.specialization"), specializationField, false);
+                LanguageManager.getString("mechanic.specialization"),
+                canEdit ? specializationField : specializationLabel,
+                false
+        );
 
         Label availabilityLabel = new Label(String.format(
                 LanguageManager.getString("mechanic.status"),
@@ -59,28 +72,35 @@ public class MechanicDetails extends BorderPane {
 
         errorLabel.getStyleClass().add("error-label");
 
-
         VBox fields = new VBox(
-                explanation,
                 nameBox,
                 phoneBox,
                 specializationBox,
                 availabilityLabel,
                 errorLabel
         );
+        if (canEdit) {
+            Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
+            explanation.setWrapText(true);
+            explanation.setMaxWidth(Double.MAX_VALUE);
+            explanation.getStyleClass().add("form-explanation");
+            fields.getChildren().addFirst(explanation);
+        }
         fields.getStyleClass().add("details-container");
-
-        HBox confirmingButtons = new HBox(createSaveBtn());
-        confirmingButtons.getStyleClass().add("btn-container");
-
-        HBox destructiveButtons = new HBox(createDeleteBtn(onDelete));
-        destructiveButtons.getStyleClass().add("btn-container");
-
-        BorderPane actionableButtons = new BorderPane(null, null, destructiveButtons, null, confirmingButtons);
 
         setTop(idLabel);
         setCenter(fields);
-        setBottom(actionableButtons);
+
+        if (canEdit) {
+            HBox confirmingButtons = new HBox(createSaveBtn());
+            confirmingButtons.getStyleClass().add("btn-container");
+
+            HBox destructiveButtons = new HBox(createDeleteBtn(onDelete));
+            destructiveButtons.getStyleClass().add("btn-container");
+
+            BorderPane actionableButtons = new BorderPane(null, null, destructiveButtons, null, confirmingButtons);
+            setBottom(actionableButtons);
+        }
     }
 
     private Button createSaveBtn() {

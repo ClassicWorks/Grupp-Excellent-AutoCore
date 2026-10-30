@@ -4,6 +4,7 @@ import com.wac.autocore.controller.MechanicController;
 import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Mechanic;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.AppDialog;
 import com.wac.autocore.view.components.MechanicCard;
@@ -138,15 +139,18 @@ public class ShowMechanicsView {
         BorderPane headerPane = new BorderPane();
         Label title = new Label(LanguageManager.getString("mechanics.title"));
         title.getStyleClass().setAll("page-title");
-
-        Button createMechanicBtn = new Button(LanguageManager.getString("mechanics.create"));
-        createMechanicBtn.getStyleClass().addAll("confirm-btn");
-
-        createMechanicBtn.setOnAction(e ->
-                System.out.println("Should call ViewManager.getInstance().showCreateMechanicPopup()"));
-
         headerPane.setCenter(title);
-        headerPane.setRight(createMechanicBtn);
+
+        boolean canManageMechanics = ViewManager.getInstance().getAccessGuard().has(Permission.MANAGE_MECHANICS);
+        if (canManageMechanics) {
+            Button createMechanicBtn = new Button(LanguageManager.getString("mechanics.create"));
+            createMechanicBtn.getStyleClass().addAll("confirm-btn");
+
+            createMechanicBtn.setOnAction(e ->
+                    System.out.println("Should call ViewManager.getInstance().showCreateMechanicPopup()"));
+
+            headerPane.setRight(createMechanicBtn);
+        }
         return headerPane;
     }
 }
