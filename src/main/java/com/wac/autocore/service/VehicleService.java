@@ -6,6 +6,8 @@ import com.wac.autocore.data.VehicleRepo;
 import com.wac.autocore.exceptions.*;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
+import com.wac.autocore.security.AccessGuard;
+import com.wac.autocore.security.Permission;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,31 +17,18 @@ public class VehicleService {
     private final VehicleRepo vehicleRepo;
     private final CustomerRepo customerRepo;
     private final BookingRepo bookingRepo;
+    private final AccessGuard accessGuard;
 
-    public VehicleService(VehicleRepo vehicleRepo, CustomerRepo customerRepo, BookingRepo bookingRepo) {
+    public VehicleService(VehicleRepo vehicleRepo, CustomerRepo customerRepo, BookingRepo bookingRepo,
+                          AccessGuard accessGuard) {
         this.vehicleRepo = vehicleRepo;
         this.customerRepo = customerRepo;
         this.bookingRepo = bookingRepo;
-    }
-
-    /**
-     * For testing
-     */
-    public void showVehicles() {
-        System.out.println();
-        System.out.println("=== VEHICLES ===");
-
-        if (vehicleRepo.getAll().isEmpty()) {
-            System.out.println("No vehicles found.");
-            return;
-        }
-
-        for (Vehicle vehicle : vehicleRepo.getAll()) {
-            System.out.println(vehicle);
-        }
+        this.accessGuard = accessGuard;
     }
 
     public List<Vehicle> getVehicles() {
+        accessGuard.require(Permission.READ, "getVehicles");
         List<Vehicle> vehicles = vehicleRepo.getAll();
         if (vehicles.isEmpty()) {
             System.out.println("No vehicles found.");
@@ -48,10 +37,12 @@ public class VehicleService {
     }
 
     public Optional<Vehicle> getVehicle(int id){
+        accessGuard.require(Permission.READ, "getVehicle");
         return vehicleRepo.get(id);
     }
 
     public List<Vehicle> getCustomersVehicle(int customerId){
+        accessGuard.require(Permission.READ, "getCustomersVehicle");
         return vehicleRepo.getVehicleByCustomerId(customerId);
     }
 
@@ -74,6 +65,8 @@ public class VehicleService {
                                  String model,
                                  int year,
                                  int customerId) {
+        accessGuard.require(Permission.MANAGE_VEHICLES, "createVehicle");
+
         if(registrationNumber == null || registrationNumber.trim().isEmpty() || registrationNumber.trim().length() > 10){
             throw new InputNotValidException("Vehicle registration number cannot be empty or longer than 10 characters.");
         }
@@ -130,7 +123,9 @@ public class VehicleService {
      * @throws CustomerNotFoundException if no customer is found with the given customerId
      */
     public Vehicle updateVehicle(int vehicleId, String registrationNumber, String brand,
-                                String model, int year, int customerId) {
+                                 String model, int year, int customerId) {
+        accessGuard.require(Permission.MANAGE_VEHICLES, "updateVehicle");
+
         if(registrationNumber == null || registrationNumber.trim().isEmpty() || registrationNumber.trim().length() > 10){
             throw new InputNotValidException("Vehicle registration number cannot be empty or longer than 10 characters.");
         }
@@ -167,6 +162,7 @@ public class VehicleService {
     }
 
     public boolean vehicleHasBookings(int vehicleId) {
+        accessGuard.require(Permission.READ, "vehicleHasBookings");
         return bookingRepo.vehicleHasBooking(vehicleId);
     }
 
@@ -179,6 +175,8 @@ public class VehicleService {
      * @throws DeletionNotAllowedException if the vehicle has active bookings and cannot be deleted
      */
     public boolean deleteVehicle(int vehicleId) {
+        accessGuard.require(Permission.MANAGE_VEHICLES, "deleteVehicle");
+
         if (vehicleRepo.get(vehicleId).isEmpty()) {
             throw new VehicleNotFoundException(vehicleId);
         }
