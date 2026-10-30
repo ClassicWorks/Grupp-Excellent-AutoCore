@@ -24,11 +24,11 @@ public class ErrorHandler {
             return Result.success(action.get());
         } catch (AutoCoreException e) {
             log.warn("Operation failed: {} - {}", e.getClass().getSimpleName(), e.getMessage());
-            return Result.failure(messageFor(e));
+            return Result.failure(messageForUser(e));
         }
     }
 
-    private String messageFor(AutoCoreException e) {
+    private String messageForUser(AutoCoreException e) {
         if (e instanceof PermissionDeniedException) {
             return LanguageManager.getString("error.permissionDenied");
         }
