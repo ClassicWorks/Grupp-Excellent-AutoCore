@@ -6,5 +6,6 @@ public record AppControllers(
         PaymentController payments,
         CustomerController customers,
         CatalogController catalog,
-        LoginController login) {
+        LoginController login,
+        MechanicController mechanics) {
 }
