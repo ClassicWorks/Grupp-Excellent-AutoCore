@@ -81,8 +81,8 @@ public class SpringConfig {
     }
 
     @Bean
-    ServiceItemService serviceItemService(ServiceItemRepo serviceItemRepo, ServicePackRepo servicePackRepo) {
-        return new ServiceItemService(serviceItemRepo, servicePackRepo);
+    ServiceItemService serviceItemService(ServiceItemRepo serviceItemRepo, ServicePackRepo servicePackRepo, AccessGuard accessGuard) {
+        return new ServiceItemService(serviceItemRepo, servicePackRepo, accessGuard);
     }
 
     @Bean

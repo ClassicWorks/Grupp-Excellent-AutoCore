@@ -8,6 +8,8 @@ import com.wac.autocore.exceptions.ServiceItemNotFoundException;
 import com.wac.autocore.exceptions.ServicePackNotFoundException;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.ServicePack;
+import com.wac.autocore.security.AccessGuard;
+import com.wac.autocore.security.Permission;
 
 import java.util.*;
 import java.util.function.Function;
@@ -16,27 +18,18 @@ import java.util.stream.Collectors;
 public class ServiceItemService {
     private final ServiceItemRepo serviceItemRepo;
     private final ServicePackRepo servicePackRepo;
+    private final AccessGuard accessGuard;
 
-    public ServiceItemService(ServiceItemRepo serviceItemRepo, ServicePackRepo servicePackRepo) {
+    public ServiceItemService(ServiceItemRepo serviceItemRepo, ServicePackRepo servicePackRepo,
+    AccessGuard accessguard) {
         this.serviceItemRepo = serviceItemRepo;
         this.servicePackRepo = servicePackRepo;
-    }
-
-    public void showServiceItems() {
-        System.out.println();
-        System.out.println("=== SERVICES ===");
-
-        if (serviceItemRepo.getAll().isEmpty()) {
-            System.out.println("No services found.");
-            return;
-        }
-
-        for (ServiceItem serviceItem : serviceItemRepo.getAll()) {
-            System.out.println(serviceItem);
-        }
+        this.accessGuard = accessguard;
     }
 
     public List<ServiceItem> getServiceItems() {
+        accessGuard.require(Permission.READ, "getServiceItems");
+
         List<ServiceItem> serviceItems = serviceItemRepo.getAll();
         if (serviceItems.isEmpty()) {
             System.out.println("No services found.");
@@ -46,6 +39,7 @@ public class ServiceItemService {
     }
 
     public List<ServiceItem> getServiceItemsByIds(List<Integer> serviceIds) {
+        accessGuard.require(Permission.READ, "getServiceItemsById");
         List<ServiceItem> serviceItems = serviceItemRepo.getByIds(serviceIds);
         if (serviceItems.isEmpty()) {
             System.out.println("No services found.");
@@ -65,6 +59,7 @@ public class ServiceItemService {
      *         but not found within the serviceList
      */
     public List<Integer> getMissingIds(List<Integer> lookingForIds, List<ServiceItem> serviceList) {
+        accessGuard.require(Permission.READ, "getMissingIds");
         Set<Integer> foundIds = serviceList.stream()
                 .map(ServiceItem::getId)
                 .collect(Collectors.toSet());
@@ -75,6 +70,7 @@ public class ServiceItemService {
     }
 
     public Optional<ServiceItem> getServiceItem(int id){
+        accessGuard.require(Permission.READ, "getServiceItem");
         return serviceItemRepo.get(id);
     }
 
@@ -88,6 +84,7 @@ public class ServiceItemService {
      * @throws ServiceItemNotFoundException if no service item is found with the specified ID
      */
     public ServiceItem updateServiceItemPrice(int serviceItemId, double newPrice) {
+        accessGuard.require(Permission.MANAGE_CATALOG, "updateServiceItemPrice");
         if (newPrice < 0) {
             throw new InputNotValidException("Price can not  be negative");
         }
@@ -103,23 +100,13 @@ public class ServiceItemService {
         return savedServiceItem;
     }
 
-    public void showServicePacks() {
-        System.out.println();
-        System.out.println("=== SERVICE PACKS ===");
-        if (servicePackRepo.getAll().isEmpty()) {
-            System.out.println("No services found.");
-            return;
-        }
-        for (ServicePack servicePack : servicePackRepo.getAll()) {
-            System.out.println(servicePack);
-        }
-    }
-
     public List<ServicePack> getServicePacks() {
+        accessGuard.require(Permission.READ, "getServicePacks");
         return servicePackRepo.getAll();
     }
 
     public Optional<ServicePack> getServicePack(int id){
+        accessGuard.require(Permission.READ, "getServicePack");
         return servicePackRepo.getById(id);
     }
 
@@ -136,6 +123,8 @@ public class ServiceItemService {
      * @throws ServiceItemNotFoundException if any service item in the updated service pack does not exist
      */
     public ServicePack updateServicePack(int servicePackId, ServicePack updatedServicePack){
+        accessGuard.require(Permission.MANAGE_CATALOG, "UpdateServicePacks");
+
         if(updatedServicePack.getName() == null || updatedServicePack.getName().trim().isEmpty() ||
                 updatedServicePack.getName().trim().length() > 50){
             throw new InputNotValidException("Name cannot be empty or longer than 50 characters");
@@ -187,6 +176,8 @@ public class ServiceItemService {
      * @throws ServiceItemNotFoundException if any of the provided service item IDs does not exist
      */
     public ServicePack createServicePack(String name, int... serviceItemIds){
+        accessGuard.require(Permission.MANAGE_CATALOG, "createServicePack");
+
         if(name == null || name.trim().isEmpty() || name.trim().length() > 50) {
             throw new InputNotValidException("Service pack name cannot be empty or longer than 50 characters.");
         }
@@ -211,7 +202,14 @@ public class ServiceItemService {
         return servicePackRepo.save(servicePack);
     }
 
+    /**
+     * Delete ServicePack with provided id
+     * Must have permission to MANAGE_CATALOG
+     *
+     * @param id id of servicePack to be deleted
+     */
     public void deleteServicePack(int id){
+        accessGuard.require(Permission.MANAGE_CATALOG, "deleteServicePacks");
         servicePackRepo.delete(id);
     }
 }
