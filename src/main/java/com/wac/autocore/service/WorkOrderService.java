@@ -3,6 +3,8 @@ package com.wac.autocore.service;
 import com.wac.autocore.data.*;
 import com.wac.autocore.exceptions.*;
 import com.wac.autocore.model.*;
+import com.wac.autocore.security.AccessGuard;
+import com.wac.autocore.security.Permission;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,29 +14,19 @@ public class WorkOrderService {
     private final WorkOrderRepo workOrderRepo;
     private final MechanicRepo mechanicRepo;
     private final ServiceItemRepo serviceItemRepo;
+    private final AccessGuard accessGuard;
 
-    public WorkOrderService(BookingRepo bookingRepo, WorkOrderRepo workOrderRepo, MechanicRepo mechanicRepo, ServiceItemRepo serviceItemRepo) {
+    public WorkOrderService(BookingRepo bookingRepo, WorkOrderRepo workOrderRepo, MechanicRepo mechanicRepo,
+                            ServiceItemRepo serviceItemRepo, AccessGuard accessGuard) {
         this.bookingRepo = bookingRepo;
         this.workOrderRepo = workOrderRepo;
         this.mechanicRepo = mechanicRepo;
         this.serviceItemRepo = serviceItemRepo;
-    }
-
-    public void showWorkOrders() {
-        System.out.println();
-        System.out.println("=== WORK ORDERS ===");
-
-        if (workOrderRepo.getAll().isEmpty()) {
-            System.out.println("No work orders found.");
-            return;
-        }
-
-        for (WorkOrder workOrder : workOrderRepo.getAll()) {
-            System.out.println(workOrder);
-        }
+        this.accessGuard = accessGuard;
     }
 
     public List<WorkOrder> getWorkOrders() {
+        accessGuard.require(Permission.READ, "getWorkOrders");
         List<WorkOrder> workOrders = workOrderRepo.getAll();
         if (workOrders.isEmpty()) {
             System.out.println("No work orders found.");
@@ -44,6 +36,7 @@ public class WorkOrderService {
     }
 
     public List<WorkOrder> getWorkOrdersWithItems(){
+        accessGuard.require(Permission.READ, "getWorkOrdersWithItems");
         List<WorkOrder> workOrders = workOrderRepo.getAllWithItems();
         if (workOrders.isEmpty()) {
             System.out.println("No work orders found.");
@@ -53,16 +46,19 @@ public class WorkOrderService {
     }
 
     public List<WorkOrder> getWorkOrdersWithItemsByStatus(WorkOrderStatus status){
+        accessGuard.require(Permission.READ, "getWorkOrdersWithItemsByStatus");
         return workOrderRepo.getWithStatus(status);
     }
 
     public Optional<WorkOrder> getWorkOrderWithItems(int workOrderId) {
+        accessGuard.require(Permission.READ, "getWorkOrderWithItems");
         if(workOrderId <= 0)
             return Optional.empty();
         return workOrderRepo.getWithItems(workOrderId);
     }
 
     public Optional<WorkOrder> getWorkOrder(int workOrderId){
+        accessGuard.require(Permission.READ, "getWorkOrder");
         if(workOrderId <= 0)
             return Optional.empty();
         return workOrderRepo.get(workOrderId);
@@ -88,6 +84,7 @@ public class WorkOrderService {
                                      int mechanicId,
                                      WorkOrderType type,
                                      int... serviceItemIds) {
+        accessGuard.require(Permission.MANAGE_WORK_ORDERS, "createWorkOrder");
 
         if (type == null) {
             throw new InputNotValidException("A work order must have a type.");
@@ -143,6 +140,8 @@ public class WorkOrderService {
      * @throws InputNotValidException if the work order does not contain any service items
      */
     public void confirmWorkOrder (int workOrderId) {
+        accessGuard.require(Permission.MANAGE_WORK_ORDERS, "confirmWorkOrder");
+
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (optionalWorkOrder.isEmpty()) {
@@ -180,6 +179,8 @@ public class WorkOrderService {
     public WorkOrder updateWorkOrderServices(int workOrderId,
                                              List<Integer> serviceItemIdsToAdd,
                                              List<Integer> itemIdsToRemove) {
+        accessGuard.require(Permission.MANAGE_WORK_ORDERS, "updateWorkOrderServices");
+
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (optionalWorkOrder.isEmpty()) {
@@ -227,6 +228,8 @@ public class WorkOrderService {
      * @throws StatusNotValidException if the work order status does not allow modifications to its type
      */
     public WorkOrder updateWorkOrderType(int workOrderId, WorkOrderType type) {
+        accessGuard.require(Permission.MANAGE_WORK_ORDERS, "updateWorkOrderType");
+
         if (type == null) {
             throw new InputNotValidException("A work order must have a type.");
         }
@@ -258,6 +261,8 @@ public class WorkOrderService {
      * @throws MechanicNotAvailableException if the mechanic is not available.
      */
     public WorkOrder updateWorkOrderMechanic(int workOrderId, int mechanicId){
+        accessGuard.require(Permission.MANAGE_WORK_ORDERS, "updateWorkOrderMechanic");
+
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
         if (optionalWorkOrder.isEmpty()) {
@@ -293,6 +298,8 @@ public class WorkOrderService {
      * @throws InputNotValidException if the work order does not contain any service items
      */
     public void startWorkOrder(int workOrderId) {
+        accessGuard.require(Permission.MANAGE_WORK_ORDERS, "startWorkOrder");
+
         Optional<WorkOrder> optionalWorkOrder = getWorkOrderWithItems(workOrderId);
 
         if (optionalWorkOrder.isEmpty()) {
@@ -342,6 +349,8 @@ public class WorkOrderService {
      * @throws StatusNotValidException if the current work order status does not allow transitioning to "COMPLETED"
      */
     public void completeWorkOrder(int workOrderId) {
+        accessGuard.require(Permission.MANAGE_WORK_ORDERS, "completeWorkOrder");
+
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
         if (optionalWorkOrder.isEmpty()) {
@@ -381,6 +390,8 @@ public class WorkOrderService {
      * @throws StatusNotValidException if the current status of the work order does not allow it to be cancelled
      */
     public void cancelWorkOrder(int workOrderId) {
+        accessGuard.require(Permission.MANAGE_WORK_ORDERS, "cancelWorkOrder");
+
         Optional<WorkOrder> optionalWorkOrder = getWorkOrder(workOrderId);
 
         if (optionalWorkOrder.isEmpty()) {

@@ -7,6 +7,8 @@ import com.wac.autocore.exceptions.InputNotValidException;
 import com.wac.autocore.exceptions.VehicleNotFoundException;
 import com.wac.autocore.model.Booking;
 import com.wac.autocore.model.Vehicle;
+import com.wac.autocore.security.AccessGuard;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.util.TranslationService;
 
 import java.time.LocalDate;
@@ -16,30 +18,16 @@ import java.util.Optional;
 public class BookingService {
     private final VehicleRepo vehicleRepo;
     private final BookingRepo bookingRepo;
+    private final AccessGuard accessGuard;
 
-    public BookingService(VehicleRepo vehicleRepo, BookingRepo bookingRepo) {
+    public BookingService(VehicleRepo vehicleRepo, BookingRepo bookingRepo, AccessGuard accessGuard) {
         this.vehicleRepo = vehicleRepo;
         this.bookingRepo = bookingRepo;
-    }
-
-    /**
-     * Shows alla Bookings. For testing
-     */
-    public void showBookings() {
-        System.out.println();
-        System.out.println("=== BOOKINGS ===");
-
-        if (bookingRepo.getAll().isEmpty()) {
-            System.out.println("No bookings found.");
-            return;
-        }
-
-        for (Booking booking : bookingRepo.getAll()) {
-            System.out.println(booking);
-        }
+        this.accessGuard = accessGuard;
     }
 
     public List<Booking> getBookings() {
+        accessGuard.require(Permission.READ, "getBookings");
         List<Booking> bookings = bookingRepo.getAll();
         if (bookings.isEmpty()) {
             System.out.println("No bookings found.");
@@ -49,6 +37,7 @@ public class BookingService {
     }
 
     public Optional<Booking> getBooking(int id){
+        accessGuard.require(Permission.READ, "getBooking");
         return bookingRepo.get(id);
     }
 
@@ -69,6 +58,8 @@ public class BookingService {
                                                 LocalDate date,
                                                 String description,
                                                 String descriptionLang) {
+        accessGuard.require(Permission.MANAGE_WORK_ORDERS, "createBookingWithTranslation");
+
         if(vehicleId <= 0){
             throw new InputNotValidException("Vehicle ID cannot be zero or negative.");
         }

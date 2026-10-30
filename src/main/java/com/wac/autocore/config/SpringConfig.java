@@ -60,14 +60,15 @@ public class SpringConfig {
     }
 
     @Bean
-    BookingService bookingService(VehicleRepo vehicleRepo, BookingRepo bookingRepo) {
-        return new BookingService(vehicleRepo, bookingRepo);
+    BookingService bookingService(VehicleRepo vehicleRepo, BookingRepo bookingRepo, AccessGuard accessGuard) {
+        return new BookingService(vehicleRepo, bookingRepo, accessGuard);
     }
 
     @Bean
     WorkOrderService workOrderService(BookingRepo bookingRepo, WorkOrderRepo workOrderRepo,
-                                      MechanicRepo mechanicRepo, ServiceItemRepo serviceItemRepo) {
-        return new WorkOrderService(bookingRepo, workOrderRepo, mechanicRepo, serviceItemRepo);
+                                      MechanicRepo mechanicRepo, ServiceItemRepo serviceItemRepo,
+                                      AccessGuard accessGuard) {
+        return new WorkOrderService(bookingRepo, workOrderRepo, mechanicRepo, serviceItemRepo, accessGuard);
     }
 
     @Bean
