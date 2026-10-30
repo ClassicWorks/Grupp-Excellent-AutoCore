@@ -5,6 +5,7 @@ import com.wac.autocore.controller.VehicleController;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.AppDialog;
@@ -84,12 +85,15 @@ public class ShowVehicleView {
             return;
         }
 
+        boolean canBook = ViewManager.getInstance().getAccessGuard().has(Permission.MANAGE_WORK_ORDERS);
+
         //Show details of car
         for (Vehicle vehicle : result.value()){
             Customer customer = vehicle.getCustomer();
-            VehicleCard vehicleCard = new VehicleCard(vehicle, customer,
-                    v -> ViewManager.getInstance().showCreateBooking(v.getId())
-            );
+            VehicleCard vehicleCard = canBook
+                    ? new VehicleCard(vehicle, customer,
+                    v -> ViewManager.getInstance().showCreateBooking(v.getId()))
+                    : new VehicleCard(vehicle, customer);
 
             vehicleCard.setOnMouseClicked(e-> {
                 VehicleDetails vehicleDetails = new VehicleDetails(
@@ -157,12 +161,15 @@ public class ShowVehicleView {
         BorderPane headerPane = new BorderPane();
         Label title = new Label(LanguageManager.getString("vehicles.title"));
         title.getStyleClass().setAll("page-title");
-        Button createBookingBtn = new Button(LanguageManager.getString("vehicles.create"));
-        createBookingBtn.getStyleClass().addAll("confirm-btn");
-        createBookingBtn.setOnAction(e -> ViewManager.getInstance().showCreateVehiclePopup());
-
         headerPane.setCenter(title);
-        headerPane.setRight(createBookingBtn);
+
+        boolean canManageVehicles = ViewManager.getInstance().getAccessGuard().has(Permission.MANAGE_VEHICLES);
+        if (canManageVehicles) {
+            Button createVehicleBtn = new Button(LanguageManager.getString("vehicles.create"));
+            createVehicleBtn.getStyleClass().addAll("confirm-btn");
+            createVehicleBtn.setOnAction(e -> ViewManager.getInstance().showCreateVehiclePopup());
+            headerPane.setRight(createVehicleBtn);
+        }
         return headerPane;
     }
 }
