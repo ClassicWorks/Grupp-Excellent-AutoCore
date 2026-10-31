@@ -186,24 +186,28 @@ public class ViewManager {
     }
 
     public void showCreateBooking() {
+        accessGuard.require(Permission.MANAGE_WORK_ORDERS, "ViewManager.showCreateBooking");
         Stage popup = new Stage();
         Parent content = new CreateBookingForm(popup, garageSystem).show();
         showPopup(popup, LanguageManager.getString("bookings.create"), content, this::refreshCurrentView);
     }
 
     public void showCreateBooking(int vehicleId) {
+        accessGuard.require(Permission.MANAGE_WORK_ORDERS, "ViewManager.showCreateBooking(vehicleId)");
         Stage popup = new Stage();
         Parent content = new CreateBookingForm(popup, garageSystem).show(vehicleId);
         showPopup(popup, LanguageManager.getString("bookings.create"), content, this::refreshCurrentView);
     }
 
     public void showCreateBooking(int vehicleId, List<Integer> preselectedServiceIds) {
+        accessGuard.require(Permission.MANAGE_WORK_ORDERS, "ViewManager.showCreateBooking(vehicleId, serviceIds)");
         Stage popup = new Stage();
         Parent content = new CreateBookingForm(popup, garageSystem).show(vehicleId, preselectedServiceIds);
         showPopup(popup, LanguageManager.getString("bookings.create"), content, this::refreshCurrentView);
     }
 
     public void showEditWorkOrderItemsPopUp(int workOrderId, Runnable onClose) {
+        accessGuard.require(Permission.MANAGE_WORK_ORDERS, "ViewManager.showEditWorkOrderItemsPopUp");
         Stage popup = new Stage();
         Parent content = new EditWorkOrderItemsForm(popup, workOrderId, garageSystem).show();
 
