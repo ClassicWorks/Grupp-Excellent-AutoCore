@@ -5,6 +5,7 @@ import com.wac.autocore.controller.Result;
 import com.wac.autocore.controller.WorkOrderController;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
@@ -29,17 +30,21 @@ public class WorkOrderDetails extends BorderPane {
     private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
     private final WorkOrder workOrder;
     private final Runnable onChanged;
+    private final boolean canManage;
 
     private final WorkOrderController workOrderController =
             ViewManager.getInstance().getControllers().workOrders();
 
     public WorkOrderDetails(WorkOrder workOrder, Runnable onChanged) {
+        this.canManage = ViewManager.getInstance().getAccessGuard().has(Permission.MANAGE_WORK_ORDERS);
         this.workOrder = workOrder;
         this.onChanged = onChanged;
 
         this.setTop(createHeader());
         this.setCenter(createInfoSection());
-        this.setBottom(createActionButtons());
+        if (canManage) {
+            this.setBottom(createActionButtons());
+        }
     }
 
     private HBox createHeader() {
@@ -101,7 +106,7 @@ public class WorkOrderDetails extends BorderPane {
     }
 
     private Node createTypeNode() {
-        if (!workOrder.getStatus().canEdit()) {
+        if (!canManage || !workOrder.getStatus().canEdit()) {
             return new Label(ValueLabels.workOrderType(workOrder.getType()));
         }
 
@@ -124,7 +129,7 @@ public class WorkOrderDetails extends BorderPane {
 
     //SKa den verkligen sparas så fort man ändrar?
     private Node createMechanicNode(){
-        if (!workOrder.getStatus().canEdit()) {
+        if (!canManage || !workOrder.getStatus().canEdit()) {
             return new MechanicHyperLink(workOrder.getMechanic());
         }
 
