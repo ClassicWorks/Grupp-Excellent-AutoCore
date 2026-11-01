@@ -53,7 +53,7 @@ public class ServiceItemSelection extends VBox{
         chosenServicesRows = new VBox();
         chosenServicesRows.getStyleClass().add("row-container");
 
-        VBox currentServicesContainer = new VBox( chosenServicesRows);
+        VBox currentServicesContainer = new VBox(chosenServicesRows);
         VBox addServiceSection = createAddServiceSection();
 
         //Get and set Service items

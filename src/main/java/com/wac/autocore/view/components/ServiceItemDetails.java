@@ -4,6 +4,7 @@ import com.wac.autocore.controller.CatalogController;
 import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.ServiceItem;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
 import com.wac.autocore.view.UiResultHandler;
@@ -18,6 +19,7 @@ import javafx.scene.layout.VBox;
 public class ServiceItemDetails extends BorderPane {
 
     private final ServiceItem serviceItem;
+    private final boolean canEdit;
 
     private final TextField priceField = new TextField();
     private final Label errorLabel = new Label();
@@ -26,6 +28,7 @@ public class ServiceItemDetails extends BorderPane {
     private final Runnable onSaved;
 
     public ServiceItemDetails(ServiceItem serviceItem, Runnable onSaved) {
+        canEdit = ViewManager.getInstance().getAccessGuard().has(Permission.MANAGE_CATALOG);
         this.serviceItem = serviceItem;
         this.onSaved = onSaved;
 
@@ -34,11 +37,6 @@ public class ServiceItemDetails extends BorderPane {
                 ValueLabels.serviceName(serviceItem.getName()))
         );
         nameLabel.getStyleClass().add("details-title");
-
-        Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
-        explanation.setWrapText(true);
-        explanation.setMaxWidth(Double.MAX_VALUE);
-        explanation.getStyleClass().add("form-explanation");
 
         Label descriptionLabel = new Label(ValueLabels.serviceDescription(serviceItem.getName(), serviceItem.getDescription()));
         descriptionLabel.setWrapText(true);
@@ -50,13 +48,16 @@ public class ServiceItemDetails extends BorderPane {
                 LanguageManager.getString("service.estimatedTime"), timeLabel, false);
 
         priceField.setText(String.valueOf(serviceItem.getPrice()));
-        VBox priceBox = new FormFieldContainer(LanguageManager.getString("service.price"), priceField, true);
-
+        Label priceLabel = new Label(String.valueOf(serviceItem.getPrice()));
+        VBox priceBox = new FormFieldContainer(
+                LanguageManager.getString("service.price"),
+                canEdit ? priceField : priceLabel,
+                canEdit);
 
         errorLabel.getStyleClass().add("error-label");
 
         VBox fields = new VBox(
-                explanation,
+                //explanation,
                 descriptionBox,
                 timeBox,
                 priceBox,
@@ -64,14 +65,23 @@ public class ServiceItemDetails extends BorderPane {
         );
         fields.getStyleClass().add("details-container");
 
+        if (canEdit) {
+            Label explanation = new Label(LanguageManager.getString("general.form.explanation"));
+            explanation.setWrapText(true);
+            explanation.getStyleClass().add("form-explanation");
+            fields.getChildren().addFirst(explanation);
+        }
 
-        HBox actionableButtons = new HBox(createSaveBtn());
-        actionableButtons.getStyleClass().add("btn-container");
+        //Buttons
+        if(canEdit) {
+            HBox actionableButtons = new HBox(createSaveBtn());
+            actionableButtons.getStyleClass().add("btn-container");
+            this.setBottom(actionableButtons);
+        }
 
 
         this.setTop(nameLabel);
         this.setCenter(fields);
-        this.setBottom(actionableButtons);
     }
 
     private Button createSaveBtn() {

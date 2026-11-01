@@ -5,6 +5,8 @@ import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.ServicePack;
+import com.wac.autocore.security.AccessGuard;
+import com.wac.autocore.security.Permission;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.StylingUtil;
 import com.wac.autocore.view.components.*;
@@ -22,15 +24,18 @@ import java.util.List;
 public class ShowServiceItemsView {
     private final CatalogController catalogController;
     private final UiResultHandler uiResultHandler;
-
-    public ShowServiceItemsView() {
-        catalogController = ViewManager.getInstance().getControllers().catalog();
-        uiResultHandler = new UiResultHandler();
-    }
+    private boolean canEdit;
 
     private VBox serviceItemsBox;
     private VBox servicePackBox;
     private VBox detailPanel;
+
+    public ShowServiceItemsView() {
+        catalogController = ViewManager.getInstance().getControllers().catalog();
+        uiResultHandler = new UiResultHandler();
+        AccessGuard accessGuard = ViewManager.getInstance().getAccessGuard();
+        canEdit = accessGuard.has(Permission.MANAGE_CATALOG);
+    }
 
     public Parent show() {
         BorderPane layout = new BorderPane();
@@ -103,22 +108,25 @@ public class ShowServiceItemsView {
         }
     }
 
-    private static BorderPane getServicePackColumnHeader() {
+    private BorderPane getServicePackColumnHeader() {
         Label servicePackColumnTitle = new Label(
                 LanguageManager.getString("servicePack.column.title")
         );
         servicePackColumnTitle.getStyleClass().add("column-title");
 
-        Button createServicePackBtn = new Button(
-                LanguageManager.getString("servicePack.create.button")
-        );
-        createServicePackBtn.getStyleClass().add("confirm-btn");
-        createServicePackBtn.setOnAction(e -> ViewManager.getInstance().showCreateServicePackPopup());
-
         BorderPane servicePackColumnHeader = new BorderPane();
         servicePackColumnHeader.getStyleClass().add("column-header");
         servicePackColumnHeader.setCenter(servicePackColumnTitle);
-        servicePackColumnHeader.setRight(createServicePackBtn);
+
+        if(canEdit) {
+            Button createServicePackBtn = new Button(
+                    LanguageManager.getString("servicePack.create.button")
+            );
+            createServicePackBtn.getStyleClass().add("confirm-btn");
+            createServicePackBtn.setOnAction(e -> ViewManager.getInstance().showCreateServicePackPopup());
+            servicePackColumnHeader.setRight(createServicePackBtn);
+        }
+
         return servicePackColumnHeader;
     }
 
@@ -188,27 +196,27 @@ public class ShowServiceItemsView {
     }
 
     private void saveServicePack(ServicePack servicePack) {
-            Result<ServicePack> savedServicePackResult =
-                    uiResultHandler.handle(
-                            catalogController.updateServicePack(
-                                servicePack.getId(),
-                                servicePack
-                    ));
+        Result<ServicePack> savedServicePackResult =
+                uiResultHandler.handle(
+                        catalogController.updateServicePack(
+                            servicePack.getId(),
+                            servicePack
+                ));
 
-            if(savedServicePackResult.isSuccess()) {
-                ServicePack savedServicePack = savedServicePackResult.value();
-                AppDialog.showInformation(
-                        LanguageManager.getString("servicePack.save.success.title"),
-                        LanguageManager.getString("servicePack.save.success.message"),
-                        String.format(
-                                LanguageManager.getString("servicePack.save.success.details"),
-                                savedServicePack.getName(),
-                                savedServicePack.getServiceItems().size()
-                        )
-                );
+        if(savedServicePackResult.isSuccess()) {
+            ServicePack savedServicePack = savedServicePackResult.value();
+            AppDialog.showInformation(
+                    LanguageManager.getString("servicePack.save.success.title"),
+                    LanguageManager.getString("servicePack.save.success.message"),
+                    String.format(
+                            LanguageManager.getString("servicePack.save.success.details"),
+                            savedServicePack.getName(),
+                            savedServicePack.getServiceItems().size()
+                    )
+            );
 
-                fillServicePacks();
-            }
+            fillServicePacks();
+        }
     }
 
     private Node getHeader() {
