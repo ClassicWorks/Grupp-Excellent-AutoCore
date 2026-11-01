@@ -265,11 +265,11 @@ public class ViewManager {
                 null);
     }
     public void showCreateServicePackPopup(){
+        accessGuard.require(Permission.MANAGE_CATALOG, "ViewManager.showCreateServicePackPopup");
         Stage popup = new Stage();
         Parent content = new CreateServicePackForm(popup).show();
 
         showPopup(popup, LanguageManager.getString("servicePack.form.title"), content, this::showServices);
-
     }
 
     public void exit() {
