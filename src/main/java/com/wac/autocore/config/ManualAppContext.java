@@ -46,7 +46,8 @@ public class ManualAppContext implements AppContext {
                 new CatalogController(serviceItemService, errorHandler),
                 new LoginController(authenticator),
                 new MechanicController(mechanicService, errorHandler),
-                new VehicleController(vehicleService, errorHandler)
+                new VehicleController(vehicleService, errorHandler),
+                new BookingController(bookingService, errorHandler)
         );
 
         // GarageSystem (Kvar tills vyer använder controllers)
