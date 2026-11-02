@@ -4,7 +4,6 @@ import com.wac.autocore.controller.MechanicController;
 import com.wac.autocore.controller.Result;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Mechanic;
-import com.wac.autocore.security.Permission;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.components.AppDialog;
 import com.wac.autocore.view.components.MechanicCard;
@@ -12,7 +11,6 @@ import com.wac.autocore.view.components.MechanicDetails;
 import com.wac.autocore.view.components.kanban.KanbanGrid;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
@@ -141,7 +139,7 @@ public class ShowMechanicsView {
         title.getStyleClass().setAll("page-title");
         headerPane.setCenter(title);
 
-        boolean canManageMechanics = ViewManager.getInstance().getAccessGuard().has(Permission.MANAGE_MECHANICS);
+        /*boolean canManageMechanics = ViewManager.getInstance().getAccessGuard().has(Permission.MANAGE_MECHANICS);
         if (canManageMechanics) {
             Button createMechanicBtn = new Button(LanguageManager.getString("mechanics.create"));
             createMechanicBtn.getStyleClass().addAll("confirm-btn");
@@ -150,7 +148,7 @@ public class ShowMechanicsView {
                     System.out.println("Should call ViewManager.getInstance().showCreateMechanicPopup()"));
 
             headerPane.setRight(createMechanicBtn);
-        }
+        }*/
         return headerPane;
     }
 }
