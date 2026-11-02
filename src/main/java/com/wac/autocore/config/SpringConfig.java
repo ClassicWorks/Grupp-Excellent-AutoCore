@@ -162,6 +162,11 @@ public class SpringConfig {
     }
 
     @Bean
+    BookingController bookingController(BookingService bookingService, ErrorHandler errorHandler) {
+        return new BookingController(bookingService, errorHandler);
+    }
+
+    @Bean
     AppControllers appControllers(WorkOrderController workOrderController,
                                   InvoiceController invoiceController,
                                   PaymentController paymentController,
@@ -169,9 +174,10 @@ public class SpringConfig {
                                   CatalogController catalogController,
                                   LoginController loginController,
                                   MechanicController mechanicController,
-                                  VehicleController vehicleController) {
+                                  VehicleController vehicleController,
+                                  BookingController bookingController) {
         return new AppControllers(workOrderController, invoiceController, paymentController,
                 customerController, catalogController, loginController,
-                mechanicController, vehicleController);
+                mechanicController, vehicleController, bookingController);
     }
 }

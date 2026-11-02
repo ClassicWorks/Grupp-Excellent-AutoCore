@@ -20,6 +20,11 @@ public class WorkOrderController {
         return errorHandler.call(() -> workOrderService.getWorkOrdersWithItemsByStatus(status));
     }
 
+    public Result<WorkOrder> create(int bookingId, Integer mechanicId, WorkOrderType workOrderType, int... serviceItemIds) {
+        return errorHandler.call(() ->
+                workOrderService.createWorkOrder(bookingId, mechanicId, workOrderType, serviceItemIds));
+    }
+
     public Result<Void> confirm(int workOrderId) {
         return errorHandler.run(() -> workOrderService.confirmWorkOrder(workOrderId));
     }
