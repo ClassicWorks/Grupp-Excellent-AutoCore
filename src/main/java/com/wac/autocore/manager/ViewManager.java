@@ -4,7 +4,6 @@ import com.wac.autocore.controller.AppControllers;
 import com.wac.autocore.security.AccessGuard;
 import com.wac.autocore.security.CurrentUserProvider;
 import com.wac.autocore.security.Permission;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.*;
 import com.wac.autocore.view.components.*;
@@ -26,7 +25,6 @@ public class ViewManager {
     private SideNav sideNav;
     private String currentNav;
     private Runnable currentViewRefresher;
-    private GarageSystem garageSystem;
 
     private CurrentUserProvider currentUserProvider;
     private AccessGuard accessGuard;
@@ -54,14 +52,6 @@ public class ViewManager {
         stage.setTitle("Wigell AutoCore");
         stage.setScene(scene);
         stage.show();
-    }
-
-    public GarageSystem getGarageSystem() {
-        return garageSystem;
-    }
-
-    public void setGarageSystem(GarageSystem garageSystem) {
-        this.garageSystem = garageSystem;
     }
 
     public AppControllers getControllers() {

@@ -7,7 +7,6 @@ import com.wac.autocore.service.*;
 
 public class ManualAppContext implements AppContext {
 
-    private final GarageSystem garageSystem;
     private final Authenticator authenticator;
     private final AppControllers controllers;
     private final AccessGuard accessGuard;
@@ -49,15 +48,6 @@ public class ManualAppContext implements AppContext {
                 new VehicleController(vehicleService, errorHandler),
                 new BookingController(bookingService, errorHandler)
         );
-
-        // GarageSystem (Kvar tills vyer använder controllers)
-        garageSystem = new GarageSystem(customerService, vehicleService, bookingService, workOrderService,
-                mechanicService, serviceItemService, invoiceService, paymentService);
-    }
-
-    @Override
-    public GarageSystem garageSystem() {
-        return garageSystem;
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.wac.autocore.controller.AppControllers;
 import com.wac.autocore.security.AccessGuard;
 import com.wac.autocore.security.Authenticator;
 import com.wac.autocore.security.CurrentUserProvider;
-import com.wac.autocore.service.GarageSystem;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -20,11 +19,6 @@ public class SpringAppContext implements AppContext {
                 .web(WebApplicationType.NONE)
                 .headless(false)
                 .run();
-    }
-
-    @Override
-    public GarageSystem garageSystem() {
-        return context.getBean(GarageSystem.class);
     }
 
     @Override

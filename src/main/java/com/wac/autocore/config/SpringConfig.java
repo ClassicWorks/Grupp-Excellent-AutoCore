@@ -101,15 +101,6 @@ public class SpringConfig {
     }
 
     @Bean
-    GarageSystem garageSystem(CustomerService customerService, VehicleService vehicleService,
-                              BookingService bookingService, WorkOrderService workOrderService,
-                              MechanicService mechanicService, ServiceItemService serviceItemService,
-                              InvoiceService invoiceService, PaymentService paymentService) {
-        return new GarageSystem(customerService, vehicleService, bookingService, workOrderService,
-                mechanicService, serviceItemService, invoiceService, paymentService);
-    }
-
-    @Bean
     AccessGuard accessGuard(CurrentUserProvider currentUserProvider) {
         return new AccessGuard(currentUserProvider);
     }
