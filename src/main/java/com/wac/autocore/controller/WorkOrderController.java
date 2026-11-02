@@ -1,8 +1,11 @@
 package com.wac.autocore.controller;
 
 import com.wac.autocore.model.WorkOrder;
+import com.wac.autocore.model.WorkOrderStatus;
 import com.wac.autocore.model.WorkOrderType;
 import com.wac.autocore.service.WorkOrderService;
+
+import java.util.List;
 
 public class WorkOrderController {
     private final WorkOrderService workOrderService;
@@ -11,6 +14,10 @@ public class WorkOrderController {
     public WorkOrderController(WorkOrderService workOrderService, ErrorHandler errorHandler) {
         this.workOrderService = workOrderService;
         this.errorHandler = errorHandler;
+    }
+
+    public Result<List<WorkOrder>> getWorkOrdersWithItemsByStatus(WorkOrderStatus status) {
+        return errorHandler.call(() -> workOrderService.getWorkOrdersWithItemsByStatus(status));
     }
 
     public Result<Void> confirm(int workOrderId) {
