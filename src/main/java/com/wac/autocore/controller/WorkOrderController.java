@@ -57,4 +57,9 @@ public class WorkOrderController {
     public Result<WorkOrder> updateMechanic(int workOrderId, int mechanicId) {
         return errorHandler.call(() -> workOrderService.updateWorkOrderMechanic(workOrderId, mechanicId));
     }
+
+    public Result<WorkOrder> updateItems(int workOrderId, List<Integer> serviceItemIdsToAdd, List<Integer> itemIdsToRemove) {
+        return errorHandler.call(() ->
+                workOrderService.updateWorkOrderServices(workOrderId, serviceItemIdsToAdd, itemIdsToRemove));
+    }
 }

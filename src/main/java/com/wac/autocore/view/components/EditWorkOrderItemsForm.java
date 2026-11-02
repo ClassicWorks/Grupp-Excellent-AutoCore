@@ -1,14 +1,17 @@
 package com.wac.autocore.view.components;
 
-import com.wac.autocore.exceptions.AutoCoreException;
+import com.wac.autocore.controller.CatalogController;
+import com.wac.autocore.controller.Result;
+import com.wac.autocore.controller.WorkOrderController;
+import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.ServiceItem;
 import com.wac.autocore.model.ServicePack;
 import com.wac.autocore.model.WorkOrder;
 import com.wac.autocore.model.WorkOrderItem;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
+import com.wac.autocore.view.UiResultHandler;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -29,8 +32,10 @@ import java.util.stream.Collectors;
 
 
 public class EditWorkOrderItemsForm {
-
-    private final GarageSystem garageSystem;
+    private final WorkOrderController workOrderController;
+    private final CatalogController catalogController;
+    private final UiResultHandler uiResultHandler = new UiResultHandler();
+    private List<ServiceItem> allServiceItems;
     private final Stage popupStage;
     private final int workOrderId;
 
@@ -42,17 +47,39 @@ public class EditWorkOrderItemsForm {
     private final List<Integer> removedItemIds = new ArrayList<>();
     private List<ServicePack> servicePacks = new ArrayList<>();
 
-    public EditWorkOrderItemsForm(Stage popupStage, int workOrderId, GarageSystem garageSystem) {
+    public EditWorkOrderItemsForm(Stage popupStage, int workOrderId) {
         this.popupStage = popupStage;
         this.workOrderId = workOrderId;
-        this.garageSystem = garageSystem;
+        workOrderController = ViewManager.getInstance().getControllers().workOrders();
+        catalogController = ViewManager.getInstance().getControllers().catalog();
         errorLabel.getStyleClass().add("error-label");
     }
 
     public Parent show() {
         content.getStyleClass().add("form-container");
-        workOrder = garageSystem.getWorkOrderWithItems(workOrderId).orElse(null);
-        servicePacks = garageSystem.getServicePacks();
+
+        //If workOrder or serviceItems can not be loaded then no updates can be made
+        Result<Optional<WorkOrder>> workOrderOptionalResult =
+                uiResultHandler.handle(workOrderController.getWorkOrderWithItems(workOrderId));
+        Result<List<ServiceItem>> allServiceItemsResult =
+                uiResultHandler.handle(catalogController.getServiceItems());
+        if(!workOrderOptionalResult.isSuccess() || !allServiceItemsResult.isSuccess()){
+            content.getChildren().addAll(
+                    new Label(LanguageManager.getString("workorder.edit.errorLoading")),
+                    createCloseBtn());
+            return content;
+        }
+        workOrder = workOrderOptionalResult.value().orElse(null);
+        allServiceItems = allServiceItemsResult.value();
+
+        //If servicePacks cannot be loaded updates can still be made (still shows error message)
+        Result<List<ServicePack>> servicePacksResult =
+                uiResultHandler.handle(catalogController.getServicePacks());
+        if(servicePacksResult.isSuccess()) {
+            servicePacks = servicePacksResult.value();
+        }else {
+            servicePacks = new ArrayList<>();
+        }
         refresh();
 
         ScrollPane scrollPane = new ScrollPane(content);
@@ -165,7 +192,7 @@ public class EditWorkOrderItemsForm {
     }
 
     private Node createAddServiceSection(List<WorkOrderItem> keptItems) {
-        List<ServiceItem> availableServices = garageSystem.getServiceItems().stream()
+        List<ServiceItem> availableServices = allServiceItems.stream()
                 .filter(serviceItem -> keptItems.stream()
                         .noneMatch(item -> item.getServiceItem().getId() == serviceItem.getId()))
                 .filter(serviceItem -> addedServices.stream()
@@ -238,15 +265,23 @@ public class EditWorkOrderItemsForm {
         Button saveBtn = new Button(LanguageManager.getString("workorder.edit.save"));
         saveBtn.getStyleClass().add("confirm-btn");
         saveBtn.setDisable(addedServices.isEmpty() && removedItemIds.isEmpty());
+
         saveBtn.setOnAction(e -> {
             List<Integer> serviceItemIdsToAdd = addedServices.stream()
                     .map(ServiceItem::getId)
                     .collect(Collectors.toList());
-            try {
-                garageSystem.updateWorkOrderServices(workOrderId, serviceItemIdsToAdd, removedItemIds);
+            Result<WorkOrder> updatedWorkOrderResult = uiResultHandler.handle(
+                    workOrderController.updateItems(workOrderId, serviceItemIdsToAdd, removedItemIds));
+            if(updatedWorkOrderResult.isSuccess()) {
+                AppDialog.showInformation(
+                        LanguageManager.getString("workorder.edit.success.title"),
+                        LanguageManager.getString("workorder.edit.success.heading"),
+                        LanguageManager.getString("workorder.edit.success.message")
+                );
+
                 popupStage.close();
-            } catch (AutoCoreException ex) {
-                errorLabel.setText(ex.getMessage());
+            }else {
+                errorLabel.setText(LanguageManager.getString("workorder.edit.failed"));
             }
         });
 

@@ -209,7 +209,7 @@ public class ViewManager {
     public void showEditWorkOrderItemsPopUp(int workOrderId, Runnable onClose) {
         accessGuard.require(Permission.MANAGE_WORK_ORDERS, "ViewManager.showEditWorkOrderItemsPopUp");
         Stage popup = new Stage();
-        Parent content = new EditWorkOrderItemsForm(popup, workOrderId, garageSystem).show();
+        Parent content = new EditWorkOrderItemsForm(popup, workOrderId).show();
 
         showPopup(popup,
                 String.format(LanguageManager.getString("workorder.edit.title"), workOrderId),
