@@ -1,15 +1,17 @@
 package com.wac.autocore.view.components;
 
 import java.util.function.Supplier;
+
+import com.wac.autocore.controller.MechanicController;
 import com.wac.autocore.controller.Result;
 import com.wac.autocore.controller.WorkOrderController;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.*;
 import com.wac.autocore.security.Permission;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.ComboBoxLabels;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
+import com.wac.autocore.view.UiResultHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -26,14 +28,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class WorkOrderDetails extends BorderPane {
-
-    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
     private final WorkOrder workOrder;
     private final Runnable onChanged;
     private final boolean canManage;
 
+    private final UiResultHandler uiResultHandler = new UiResultHandler();
     private final WorkOrderController workOrderController =
             ViewManager.getInstance().getControllers().workOrders();
+    private final MechanicController mechanicController =
+            ViewManager.getInstance().getControllers().mechanics();
 
     public WorkOrderDetails(WorkOrder workOrder, Runnable onChanged) {
         this.canManage = ViewManager.getInstance().getAccessGuard().has(Permission.MANAGE_WORK_ORDERS);
@@ -133,8 +136,15 @@ public class WorkOrderDetails extends BorderPane {
             return new MechanicHyperLink(workOrder.getMechanic());
         }
 
+        Result<List<Mechanic>> mechanicsResult = uiResultHandler.handle(mechanicController.getMechanics());
+        if (!mechanicsResult.isSuccess()) {
+            ComboBox<?> errorComboBox = new ComboBox<>();
+            errorComboBox.setPromptText(LanguageManager.getString("workorder.details.errorLoading.mechanics"));
+            errorComboBox.setDisable(true);
+            return errorComboBox;
+        }
         ComboBox<Mechanic> mechanicComboBox = new ComboBox<>();
-        mechanicComboBox.getItems().setAll(garageSystem.getMechanics());
+        mechanicComboBox.getItems().setAll(mechanicsResult.value());
         mechanicComboBox.setConverter(ComboBoxLabels.mechanic());
         mechanicComboBox.setPromptText(LanguageManager.getString("workorder.details.mechanic.prompt"));
         mechanicComboBox.setValue(workOrder.getMechanic());

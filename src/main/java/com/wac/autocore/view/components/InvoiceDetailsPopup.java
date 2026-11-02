@@ -9,6 +9,7 @@ import com.wac.autocore.model.WorkOrder;
 import com.wac.autocore.model.WorkOrderItem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
+import com.wac.autocore.view.UiResultHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -25,6 +26,7 @@ public class InvoiceDetailsPopup {
 
     private final InvoiceController invoiceController = ViewManager.getInstance().getControllers().invoices();
     private final WorkOrderController workOrderController = ViewManager.getInstance().getControllers().workOrders();
+    private final UiResultHandler uiResultHandler = new UiResultHandler();
     private final Stage popupStage;
     private final int invoiceId;
 
@@ -55,7 +57,7 @@ public class InvoiceDetailsPopup {
         Invoice invoice = optionalInvoice.get();
 
         Result<Optional<WorkOrder>> optionalWorkOrderResult =
-                workOrderController.getWorkOrderWithItems(invoice.getWorkOrder().getId());
+                uiResultHandler.handle(workOrderController.getWorkOrderWithItems(invoice.getWorkOrder().getId()));
         if (!optionalWorkOrderResult.isSuccess() || optionalWorkOrderResult.value().isEmpty()) {
             content.getChildren().addAll(
                     new Label(LanguageManager.getString("invoice.details.error.workOrderNotFound")),
