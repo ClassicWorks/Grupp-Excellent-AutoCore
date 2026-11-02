@@ -2,11 +2,11 @@ package com.wac.autocore.view.components;
 
 import com.wac.autocore.controller.InvoiceController;
 import com.wac.autocore.controller.Result;
+import com.wac.autocore.controller.WorkOrderController;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Invoice;
 import com.wac.autocore.model.WorkOrder;
 import com.wac.autocore.model.WorkOrderItem;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
 import javafx.geometry.Insets;
@@ -24,7 +24,7 @@ import java.util.Optional;
 public class InvoiceDetailsPopup {
 
     private final InvoiceController invoiceController = ViewManager.getInstance().getControllers().invoices();
-    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
+    private final WorkOrderController workOrderController = ViewManager.getInstance().getControllers().workOrders();
     private final Stage popupStage;
     private final int invoiceId;
 
@@ -54,15 +54,15 @@ public class InvoiceDetailsPopup {
         }
         Invoice invoice = optionalInvoice.get();
 
-        Optional<WorkOrder> optionalWorkOrder =
-                garageSystem.getWorkOrderWithItems(invoice.getWorkOrder().getId());
-        if (optionalWorkOrder.isEmpty()) {
+        Result<Optional<WorkOrder>> optionalWorkOrderResult =
+                workOrderController.getWorkOrderWithItems(invoice.getWorkOrder().getId());
+        if (!optionalWorkOrderResult.isSuccess() || optionalWorkOrderResult.value().isEmpty()) {
             content.getChildren().addAll(
                     new Label(LanguageManager.getString("invoice.details.error.workOrderNotFound")),
                     createCloseBtn());
             return wrapInScrollPane(content);
         }
-        WorkOrder workOrder = optionalWorkOrder.get();
+        WorkOrder workOrder = optionalWorkOrderResult.value().get();
 
         Label title = new Label(String.format(LanguageManager.getString("invoice.id"), invoice.getId()));
         title.getStyleClass().add("form-title");
