@@ -1,9 +1,10 @@
 package com.wac.autocore.view;
 
+import com.wac.autocore.controller.Result;
+import com.wac.autocore.controller.WorkOrderController;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.WorkOrder;
 import com.wac.autocore.model.WorkOrderStatus;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.util.ValueLabels;
 import com.wac.autocore.view.components.WorkOrderCard;
@@ -20,11 +21,12 @@ import java.util.List;
 
 public class ShowWorkOrdersView {
 
-    private final GarageSystem garageSystem;
+    private final WorkOrderController workOrderController;
+    private final UiResultHandler uiResultHandler = new UiResultHandler();
     private final TabPane tabPane = new TabPane();
 
     public ShowWorkOrdersView() {
-        garageSystem = ViewManager.getInstance().getGarageSystem();
+        workOrderController = ViewManager.getInstance().getControllers().workOrders();
     }
 
     public Parent show() {
@@ -43,9 +45,7 @@ public class ShowWorkOrdersView {
 
         tabPane.getTabs().clear();
         for (WorkOrderStatus status : WorkOrderStatus.values()) {
-            List<WorkOrder> workOrders = garageSystem.getWorkOrdersWithItemsByStatus(status);
-
-            tabPane.getTabs().add(createTab(status, workOrders));
+                tabPane.getTabs().add(createTab(status));
         }
 
         if (selectedIndex >= 0) {
@@ -53,24 +53,37 @@ public class ShowWorkOrdersView {
         }
     }
 
-    private Tab createTab(WorkOrderStatus status, List<WorkOrder> workOrders) {
+    private Tab createTab(WorkOrderStatus status) {
         VBox detailPanel = new VBox();
 
         VBox cardList = new VBox();
         cardList.getStyleClass().add("card-container");
 
-        if (workOrders.isEmpty()) {
-            cardList.getChildren().add(new Label(LanguageManager.getString("workorders.empty")));
-        }
+        String tabTitle;
 
-        for (WorkOrder workOrder : workOrders) {
-            cardList.getChildren().add(new WorkOrderCard(workOrder, wo ->
-            {
-                WorkOrderDetails workOrderDetails = new WorkOrderDetails(wo, this::refreshTabs);
-                detailPanel.getChildren().setAll(workOrderDetails);
-                VBox.setVgrow(workOrderDetails, Priority.ALWAYS);
+        Result<List<WorkOrder>> workOrdersResult = uiResultHandler.handle(workOrderController.getWorkOrdersWithItemsByStatus(status));
+        if(workOrdersResult.isSuccess()){
+            List<WorkOrder> workOrders = workOrdersResult.value();
+
+            if (workOrders.isEmpty()) {
+                cardList.getChildren().add(new Label(LanguageManager.getString("workorders.empty")));
             }
-            ));
+
+            for (WorkOrder workOrder : workOrders) {
+                cardList.getChildren().add(new WorkOrderCard(workOrder, wo ->
+                {
+                    WorkOrderDetails workOrderDetails = new WorkOrderDetails(wo, this::refreshTabs);
+                    detailPanel.getChildren().setAll(workOrderDetails);
+                    VBox.setVgrow(workOrderDetails, Priority.ALWAYS);
+                }
+                ));
+            }
+            tabTitle = String.format("%s (%d)",
+                    ValueLabels.workOrderStatus(status), workOrders.size());
+        } else {
+            cardList.getChildren().add(new Label(LanguageManager.getString("workorders.errorLoading")));
+            tabTitle = String.format("%s (%s)",
+                    ValueLabels.workOrderStatus(status), "Error");
         }
 
         ScrollPane cardScroll = new ScrollPane(cardList);
@@ -82,9 +95,6 @@ public class ShowWorkOrdersView {
         grid.add(detailPanel, 1, 0);
         GridPane.setVgrow(cardScroll, Priority.ALWAYS);
         GridPane.setVgrow(detailPanel, Priority.ALWAYS);
-
-        String tabTitle = String.format("%s (%d)",
-                ValueLabels.workOrderStatus(status), workOrders.size());
 
         Tab tab = new Tab(tabTitle, grid);
         tab.getStyleClass().addAll(status.name().toLowerCase().replace("_", "-"));

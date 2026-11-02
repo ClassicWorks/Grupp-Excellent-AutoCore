@@ -1,8 +1,12 @@
 package com.wac.autocore.controller;
 
 import com.wac.autocore.model.WorkOrder;
+import com.wac.autocore.model.WorkOrderStatus;
 import com.wac.autocore.model.WorkOrderType;
 import com.wac.autocore.service.WorkOrderService;
+
+import java.util.List;
+import java.util.Optional;
 
 public class WorkOrderController {
     private final WorkOrderService workOrderService;
@@ -11,6 +15,23 @@ public class WorkOrderController {
     public WorkOrderController(WorkOrderService workOrderService, ErrorHandler errorHandler) {
         this.workOrderService = workOrderService;
         this.errorHandler = errorHandler;
+    }
+
+    public Result<List<WorkOrder>> getWorkOrdersWithItemsByStatus(WorkOrderStatus status) {
+        return errorHandler.call(() -> workOrderService.getWorkOrdersWithItemsByStatus(status));
+    }
+
+    public Result<List<WorkOrder>> getWorkOrdersWithItems() {
+        return errorHandler.call(workOrderService::getWorkOrdersWithItems);
+    }
+
+    public Result<Optional<WorkOrder>> getWorkOrderWithItems(int workOrderId) {
+        return errorHandler.call(() -> workOrderService.getWorkOrderWithItems(workOrderId));
+    }
+
+    public Result<WorkOrder> create(int bookingId, Integer mechanicId, WorkOrderType workOrderType, int... serviceItemIds) {
+        return errorHandler.call(() ->
+                workOrderService.createWorkOrder(bookingId, mechanicId, workOrderType, serviceItemIds));
     }
 
     public Result<Void> confirm(int workOrderId) {
@@ -35,5 +56,10 @@ public class WorkOrderController {
 
     public Result<WorkOrder> updateMechanic(int workOrderId, int mechanicId) {
         return errorHandler.call(() -> workOrderService.updateWorkOrderMechanic(workOrderId, mechanicId));
+    }
+
+    public Result<WorkOrder> updateItems(int workOrderId, List<Integer> serviceItemIdsToAdd, List<Integer> itemIdsToRemove) {
+        return errorHandler.call(() ->
+                workOrderService.updateWorkOrderServices(workOrderId, serviceItemIdsToAdd, itemIdsToRemove));
     }
 }

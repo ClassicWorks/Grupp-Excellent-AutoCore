@@ -101,15 +101,6 @@ public class SpringConfig {
     }
 
     @Bean
-    GarageSystem garageSystem(CustomerService customerService, VehicleService vehicleService,
-                              BookingService bookingService, WorkOrderService workOrderService,
-                              MechanicService mechanicService, ServiceItemService serviceItemService,
-                              InvoiceService invoiceService, PaymentService paymentService) {
-        return new GarageSystem(customerService, vehicleService, bookingService, workOrderService,
-                mechanicService, serviceItemService, invoiceService, paymentService);
-    }
-
-    @Bean
     AccessGuard accessGuard(CurrentUserProvider currentUserProvider) {
         return new AccessGuard(currentUserProvider);
     }
@@ -162,6 +153,11 @@ public class SpringConfig {
     }
 
     @Bean
+    BookingController bookingController(BookingService bookingService, ErrorHandler errorHandler) {
+        return new BookingController(bookingService, errorHandler);
+    }
+
+    @Bean
     AppControllers appControllers(WorkOrderController workOrderController,
                                   InvoiceController invoiceController,
                                   PaymentController paymentController,
@@ -169,9 +165,10 @@ public class SpringConfig {
                                   CatalogController catalogController,
                                   LoginController loginController,
                                   MechanicController mechanicController,
-                                  VehicleController vehicleController) {
+                                  VehicleController vehicleController,
+                                  BookingController bookingController) {
         return new AppControllers(workOrderController, invoiceController, paymentController,
                 customerController, catalogController, loginController,
-                mechanicController, vehicleController);
+                mechanicController, vehicleController, bookingController);
     }
 }

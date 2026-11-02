@@ -8,5 +8,6 @@ public record AppControllers(
         CatalogController catalog,
         LoginController login,
         MechanicController mechanics,
-        VehicleController vehicles) {
+        VehicleController vehicles,
+        BookingController bookings) {
 }

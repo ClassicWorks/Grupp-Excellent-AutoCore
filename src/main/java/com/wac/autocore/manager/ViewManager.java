@@ -4,7 +4,6 @@ import com.wac.autocore.controller.AppControllers;
 import com.wac.autocore.security.AccessGuard;
 import com.wac.autocore.security.CurrentUserProvider;
 import com.wac.autocore.security.Permission;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.*;
 import com.wac.autocore.view.components.*;
@@ -26,7 +25,6 @@ public class ViewManager {
     private SideNav sideNav;
     private String currentNav;
     private Runnable currentViewRefresher;
-    private GarageSystem garageSystem;
 
     private CurrentUserProvider currentUserProvider;
     private AccessGuard accessGuard;
@@ -54,14 +52,6 @@ public class ViewManager {
         stage.setTitle("Wigell AutoCore");
         stage.setScene(scene);
         stage.show();
-    }
-
-    public GarageSystem getGarageSystem() {
-        return garageSystem;
-    }
-
-    public void setGarageSystem(GarageSystem garageSystem) {
-        this.garageSystem = garageSystem;
     }
 
     public AppControllers getControllers() {
@@ -188,28 +178,28 @@ public class ViewManager {
     public void showCreateBooking() {
         accessGuard.require(Permission.MANAGE_WORK_ORDERS, "ViewManager.showCreateBooking");
         Stage popup = new Stage();
-        Parent content = new CreateBookingForm(popup, garageSystem).show();
+        Parent content = new CreateBookingForm(popup).show();
         showPopup(popup, LanguageManager.getString("bookings.create"), content, this::refreshCurrentView);
     }
 
     public void showCreateBooking(int vehicleId) {
         accessGuard.require(Permission.MANAGE_WORK_ORDERS, "ViewManager.showCreateBooking(vehicleId)");
         Stage popup = new Stage();
-        Parent content = new CreateBookingForm(popup, garageSystem).show(vehicleId);
+        Parent content = new CreateBookingForm(popup).show(vehicleId);
         showPopup(popup, LanguageManager.getString("bookings.create"), content, this::refreshCurrentView);
     }
 
     public void showCreateBooking(int vehicleId, List<Integer> preselectedServiceIds) {
         accessGuard.require(Permission.MANAGE_WORK_ORDERS, "ViewManager.showCreateBooking(vehicleId, serviceIds)");
         Stage popup = new Stage();
-        Parent content = new CreateBookingForm(popup, garageSystem).show(vehicleId, preselectedServiceIds);
+        Parent content = new CreateBookingForm(popup).show(vehicleId, preselectedServiceIds);
         showPopup(popup, LanguageManager.getString("bookings.create"), content, this::refreshCurrentView);
     }
 
     public void showEditWorkOrderItemsPopUp(int workOrderId, Runnable onClose) {
         accessGuard.require(Permission.MANAGE_WORK_ORDERS, "ViewManager.showEditWorkOrderItemsPopUp");
         Stage popup = new Stage();
-        Parent content = new EditWorkOrderItemsForm(popup, workOrderId, garageSystem).show();
+        Parent content = new EditWorkOrderItemsForm(popup, workOrderId).show();
 
         showPopup(popup,
                 String.format(LanguageManager.getString("workorder.edit.title"), workOrderId),
@@ -220,14 +210,14 @@ public class ViewManager {
     public void showCreateVehiclePopup() {
         accessGuard.require(Permission.MANAGE_VEHICLES, "ViewManager.showCreateVehiclePopup");
         Stage popup = new Stage();
-        Parent content = new CreateVehicleForm(garageSystem, popup).show();
+        Parent content = new CreateVehicleForm(popup).show();
         showPopup(popup, LanguageManager.getString("vehicle.form.title"), content, this::showVehicles);
     }
 
     public void showCreateVehiclePopup(int customerId) {
         accessGuard.require(Permission.MANAGE_VEHICLES, "ViewManager.showCreateVehiclePopup(customerId)");
         Stage popup = new Stage();
-        Parent content = new CreateVehicleForm(garageSystem, popup).show(customerId);
+        Parent content = new CreateVehicleForm(popup).show(customerId);
         showPopup(popup, LanguageManager.getString("vehicle.form.title"), content, null);
     }
 

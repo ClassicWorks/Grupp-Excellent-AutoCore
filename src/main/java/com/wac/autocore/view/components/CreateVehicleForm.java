@@ -1,11 +1,11 @@
 package com.wac.autocore.view.components;
 
+import com.wac.autocore.controller.CustomerController;
 import com.wac.autocore.controller.Result;
 import com.wac.autocore.controller.VehicleController;
 import com.wac.autocore.manager.ViewManager;
 import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.UiResultHandler;
 import javafx.beans.property.ObjectProperty;
@@ -24,13 +24,12 @@ import java.util.Optional;
 
 public class CreateVehicleForm {
 
-    private final GarageSystem garageSystem;
     private final Stage popupStage;
     private final VehicleController vehicleController = ViewManager.getInstance().getControllers().vehicles();
+    private final CustomerController customerController = ViewManager.getInstance().getControllers().customers();
     private final UiResultHandler uiResultHandler = new UiResultHandler();
 
-    public CreateVehicleForm(GarageSystem garageSystem, Stage popUpStage) {
-        this.garageSystem = garageSystem;
+    public CreateVehicleForm(Stage popUpStage) {
         this.popupStage = popUpStage;
     }
 
@@ -39,8 +38,14 @@ public class CreateVehicleForm {
     }
 
     public Parent show(int customerId) {
-        Optional<Customer> optionalCustomer = garageSystem.getCustomer(customerId);
-        if(!optionalCustomer.isPresent()){
+        Result<Optional<Customer>> optionalCustomerResult = customerController.getCustomer(customerId);
+        if(!optionalCustomerResult.isSuccess()){
+            uiResultHandler.handle(optionalCustomerResult);
+            popupStage.close();
+            return null;
+        }
+        Optional<Customer> optionalCustomer = optionalCustomerResult.value();
+        if(optionalCustomer.isEmpty()){
             AppDialog.showError(
                     LanguageManager.getString("vehicle.form.customerNotFound.title"),
                     LanguageManager.getString("vehicle.form.customerNotFound.message"),

@@ -7,7 +7,6 @@ import com.wac.autocore.model.Customer;
 import com.wac.autocore.model.Vehicle;
 import com.wac.autocore.security.AccessGuard;
 import com.wac.autocore.security.Permission;
-import com.wac.autocore.service.GarageSystem;
 import com.wac.autocore.util.LanguageManager;
 import com.wac.autocore.view.UiResultHandler;
 import javafx.geometry.Pos;
@@ -22,7 +21,6 @@ import javafx.scene.layout.VBox;
 import java.util.function.Consumer;
 
 public class VehicleDetails extends BorderPane {
-    private final GarageSystem garageSystem = ViewManager.getInstance().getGarageSystem();
     private final VehicleController vehicleController = ViewManager.getInstance().getControllers().vehicles();
     private final UiResultHandler uiResultHandler = new UiResultHandler();
     private final Runnable onSaved;
